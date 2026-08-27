@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input } from "@/components/ui/Form";
 import Modal from "@/components/ui/Modal";
@@ -23,7 +24,12 @@ export default function AcademicYearForm({
   onSaved,
   initialData,
 }: AcademicYearFormProps) {
-  const [name, setName] = useState("");
+  const [startYear, setStartYear] = useState<string>(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    return String(month >= 6 ? year : year - 1);
+  });
   const [isActive, setIsActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -31,10 +37,17 @@ export default function AcademicYearForm({
 
   const isEdit = Boolean(initialData);
 
+  // Tahun selesai selalu = tahun mulai + 1
+  const startNum = parseInt(startYear, 10);
+  const endYear = isNaN(startNum) ? "" : String(startNum + 1);
+
   useEffect(() => {
-    if (open) {
-      setName(initialData?.name ?? "");
-      setIsActive(initialData?.is_active ?? false);
+    if (open && initialData) {
+      const parts = initialData.name.split("/");
+      if (parts.length === 2 && parts[0]) {
+        setStartYear(parts[0]);
+      }
+      setIsActive(initialData.is_active ?? false);
       setError(null);
       setFieldErrors({});
     }
@@ -46,16 +59,26 @@ export default function AcademicYearForm({
     setError(null);
     setFieldErrors({});
 
+    if (!/^\d{4}$/.test(startYear)) {
+      setError({
+        message: "Tahun mulai harus 4 digit angka, contoh: 2031",
+      });
+      setSubmitting(false);
+      return;
+    }
+
     const payload: CreateAcademicYearPayload = {
-      name: name.trim(),
+      name: `${startYear}/${endYear}`,
       is_active: isActive,
     };
 
     try {
       if (initialData) {
         await academicYearService.update(initialData.id, payload);
+        toast.success("Tahun ajaran berhasil diperbarui.");
       } else {
         await academicYearService.create(payload);
+        toast.success("Tahun ajaran berhasil ditambahkan.");
       }
       onSaved();
     } catch (err) {
@@ -64,6 +87,26 @@ export default function AcademicYearForm({
       if (apiError.errors) {
         setFieldErrors(apiError.errors);
       }
+
+      const msg = (apiError.message ?? "").toLowerCase();
+      const isDuplicate =
+        msg.includes("sudah") ||
+        msg.includes("exists") ||
+        msg.includes("duplicate") ||
+        msg.includes("unique") ||
+        msg.includes("terdaftar") ||
+        msg.includes("digunakan");
+
+      toast.error(
+        isDuplicate
+          ? `Tahun ajaran ${startYear}/${endYear} sudah ada`
+          : "Gagal menyimpan",
+        {
+          description: isDuplicate
+            ? "Silakan pilih tahun mulai lain yang belum terdaftar."
+            : apiError.message,
+        },
+      );
     } finally {
       setSubmitting(false);
     }
@@ -93,36 +136,92 @@ export default function AcademicYearForm({
       <form
         id="academic-year-form"
         onSubmit={handleSubmit}
-        className="space-y-4"
+        className="space-y-6"
         noValidate
       >
-        <FormField
-          label="Nama Tahun Ajaran"
-          required
-          error={fieldErrors.name?.[0]}
-          hint="Contoh: 2025/2026"
-        >
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="2025/2026"
-            disabled={submitting}
-            maxLength={20}
-          />
-        </FormField>
+        {isEdit ? (
+          <>
+            <FormField label="Tahun Ajaran">
+              <Input
+                value={`${startYear}/${endYear}`}
+                readOnly
+                className="bg-slate-50"
+              />
+            </FormField>
 
-        <label className="flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
-            disabled={submitting}
-            className="h-4 w-4 rounded border-slate-300 text-primary-container focus:ring-primary-container"
-          />
-          <span className="text-sm font-medium text-on-surface">
-            Aktif
-          </span>
-        </label>
+            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                disabled={submitting}
+                className="h-4 w-4 rounded border-slate-300 text-primary-container focus:ring-primary-container"
+              />
+              <div>
+                <span className="block text-sm font-semibold text-on-surface">
+                  Jadikan aktif
+                </span>
+                <span className="block text-xs text-on-surface-variant">
+                  Tahun ajaran aktif akan otomatis menggantikan status aktif lainnya.
+                </span>
+              </div>
+            </label>
+          </>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                label="Tahun Mulai"
+                required
+                error={fieldErrors.startYear?.[0]}
+              >
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  value={startYear}
+                  onChange={(e) => setStartYear(e.target.value)}
+                  placeholder="2031"
+                  disabled={submitting}
+                />
+              </FormField>
+
+              <FormField
+                label="Tahun Selesai"
+                required
+                error={fieldErrors.endYear?.[0]}
+              >
+                <Input
+                  value={endYear}
+                  readOnly
+                  placeholder="2032"
+                  className="bg-slate-50"
+                />
+              </FormField>
+            </div>
+
+            <p className="text-xs text-on-surface-variant">
+              Tahun selesai otomatis diisi 1 tahun lebih besar dari tahun mulai.
+            </p>
+
+            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                disabled={submitting}
+                className="h-4 w-4 rounded border-slate-300 text-primary-container focus:ring-primary-container"
+              />
+              <div>
+                <span className="block text-sm font-semibold text-on-surface">
+                  Jadikan aktif
+                </span>
+                <span className="block text-xs text-on-surface-variant">
+                  Tahun ajaran aktif akan otomatis menggantikan status aktif lainnya.
+                </span>
+              </div>
+            </label>
+          </>
+        )}
 
         {error && !error.errors && (
           <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">

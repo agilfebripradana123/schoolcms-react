@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -30,8 +31,13 @@ export default function AcademicYearDeleteDialog({
     try {
       await academicYearService.remove(data.id);
       onDeleted();
+      toast.success("Tahun ajaran berhasil dihapus.");
     } catch (err) {
-      setError(toApiError(err));
+      const apiError = toApiError(err);
+      setError(apiError);
+      toast.error("Gagal menghapus", {
+        description: apiError.message,
+      });
     } finally {
       setDeleting(false);
     }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
@@ -45,7 +46,6 @@ export default function AcademicYearPage() {
   const [editing, setEditing] = useState<AcademicYear | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toDelete, setToDelete] = useState<AcademicYear | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -71,6 +71,9 @@ export default function AcademicYearPage() {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
+        toast.error("Gagal memuat data", {
+          description: toApiError(err).message,
+        });
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -98,23 +101,17 @@ export default function AcademicYearPage() {
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
-  useEffect(() => {
-    if (!successMessage) return;
-    const t = window.setTimeout(() => setSuccessMessage(null), 3000);
-    return () => window.clearTimeout(t);
-  }, [successMessage]);
-
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
-    setSuccessMessage("Tahun ajaran berhasil disimpan.");
+    // toast sukses dipicu oleh form, agar tidak duplikat
     setQuery((prev) => ({ ...prev, page: 1 }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
-    setSuccessMessage("Tahun ajaran berhasil dihapus.");
+    // toast sukses dipicu oleh delete dialog, agar tidak duplikat
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -200,12 +197,6 @@ export default function AcademicYearPage() {
           </Button>
         }
       />
-
-      {successMessage && (
-        <div className="mb-4 rounded-2xl bg-tertiary-container/30 px-4 py-3 text-sm font-medium text-tertiary">
-          {successMessage}
-        </div>
-      )}
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

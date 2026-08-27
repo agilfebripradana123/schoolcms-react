@@ -12,7 +12,6 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPreloader, setShowPreloader] = useState(false);
 
@@ -27,7 +26,6 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
@@ -39,7 +37,6 @@ export default function Login() {
     } catch (err) {
       const apiErr = toApiError(err);
       const message = apiErr.message;
-      setError(message);
       toast.error("Login gagal", { description: message });
     } finally {
       setIsLoading(false);
