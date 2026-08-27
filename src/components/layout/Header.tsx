@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { LogOut, User, Settings } from "lucide-react";
+import { useAuth } from "@/features/auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -8,6 +10,8 @@ interface HeaderProps {
 export default function Header({ onToggleSidebar }: HeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleUserMenu = useCallback(() => {
     setUserMenuOpen((prev) => !prev);
@@ -16,6 +20,11 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
   const closeUserMenu = useCallback(() => {
     setUserMenuOpen(false);
   }, []);
+
+  const handleLogout = useCallback(() => {
+    logout();
+    navigate("/login", { replace: true });
+  }, [logout, navigate]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -26,6 +35,8 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeUserMenu]);
+
+  const userDisplayName = user?.name || "User";
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-6">
@@ -60,10 +71,12 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
             aria-expanded={userMenuOpen}
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100">
-              <span className="text-sm font-medium text-indigo-700">A</span>
+              <span className="text-sm font-medium text-indigo-700">
+                {userDisplayName.charAt(0).toUpperCase()}
+              </span>
             </div>
             <span className="hidden text-sm font-medium text-slate-700 md:block">
-              Admin
+              {userDisplayName}
             </span>
             <svg
               className={`hidden h-4 w-4 text-slate-400 transition-transform md:block ${
@@ -101,14 +114,14 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                 Settings
               </a>
               <hr className="my-1 border-slate-100" />
-              <a
-                href="#logout"
-                onClick={closeUserMenu}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 <LogOut className="h-4 w-4" />
                 Logout
-              </a>
+              </button>
             </div>
           )}
         </div>

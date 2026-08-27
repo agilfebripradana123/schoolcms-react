@@ -16,6 +16,7 @@ export interface LoginResponse {
   user: User;
   token: string;
   token_type: string;
+  message?: string;
 }
 
 export interface ApiResponse<T> {
