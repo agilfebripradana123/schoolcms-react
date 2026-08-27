@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/features/auth/AuthContext";
+import { toApiError } from "@/lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,10 +19,10 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      await login({ email, password });
+      await login({ login: email, password });
       navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login gagal");
+      setError(toApiError(err).message);
     } finally {
       setIsLoading(false);
     }
