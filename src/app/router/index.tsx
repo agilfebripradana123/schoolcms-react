@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { StudentListPage, ParentListPage, GuardianListPage, HistoryListPage, AttendanceListPage, TransferListPage, AlumniListPage, StudentIdCardListPage } from "@/features/students";
 import AppLayout from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -138,8 +139,16 @@ const router = createBrowserRouter([
           { index: true, element: <Navigate to="/dashboard" replace /> },
           { path: "dashboard", element: <Dashboard /> },
           { path: "academic/years", element: <AcademicYearPage /> },
-          ...createModuleRoutes("/academic", "Academic", academicModules),
-          ...createModuleRoutes("/students", "Students", studentModules),
+          { path: "students", element: <StudentListPage /> },
+          { path: "students/parents", element: <ParentListPage /> },
+          { path: "students/guardians", element: <GuardianListPage /> },
+          { path: "students/history", element: <HistoryListPage /> },
+          { path: "students/attendance", element: <AttendanceListPage /> },
+          { path: "students/transfers", element: <TransferListPage /> },
+          { path: "students/alumni", element: <AlumniListPage /> },
+          { path: "students/id-card", element: <StudentIdCardListPage /> },
+          ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years")),
+          ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),
           ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules),
           ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
           ...createModuleRoutes("/finance", "Finance", financeModules),
@@ -152,20 +161,6 @@ const router = createBrowserRouter([
           ...createModuleRoutes("/system", "System", systemModules),
         ],
       },
-      { index: true, element: <Navigate to="/dashboard" replace /> },
-      { path: "dashboard", element: <Dashboard /> },
-      ...createModuleRoutes("/academic", "Akademik", academicModules),
-      ...createModuleRoutes("/students", "Siswa", studentModules),
-      ...createModuleRoutes("/teachers", "Guru & Staf", teacherModules),
-      ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
-      ...createModuleRoutes("/finance", "Keuangan", financeModules),
-      ...createModuleRoutes("/development", "Kesiswaan", developmentModules),
-      ...createModuleRoutes("/facilities", "Sarana & Prasarana", facilityModules),
-      ...createModuleRoutes("/administration", "Administrasi", adminModules),
-      ...createModuleRoutes("/communication", "Komunikasi", communicationModules),
-      ...createModuleRoutes("/examinations", "Soal & Ujian", examModules),
-      ...createModuleRoutes("/reports", "Laporan", reportModules),
-      ...createModuleRoutes("/system", "Sistem", systemModules),
     ],
   },
   {

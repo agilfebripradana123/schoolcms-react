@@ -1,4 +1,10 @@
-import { forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes, type SelectHTMLAttributes, type ReactNode } from "react";
+import {
+  forwardRef,
+  type InputHTMLAttributes,
+  type TextareaHTMLAttributes,
+  type SelectHTMLAttributes,
+  type ReactNode,
+} from "react";
 
 // ponytail: komponen form minimal — tambah date picker / file upload saat modul butuh
 
@@ -15,7 +21,14 @@ interface FormFieldProps {
   className?: string;
 }
 
-export function FormField({ label, error, hint, required, children, className = "" }: FormFieldProps) {
+export function FormField({
+  label,
+  error,
+  hint,
+  required,
+  children,
+  className = "",
+}: FormFieldProps) {
   return (
     <div className={className}>
       {label && (
@@ -55,15 +68,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 /* ── Textarea ── */
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
-  ({ className = "", ...props }, ref) => (
-    <textarea
-      ref={ref}
-      className={`${baseInput} min-h-[100px] resize-y ${className}`}
-      {...props}
-    />
-  ),
-);
+export const Textarea = forwardRef<
+  HTMLTextAreaElement,
+  TextareaHTMLAttributes<HTMLTextAreaElement>
+>(({ className = "", ...props }, ref) => (
+  <textarea
+    ref={ref}
+    className={`${baseInput} min-h-[100px] resize-y ${className}`}
+    {...props}
+  />
+));
 Textarea.displayName = "Textarea";
 
 /* ── Select ── */

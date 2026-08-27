@@ -8,9 +8,21 @@ import type {
   UpdateStudentPayload,
 } from "./types";
 
+export interface StudentListResponse {
+  success?: boolean;
+  message: string;
+  data: Student[];
+  meta: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+}
+
 export const studentService = {
-  async list(params?: StudentListParams): Promise<ApiEnvelope<Student[]>> {
-    return api.get<ApiEnvelope<Student[]>>(STUDENTS.STUDENTS, params);
+  async list(params?: StudentListParams): Promise<StudentListResponse> {
+    return api.get<StudentListResponse>(STUDENTS.STUDENTS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Student>> {
