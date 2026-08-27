@@ -95,7 +95,9 @@ export default function AcademicYearForm({
         msg.includes("duplicate") ||
         msg.includes("unique") ||
         msg.includes("terdaftar") ||
-        msg.includes("digunakan");
+        msg.includes("digunakan") ||
+        msg.includes("validation") ||
+        msg.includes("failed");
 
       toast.error(
         isDuplicate
