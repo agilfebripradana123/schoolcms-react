@@ -1,0 +1,14 @@
+export * from "./types";
+export { academicYearService } from "./academic-year.service";
+export { semesterService } from "./semester.service";
+export { curriculumService } from "./curriculum.service";
+export { subjectService } from "./subject.service";
+export { classService } from "./class.service";
+export { classSubjectService } from "./class-subject.service";
+export { classStudentService } from "./class-student.service";
+export { teacherAssignmentService } from "./teacher-assignment.service";
+export { scheduleService } from "./schedule.service";
+export { periodService } from "./period.service";
+export { assignmentService } from "./assignment.service";
+export { gradeService } from "./grade.service";
+export { reportCardService } from "./report-card.service";

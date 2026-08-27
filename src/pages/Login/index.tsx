@@ -17,6 +17,9 @@ import {
 import { useAuth } from "@/features/auth/AuthContext";
 import Card from "@/components/ui/Card";
 import loginBg from "@/assets/images/gambar_login.webp";
+import { Eye, EyeOff, Loader2, Mail, Lock } from "lucide-react";
+import { useAuth } from "@/features/auth/useAuth";
+import { toApiError } from "@/lib/api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -42,8 +45,10 @@ export default function Login() {
       navigate("/dashboard", {
         replace: true,
       });
+      await login({ login: email, password });
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login gagal");
+      setError(toApiError(err).message);
     } finally {
       setIsLoading(false);
     }
