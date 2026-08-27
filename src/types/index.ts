@@ -52,6 +52,26 @@ export interface PaginationLink {
   active: boolean;
 }
 
+export interface ApiEnvelope<T> {
+  success?: boolean;
+  message: string;
+  data: T;
+}
+
+export interface ApiMessage {
+  success?: boolean;
+  message: string;
+}
+
+export interface ListParams {
+  search?: string;
+  page?: number;
+  per_page?: number;
+  sort?: string;
+  direction?: "asc" | "desc";
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 export interface ApiError {
   message: string;
   status?: number;
