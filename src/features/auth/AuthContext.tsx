@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { User, LoginPayload, LoginResponse } from "@/types";
+import { TOKEN_KEY, USER_KEY } from "@/lib/api/axios";
+import { login as loginRequest } from "./api/auth.service";
 
 interface AuthContextType {
   user: User | null;
@@ -12,9 +14,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = "schoolcms_token";
-const USER_KEY = "schoolcms_user";
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -26,23 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (storedToken && storedUser) {
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser) as User);
+      } catch {
+        // Corrupted stored user data: clear it so the user can re-authenticate.
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+      }
     }
     setIsLoading(false);
   }, []);
 
   const login = async (payload: LoginPayload) => {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data: LoginResponse = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Login gagal");
-    }
+    const data: LoginResponse = await loginRequest(payload);
 
     setToken(data.token);
     setUser(data.user);
