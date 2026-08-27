@@ -127,11 +127,6 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
-    element: (
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
-        <h1 className="text-2xl font-bold text-white">Masuk</h1>
-      </div>
-    ),
   },
   {
     path: "/",
