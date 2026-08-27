@@ -25,7 +25,6 @@ export const STUDENTS = {
   PARENTS: "/parents",
   GUARDIANS: "/guardians",
   STUDENT_HISTORIES: "/student-histories",
-  ATTENDANCES: "/attendance",
   TRANSFERS: "/transfers",
   ALUMNI: "/alumni",
   STUDENT_ID_CARDS: "/student-id-cards",
@@ -42,6 +41,12 @@ export const STAFF = {
 
 export const PPDB = {
   REGISTRATIONS: "/registrations",
+  VERIFY: "/registrations/{id}/verify",
+  REJECT: "/registrations/{id}/reject",
+  SELECT: "/registrations/{id}/select",
+  NOT_SELECT: "/registrations/{id}/not-select",
+  RE_REGISTER: "/registrations/{id}/re-register",
+  VERIFY_RE_REGISTER: "/registrations/{id}/verify-re-registration",
 } as const;
 
 export const FINANCE = {
@@ -58,13 +63,16 @@ export const FACILITIES = {
   ASSETS: "/assets",
   MAINTENANCE: "/maintenance",
   INVENTORY: "/inventory",
+  INVENTORY_MOVEMENTS: "/inventory/{id}/movements",
+  INVENTORY_STOCK_IN: "/inventory/{id}/stock-in",
+  INVENTORY_STOCK_OUT: "/inventory/{id}/stock-out",
+  INVENTORY_ADJUSTMENT: "/inventory/{id}/adjustment",
 } as const;
 
 export const ADMINISTRATION = {
   INCOMING_LETTERS: "/incoming-letters",
   OUTGOING_LETTERS: "/outgoing-letters",
   DISPOSITIONS: "/dispositions",
-  DOCUMENTS: "/documents",
 } as const;
 
 export const COMMUNICATION = {
@@ -94,8 +102,21 @@ export const DEVELOPMENT = {
 
 export const SYSTEM = {
   ROLES: "/roles",
+  ROLES_PERMISSIONS: "/roles/{id}/permissions",
   PERMISSIONS: "/permissions",
   USERS: "/users",
   AUDIT_LOGS: "/audit-logs",
   SETTINGS: "/settings",
+} as const;
+
+export const REPORTS = {
+  ACADEMIC_GRADES_SUMMARY: "/reports/academic/grades-summary",
+  STUDENT_SUMMARY: "/reports/students/summary",
+  TEACHER_SUMMARY: "/reports/teachers/summary",
+  TEACHER_ATTENDANCE_SUMMARY: "/reports/teachers/attendance-summary",
+  FINANCE_SUMMARY: "/reports/finance/summary",
+  ATTENDANCE_DAILY: "/reports/attendance/daily",
+  ATTENDANCE_STUDENT_SUMMARY: "/reports/attendance/student-summary",
+  INVENTORY_STOCK_SUMMARY: "/reports/inventory/stock-summary",
+  INVENTORY_MOVEMENT_SUMMARY: "/reports/inventory/movement-summary",
 } as const;
