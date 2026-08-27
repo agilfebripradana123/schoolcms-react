@@ -6,3 +6,4 @@ export { studentHistoryService } from "./student-history.service";
 export { transferService } from "./transfer.service";
 export { alumniService } from "./alumni.service";
 export { studentIdCardService } from "./student-id-card.service";
+export { attendanceService } from "./attendance.service";

@@ -8,7 +8,10 @@ interface SidebarProps {
   onToggleCollapse?: () => void;
 }
 
-export default function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
+export default function Sidebar({
+  collapsed = false,
+  onToggleCollapse,
+}: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -22,7 +25,8 @@ export default function Sidebar({ collapsed = false, onToggleCollapse }: Sidebar
   const toggleSection = useCallback((label: string) => {
     setExpandedSections((prev) => {
       const next = new Set(prev);
-      if (next.has(label)) next.delete(label); else next.add(label);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
       return next;
     });
   }, []);
@@ -30,7 +34,10 @@ export default function Sidebar({ collapsed = false, onToggleCollapse }: Sidebar
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
   const isGroupActive = useCallback(
     (group: (typeof navigation)[number]) =>
-      group.items.some((item) => pathname === item.path || pathname.startsWith(item.path + "/")),
+      group.items.some(
+        (item) =>
+          pathname === item.path || pathname.startsWith(item.path + "/"),
+      ),
     [pathname],
   );
 
@@ -48,8 +55,12 @@ export default function Sidebar({ collapsed = false, onToggleCollapse }: Sidebar
             </div>
             {!collapsed && (
               <div>
-                <div className="font-display text-base font-bold leading-none">Akademi Bintang</div>
-                <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">SchoolCMS</div>
+                <div className="font-display text-base font-bold leading-none">
+                  Akademi Bintang
+                </div>
+                <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  SchoolCMS
+                </div>
               </div>
             )}
           </div>
@@ -68,7 +79,9 @@ export default function Sidebar({ collapsed = false, onToggleCollapse }: Sidebar
             >
               <dashboardItem.icon
                 className={`h-5 w-5 shrink-0 ${
-                  isActive(dashboardItem.path) ? "text-primary-fixed" : "text-slate-400"
+                  isActive(dashboardItem.path)
+                    ? "text-primary-fixed"
+                    : "text-slate-400"
                 }`}
               />
               {!collapsed && <span>{dashboardItem.label}</span>}
@@ -89,11 +102,17 @@ export default function Sidebar({ collapsed = false, onToggleCollapse }: Sidebar
             ))}
           </div>
         </div>
-
-        
       </nav>
     ),
-    [collapsed, expandedSections, pathname, onToggleCollapse, isActive, isGroupActive, toggleSection],
+    [
+      collapsed,
+      expandedSections,
+      pathname,
+      onToggleCollapse,
+      isActive,
+      isGroupActive,
+      toggleSection,
+    ],
   );
 
   return (
