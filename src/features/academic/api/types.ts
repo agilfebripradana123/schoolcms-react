@@ -4,18 +4,13 @@ import type { ListParams } from "@/types";
 export interface AcademicYear {
   id: number;
   name: string;
-  start_date: string;
-  end_date: string;
-  is_active?: boolean;
+  is_active: boolean;
   created_at?: string;
   updated_at?: string;
-  deleted_at?: string | null;
 }
 
 export interface CreateAcademicYearPayload {
   name: string;
-  start_date: string;
-  end_date: string;
   is_active?: boolean;
 }
 

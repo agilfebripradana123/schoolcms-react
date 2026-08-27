@@ -5,9 +5,9 @@ import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
+import { AcademicYearPage } from "@/features/academic";
 
 const academicModules = [
-  { path: "years", title: "Tahun Ajaran" },
   { path: "semesters", title: "Semester" },
   { path: "curriculum", title: "Kurikulum" },
   { path: "subjects", title: "Mata Pelajaran" },
@@ -137,6 +137,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/dashboard" replace /> },
           { path: "dashboard", element: <Dashboard /> },
+          { path: "academic/years", element: <AcademicYearPage /> },
           ...createModuleRoutes("/academic", "Academic", academicModules),
           ...createModuleRoutes("/students", "Students", studentModules),
           ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules),
