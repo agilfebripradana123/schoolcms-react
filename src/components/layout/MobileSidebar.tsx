@@ -78,7 +78,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             <button
               onClick={onClose}
               className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
-              aria-label="Close sidebar"
+              aria-label="Tutup sidebar"
             >
               <svg
                 className="h-5 w-5"

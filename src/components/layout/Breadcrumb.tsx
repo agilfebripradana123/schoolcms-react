@@ -13,11 +13,11 @@ export default function Breadcrumb() {
 
   const segments = useMemo((): BreadcrumbSegment[] => {
     if (location.pathname === "/dashboard" || location.pathname === "/") {
-      return [{ label: "Dashboard", path: "/dashboard", isLast: true }];
+      return [{ label: "Dasbor", path: "/dashboard", isLast: true }];
     }
 
     const result: BreadcrumbSegment[] = [
-      { label: "Dashboard", path: "/dashboard", isLast: false },
+      { label: "Dasbor", path: "/dashboard", isLast: false },
     ];
 
     for (const group of navigation) {
@@ -45,7 +45,7 @@ export default function Breadcrumb() {
   }, [location.pathname]);
 
   return (
-    <nav aria-label="Breadcrumb" className="hidden md:block">
+    <nav aria-label="Rute halaman" className="hidden md:block">
       <ol className="flex items-center gap-1 text-sm">
         {segments.map((segment, index) => (
           <li key={segment.path + index} className="flex items-center gap-1">

@@ -98,7 +98,7 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
           <button
             onClick={onToggleCollapse}
             className="hidden w-full items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 lg:flex"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}
           >
             <svg
               className={`h-5 w-5 transition-transform ${collapsed ? "rotate-180" : ""}`}
