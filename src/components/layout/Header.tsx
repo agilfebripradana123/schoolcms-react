@@ -33,7 +33,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         <button
           onClick={onToggleSidebar}
           className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 lg:hidden"
-          aria-label="Toggle sidebar"
+          aria-label="Alihkan sidebar"
         >
           <svg
             className="h-5 w-5"
@@ -56,7 +56,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           <button
             onClick={toggleUserMenu}
             className="flex items-center gap-2 rounded-lg p-2 text-slate-600 hover:bg-slate-100"
-            aria-label="User menu"
+            aria-label="Menu pengguna"
             aria-expanded={userMenuOpen}
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100">
@@ -90,7 +90,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                 className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
               >
                 <User className="h-4 w-4" />
-                Profile
+                Profil
               </a>
               <a
                 href="#settings"
@@ -98,7 +98,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                 className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
               >
                 <Settings className="h-4 w-4" />
-                Settings
+                Pengaturan
               </a>
               <hr className="my-1 border-slate-100" />
               <a
@@ -107,7 +107,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                 className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
               >
                 <LogOut className="h-4 w-4" />
-                Logout
+                Keluar
               </a>
             </div>
           )}

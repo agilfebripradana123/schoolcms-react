@@ -5,107 +5,107 @@ import NotFound from "@/pages/NotFound";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 
 const academicModules = [
-  { path: "years", title: "Academic Year" },
+  { path: "years", title: "Tahun Ajaran" },
   { path: "semesters", title: "Semester" },
-  { path: "curriculum", title: "Curriculum" },
-  { path: "subjects", title: "Subjects" },
-  { path: "classes", title: "Classes" },
-  { path: "class-subjects", title: "Class Subjects" },
-  { path: "class-students", title: "Class Students" },
-  { path: "schedules", title: "Schedules" },
-  { path: "periods", title: "Periods" },
-  { path: "assignments", title: "Assignments" },
-  { path: "grades", title: "Grades" },
-  { path: "report-cards", title: "Report Cards" },
+  { path: "curriculum", title: "Kurikulum" },
+  { path: "subjects", title: "Mata Pelajaran" },
+  { path: "classes", title: "Kelas" },
+  { path: "class-subjects", title: "Mata Pelajaran Kelas" },
+  { path: "class-students", title: "Siswa Kelas" },
+  { path: "schedules", title: "Jadwal" },
+  { path: "periods", title: "Jam Pelajaran" },
+  { path: "assignments", title: "Tugas" },
+  { path: "grades", title: "Nilai" },
+  { path: "report-cards", title: "Rapor" },
 ];
 
 const studentModules = [
-  { path: "", title: "Student Data" },
-  { path: "parents", title: "Parents" },
-  { path: "guardians", title: "Guardians" },
-  { path: "history", title: "Student History" },
-  { path: "attendance", title: "Attendance" },
-  { path: "transfers", title: "Transfers" },
+  { path: "", title: "Data Siswa" },
+  { path: "parents", title: "Orang Tua" },
+  { path: "guardians", title: "Wali Siswa" },
+  { path: "history", title: "Riwayat Siswa" },
+  { path: "attendance", title: "Kehadiran" },
+  { path: "transfers", title: "Mutasi Siswa" },
   { path: "alumni", title: "Alumni" },
-  { path: "id-card", title: "Student ID Card" },
+  { path: "id-card", title: "Kartu Pelajar" },
 ];
 
 const teacherModules = [
-  { path: "", title: "Teachers" },
-  { path: "staff", title: "Staff" },
-  { path: "assignments", title: "Teaching Assignments" },
-  { path: "attendance", title: "Teacher Attendance" },
-  { path: "leave", title: "Teacher Leave" },
-  { path: "documents", title: "Teacher Documents" },
+  { path: "", title: "Guru" },
+  { path: "staff", title: "Staf" },
+  { path: "assignments", title: "Penugasan Mengajar" },
+  { path: "attendance", title: "Kehadiran Guru" },
+  { path: "leave", title: "Cuti Guru" },
+  { path: "documents", title: "Dokumen Guru" },
 ];
 
 const ppdbModules = [
-  { path: "registrations", title: "Registration" },
-  { path: "verification", title: "Verification" },
-  { path: "selection", title: "Selection" },
-  { path: "re-registration", title: "Re-registration" },
+  { path: "registrations", title: "Pendaftaran" },
+  { path: "verification", title: "Verifikasi" },
+  { path: "selection", title: "Seleksi" },
+  { path: "re-registration", title: "Daftar Ulang" },
 ];
 
 const financeModules = [
-  { path: "fee-types", title: "Fee Types" },
-  { path: "billing", title: "Billing" },
-  { path: "payments", title: "Payments" },
-  { path: "transactions", title: "Transactions" },
-  { path: "scholarships", title: "Scholarships" },
-  { path: "reports", title: "Financial Reports" },
+  { path: "fee-types", title: "Jenis Tagihan" },
+  { path: "billing", title: "Penagihan" },
+  { path: "payments", title: "Pembayaran" },
+  { path: "transactions", title: "Transaksi" },
+  { path: "scholarships", title: "Beasiswa" },
+  { path: "reports", title: "Laporan Keuangan" },
 ];
 
 const developmentModules = [
-  { path: "counseling", title: "Counseling" },
-  { path: "extracurricular", title: "Extracurricular" },
-  { path: "achievements", title: "Achievements" },
-  { path: "violations", title: "Violations" },
+  { path: "counseling", title: "Bimbingan & Konseling" },
+  { path: "extracurricular", title: "Ekstrakurikuler" },
+  { path: "achievements", title: "Prestasi" },
+  { path: "violations", title: "Pelanggaran" },
 ];
 
 const facilityModules = [
-  { path: "rooms", title: "Rooms" },
-  { path: "assets", title: "Assets" },
-  { path: "maintenance", title: "Maintenance" },
-  { path: "inventory", title: "Inventory" },
+  { path: "rooms", title: "Ruangan" },
+  { path: "assets", title: "Aset" },
+  { path: "maintenance", title: "Pemeliharaan" },
+  { path: "inventory", title: "Inventaris" },
 ];
 
 const adminModules = [
-  { path: "incoming", title: "Incoming Letters" },
-  { path: "outgoing", title: "Outgoing Letters" },
-  { path: "documents", title: "Documents" },
-  { path: "dispositions", title: "Dispositions" },
+  { path: "incoming", title: "Surat Masuk" },
+  { path: "outgoing", title: "Surat Keluar" },
+  { path: "documents", title: "Dokumen" },
+  { path: "dispositions", title: "Disposisi" },
 ];
 
 const communicationModules = [
-  { path: "announcements", title: "Announcements" },
-  { path: "notifications", title: "Notifications" },
-  { path: "calendar", title: "Calendar" },
+  { path: "announcements", title: "Pengumuman" },
+  { path: "notifications", title: "Notifikasi" },
+  { path: "calendar", title: "Kalender" },
 ];
 
 const examModules = [
-  { path: "questions", title: "Question Banks" },
-  { path: "exams", title: "Exams" },
-  { path: "schedules", title: "Exam Schedules" },
-  { path: "sessions", title: "Exam Sessions" },
-  { path: "participants", title: "Exam Participants" },
-  { path: "results", title: "Exam Results" },
+  { path: "questions", title: "Bank Soal" },
+  { path: "exams", title: "Ujian" },
+  { path: "schedules", title: "Jadwal Ujian" },
+  { path: "sessions", title: "Sesi Ujian" },
+  { path: "participants", title: "Peserta Ujian" },
+  { path: "results", title: "Hasil Ujian" },
 ];
 
 const reportModules = [
-  { path: "academic", title: "Academic Reports" },
-  { path: "students", title: "Student Reports" },
-  { path: "teachers", title: "Teacher Reports" },
-  { path: "finance", title: "Finance Reports" },
-  { path: "attendance", title: "Attendance Reports" },
-  { path: "inventory", title: "Inventory Reports" },
+  { path: "academic", title: "Laporan Akademik" },
+  { path: "students", title: "Laporan Siswa" },
+  { path: "teachers", title: "Laporan Guru" },
+  { path: "finance", title: "Laporan Keuangan" },
+  { path: "attendance", title: "Laporan Kehadiran" },
+  { path: "inventory", title: "Laporan Inventaris" },
 ];
 
 const systemModules = [
-  { path: "roles", title: "Roles" },
-  { path: "permissions", title: "Permissions" },
-  { path: "users", title: "Users" },
-  { path: "audit-logs", title: "Audit Logs" },
-  { path: "settings", title: "Settings" },
+  { path: "roles", title: "Peran" },
+  { path: "permissions", title: "Hak Akses" },
+  { path: "users", title: "Pengguna" },
+  { path: "audit-logs", title: "Log Aktivitas" },
+  { path: "settings", title: "Pengaturan" },
 ];
 
 function createModuleRoutes(
@@ -126,7 +126,7 @@ const router = createBrowserRouter([
     path: "/login",
     element: (
       <div className="flex min-h-screen items-center justify-center bg-slate-900">
-        <h1 className="text-2xl font-bold text-white">Login</h1>
+        <h1 className="text-2xl font-bold text-white">Masuk</h1>
       </div>
     ),
   },
@@ -136,18 +136,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <Dashboard /> },
-      ...createModuleRoutes("/academic", "Academic", academicModules),
-      ...createModuleRoutes("/students", "Students", studentModules),
-      ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules),
+      ...createModuleRoutes("/academic", "Akademik", academicModules),
+      ...createModuleRoutes("/students", "Siswa", studentModules),
+      ...createModuleRoutes("/teachers", "Guru & Staf", teacherModules),
       ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
-      ...createModuleRoutes("/finance", "Finance", financeModules),
-      ...createModuleRoutes("/development", "Student Development", developmentModules),
-      ...createModuleRoutes("/facilities", "Facilities", facilityModules),
-      ...createModuleRoutes("/administration", "Administration", adminModules),
-      ...createModuleRoutes("/communication", "Communication", communicationModules),
-      ...createModuleRoutes("/examinations", "Question & Examination", examModules),
-      ...createModuleRoutes("/reports", "Reports", reportModules),
-      ...createModuleRoutes("/system", "System", systemModules),
+      ...createModuleRoutes("/finance", "Keuangan", financeModules),
+      ...createModuleRoutes("/development", "Kesiswaan", developmentModules),
+      ...createModuleRoutes("/facilities", "Sarana & Prasarana", facilityModules),
+      ...createModuleRoutes("/administration", "Administrasi", adminModules),
+      ...createModuleRoutes("/communication", "Komunikasi", communicationModules),
+      ...createModuleRoutes("/examinations", "Soal & Ujian", examModules),
+      ...createModuleRoutes("/reports", "Laporan", reportModules),
+      ...createModuleRoutes("/system", "Sistem", systemModules),
     ],
   },
   {
