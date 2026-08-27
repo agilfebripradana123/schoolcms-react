@@ -2,7 +2,9 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
+import Login from "@/pages/Login";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
+import ProtectedRoute from "@/features/auth/ProtectedRoute";
 
 const academicModules = [
   { path: "years", title: "Tahun Ajaran" },
@@ -124,6 +126,7 @@ function createModuleRoutes(
 const router = createBrowserRouter([
   {
     path: "/login",
+    element: <Login />,
     element: (
       <div className="flex min-h-screen items-center justify-center bg-slate-900">
         <h1 className="text-2xl font-bold text-white">Masuk</h1>
@@ -132,8 +135,27 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <AppLayout />,
+    element: <ProtectedRoute />,
     children: [
+      {
+        element: <AppLayout />,
+        children: [
+          { index: true, element: <Navigate to="/dashboard" replace /> },
+          { path: "dashboard", element: <Dashboard /> },
+          ...createModuleRoutes("/academic", "Academic", academicModules),
+          ...createModuleRoutes("/students", "Students", studentModules),
+          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules),
+          ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
+          ...createModuleRoutes("/finance", "Finance", financeModules),
+          ...createModuleRoutes("/development", "Student Development", developmentModules),
+          ...createModuleRoutes("/facilities", "Facilities", facilityModules),
+          ...createModuleRoutes("/administration", "Administration", adminModules),
+          ...createModuleRoutes("/communication", "Communication", communicationModules),
+          ...createModuleRoutes("/examinations", "Question & Examination", examModules),
+          ...createModuleRoutes("/reports", "Reports", reportModules),
+          ...createModuleRoutes("/system", "System", systemModules),
+        ],
+      },
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <Dashboard /> },
       ...createModuleRoutes("/academic", "Akademik", academicModules),
