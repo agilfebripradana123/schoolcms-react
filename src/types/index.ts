@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 export interface User {
   id: number;
   name: string;
@@ -47,4 +49,22 @@ export interface PaginationLink {
 export interface ApiError {
   message: string;
   errors: Record<string, string[]>;
+}
+
+export interface IconComponent {
+  className?: string;
+}
+
+export interface NavigationItem {
+  label: string;
+  path: string;
+  icon: ComponentType<IconComponent>;
+  children?: NavigationItem[];
+  permission?: string;
+  roles?: string[];
+}
+
+export interface NavigationGroup {
+  label: string;
+  items: NavigationItem[];
 }
