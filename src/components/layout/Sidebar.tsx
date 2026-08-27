@@ -4,11 +4,11 @@ import { navigation, dashboardItem } from "@/config/navigation";
 import SidebarSection from "./SidebarSection";
 
 interface SidebarProps {
-  collapsed: boolean;
-  onToggleCollapse: () => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
+export default function Sidebar({ collapsed = false, onToggleCollapse }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -90,23 +90,7 @@ export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
           </div>
         </div>
 
-        <div className="border-t border-white/10 p-3">
-          <button
-            onClick={onToggleCollapse}
-            className="hidden w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-300 transition-colors hover:bg-white/10 hover:text-white lg:flex"
-            aria-label={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}
-          >
-            <svg
-              className={`h-5 w-5 transition-transform ${collapsed ? "rotate-180" : ""}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          </button>
-        </div>
+        
       </nav>
     ),
     [collapsed, expandedSections, pathname, onToggleCollapse, isActive, isGroupActive, toggleSection],
