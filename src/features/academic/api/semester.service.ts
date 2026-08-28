@@ -2,15 +2,38 @@ import { api } from "@/lib/api";
 import { ACADEMIC } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
-  AcademicListParams,
   CreateSemesterPayload,
   Semester,
   UpdateSemesterPayload,
 } from "./types";
 
+export interface SemesterListParams {
+  academic_year_id?: number;
+  is_active?: boolean;
+  page?: number;
+  per_page?: number;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+export interface SemesterListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface SemesterListResponse {
+  success: boolean;
+  message: string;
+  data: Semester[];
+  meta: SemesterListMeta;
+}
+
 export const semesterService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<Semester[]>> {
-    return api.get<ApiEnvelope<Semester[]>>(ACADEMIC.SEMESTERS, params);
+  async list(
+    params?: SemesterListParams,
+  ): Promise<SemesterListResponse> {
+    return api.get<SemesterListResponse>(ACADEMIC.SEMESTERS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Semester>> {

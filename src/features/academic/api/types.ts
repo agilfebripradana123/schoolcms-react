@@ -21,9 +21,8 @@ export interface Semester {
   id: number;
   academic_year_id: number;
   name: string;
-  start_date?: string;
-  end_date?: string;
   is_active?: boolean;
+  academic_year?: AcademicYear;
   created_at?: string;
   updated_at?: string;
 }
@@ -31,8 +30,6 @@ export interface Semester {
 export interface CreateSemesterPayload {
   academic_year_id: number;
   name: string;
-  start_date?: string;
-  end_date?: string;
   is_active?: boolean;
 }
 
