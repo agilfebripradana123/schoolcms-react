@@ -1,0 +1,305 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
+import Card from "@/components/ui/Card";
+import DataTable from "@/components/ui/DataTable";
+import Search from "@/components/ui/Search";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import { toApiError } from "@/lib/api";
+import type { ApiError } from "@/types";
+import { curriculumService } from "../api/curriculum.service";
+import type { Curriculum } from "../api/types";
+import CurriculumForm from "../components/curriculum/CurriculumForm";
+import CurriculumDeleteDialog from "../components/curriculum/CurriculumDeleteDialog";
+
+const PER_PAGE = 10;
+
+type StatusFilter = "all" | "active" | "inactive";
+
+interface QueryState {
+  q: string;
+  is_active: boolean | undefined;
+  page: number;
+}
+
+function statusToFilter(status: StatusFilter): boolean | undefined {
+  if (status === "all") return undefined;
+  return status === "active";
+}
+
+export default function CurriculumPage() {
+  const [data, setData] = useState<Curriculum[]>([]);
+  const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [page, setPage] = useState(1);
+
+  const [query, setQuery] = useState<QueryState>({ q: "", is_active: undefined, page: 1 });
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<Curriculum | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<Curriculum | null>(null);
+
+  const searchTimeout = useRef<number | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError(null);
+
+    curriculumService
+      .list({
+        q: query.q || undefined,
+        is_active: query.is_active,
+        page: query.page,
+        per_page: PER_PAGE,
+      })
+      .then((res) => {
+        if (!active) return;
+        setData(res.data);
+        setMeta(res.meta);
+        setPage(res.meta.current_page);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError(toApiError(err));
+        setData([]);
+        toast.error("Gagal memuat data kurikulum", {
+          description: toApiError(err).message,
+        });
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [query]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
+    searchTimeout.current = window.setTimeout(() => {
+      setQuery((prev) => ({ ...prev, q: value, page: 1 }));
+    }, 400);
+  }, []);
+
+  const handleStatusChange = useCallback((value: StatusFilter) => {
+    setStatus(value);
+    setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
+  }, []);
+
+  const goToPage = useCallback((target: number) => {
+    setQuery((prev) => ({ ...prev, page: target }));
+  }, []);
+
+  const handleSaved = useCallback(() => {
+    setFormOpen(false);
+    setEditing(null);
+    setQuery((prev) => ({ ...prev, page: 1 }));
+  }, []);
+
+  const handleDeleted = useCallback(() => {
+    setDeleteOpen(false);
+    setToDelete(null);
+    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
+    setQuery((prev) => ({
+      ...prev,
+      page: isLastPage ? page - 1 : page,
+    }));
+  }, [page, meta.total, meta.per_page]);
+
+  const openCreate = useCallback(() => {
+    setEditing(null);
+    setFormOpen(true);
+  }, []);
+
+  const openEdit = useCallback((row: Curriculum) => {
+    setEditing(row);
+    setFormOpen(true);
+  }, []);
+
+  const openDelete = useCallback((row: Curriculum) => {
+    setToDelete(row);
+    setDeleteOpen(true);
+  }, []);
+
+  const columns = useMemo(() => {
+    type Row = Curriculum;
+    return [
+      {
+        header: "Nama",
+        accessor: "name" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="font-medium text-on-surface">{row.name}</span>
+        ),
+      },
+      {
+        header: "Deskripsi",
+        accessor: "description" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">{row.description || "-"}</span>
+        ),
+      },
+      {
+        header: "Status",
+        accessor: "is_active" as keyof Row,
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <Badge
+            variant={row.is_active ? "success" : "secondary"}
+            className="px-2.5 py-1 text-xs leading-4"
+          >
+            {row.is_active ? "Aktif" : "Tidak Aktif"}
+          </Badge>
+        ),
+      },
+      {
+        header: "Aksi",
+        accessor: "id" as keyof Row,
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <div className="flex items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => openEdit(row)}
+              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              aria-label={`Edit ${row.name}`}
+            >
+              <Pencil className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+            <button
+              type="button"
+              onClick={() => openDelete(row)}
+              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              aria-label={`Hapus ${row.name}`}
+            >
+              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+          </div>
+        ),
+      },
+    ];
+  }, [openEdit, openDelete]);
+
+  const isFirstPage = meta.current_page <= 1;
+  const isLastPage = meta.current_page >= meta.last_page;
+  const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
+  const to = Math.min(meta.current_page * meta.per_page, meta.total);
+
+  return (
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Kurikulum"
+        description="Kelola data kurikulum yang digunakan dalam sistem akademik."
+        actions={
+          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
+            Tambah
+          </Button>
+        }
+      />
+
+      <Card>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:max-w-xs">
+            <Search
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Cari nama kurikulum..."
+            />
+          </div>
+          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+            <span className="whitespace-nowrap">Status:</span>
+            <select
+              value={status}
+              onChange={(e) => handleStatusChange(e.target.value as StatusFilter)}
+              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
+            >
+              <option value="all">Semua Status</option>
+              <option value="active">Aktif</option>
+              <option value="inactive">Tidak Aktif</option>
+            </select>
+          </label>
+        </div>
+
+        {error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">Gagal memuat data kurikulum.</p>
+            <Button
+              variant="secondary"
+              onClick={() => setQuery((prev) => ({ ...prev }))}
+            >
+              Muat Ulang
+            </Button>
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={data}
+            loading={loading}
+            emptyMessage="Tidak ada kurikulum."
+          />
+        )}
+
+        {!error && !loading && meta.total > 0 && (
+          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-sm text-on-surface-variant">
+              Menampilkan {from}-{to} dari {meta.total} data
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={isFirstPage}
+                onClick={() => goToPage(meta.current_page - 1)}
+              >
+                Sebelumnya
+              </Button>
+              <span className="text-sm text-on-surface-variant">
+                Halaman {meta.current_page} dari {meta.last_page}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={isLastPage}
+                onClick={() => goToPage(meta.current_page + 1)}
+              >
+                Berikutnya
+              </Button>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      <CurriculumForm
+        open={formOpen}
+        onClose={() => {
+          setFormOpen(false);
+          setEditing(null);
+        }}
+        onSaved={handleSaved}
+        initialData={editing}
+      />
+
+      <CurriculumDeleteDialog
+        open={deleteOpen}
+        onClose={() => {
+          setDeleteOpen(false);
+          setToDelete(null);
+        }}
+        onDeleted={handleDeleted}
+        data={toDelete}
+      />
+    </PageContainer>
+  );
+}
