@@ -66,7 +66,7 @@ export default function TeacherAssignmentsPage() {
 
   useEffect(() => {
     teacherService
-      .list()
+      .list({ per_page: 100 })
       .then((res) => setTeachers(res.data))
       .catch(() => {
         toast.error("Gagal memuat data guru");

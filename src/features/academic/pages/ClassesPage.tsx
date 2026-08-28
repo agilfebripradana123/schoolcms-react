@@ -51,7 +51,7 @@ export default function ClassesPage() {
   useEffect(() => {
     loadData();
     teacherService
-      .list()
+      .list({ per_page: 100 })
       .then((res) => setTeachers(res.data))
       .catch(() => {
         // opsional: wali kelas hanya menampilkan id jika gagal dimuat

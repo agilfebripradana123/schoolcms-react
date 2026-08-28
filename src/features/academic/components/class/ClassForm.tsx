@@ -46,7 +46,7 @@ export default function ClassForm({
     setTeachersLoading(true);
     setTeachersError(false);
     teacherService
-      .list()
+      .list({ per_page: 100 })
       .then((res) => {
         setTeachers(res.data);
         setTeachersError(false);
