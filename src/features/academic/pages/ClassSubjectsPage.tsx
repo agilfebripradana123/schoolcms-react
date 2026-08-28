@@ -68,7 +68,7 @@ export default function ClassSubjectsPage() {
         toast.error("Gagal memuat data mata pelajaran");
       });
     teacherService
-      .list()
+      .list({ per_page: 100 })
       .then((res) => setTeachers(res.data))
       .catch(() => {
         toast.error("Gagal memuat data guru");
@@ -259,7 +259,7 @@ export default function ClassSubjectsPage() {
   const teacherFilterOptions = useMemo(
     () => [
       { value: "all", label: "Semua Guru" },
-      ...teachers.map((t) => ({ value: String(t.id), label: t.name })),
+      ...teachers.map((t) => ({ value: String(t.id), label: formatTeacherName(t) })),
     ],
     [teachers],
   );
