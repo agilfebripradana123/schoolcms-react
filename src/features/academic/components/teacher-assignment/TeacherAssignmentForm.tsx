@@ -11,7 +11,7 @@ import { classService } from "../../api/class.service";
 import { subjectService } from "../../api/subject.service";
 import { academicYearService } from "../../api/academic-year.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
-import type { Teacher } from "@/features/teachers-staff/api/types";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type {
   AcademicYear,
   CreateTeacherAssignmentPayload,
@@ -186,7 +186,7 @@ export default function TeacherAssignmentForm({
     }
   };
 
-  const teacherOptions = teachers.map((t) => ({ value: String(t.id), label: t.name }));
+  const teacherOptions = teachers.map((t) => ({ value: String(t.id), label: formatTeacherName(t) }));
   const classOptions = classes.map((c) => ({ value: String(c.id), label: c.name }));
   const subjectOptions = subjects.map((s) => ({ value: String(s.id), label: s.name }));
   const yearOptions = years.map((y) => ({ value: String(y.id), label: y.name }));
