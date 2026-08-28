@@ -64,13 +64,24 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
             className="rounded-2xl border border-slate-200 bg-white p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container lg:hidden"
             aria-label="Alihkan sidebar"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
           <div className="hidden lg:block">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-on-surface-variant">Akademi Bintang</p>
-            <p className="text-sm font-semibold text-on-surface">Selamat datang kembali, {userDisplayName}</p>
+            <p className="text-sm font-semibold text-on-surface">
+              Hallo, {userDisplayName}
+            </p>
           </div>
         </div>
 
@@ -91,9 +102,13 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
               aria-expanded={userMenuOpen}
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
-                <span className="text-sm font-bold">{userDisplayName.charAt(0).toUpperCase()}</span>
+                <span className="text-sm font-bold">
+                  {userDisplayName.charAt(0).toUpperCase()}
+                </span>
               </div>
-              <span className="hidden text-sm font-semibold md:block">{userDisplayName}</span>
+              <span className="hidden text-sm font-semibold md:block">
+                {userDisplayName}
+              </span>
               <svg
                 className={`hidden h-4 w-4 text-outline transition-transform md:block ${userMenuOpen ? "rotate-180" : ""}`}
                 fill="none"
@@ -101,13 +116,19 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                 stroke="currentColor"
                 strokeWidth={2}
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
             {userMenuOpen && (
               <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-2xl border border-slate-200 bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
-                <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">Akun</div>
+                <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">
+                  Akun
+                </div>
                 <a
                   href="#profile"
                   onClick={closeUserMenu}

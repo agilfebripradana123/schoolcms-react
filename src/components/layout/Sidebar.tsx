@@ -56,9 +56,6 @@ export default function Sidebar({
             {!collapsed && (
               <div>
                 <div className="font-display text-base font-bold leading-none">
-                  Akademi Bintang
-                </div>
-                <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">
                   SchoolCMS
                 </div>
               </div>

@@ -13,7 +13,7 @@ import { classSubjectService } from "../api/class-subject.service";
 import { classService } from "../api/class.service";
 import { subjectService } from "../api/subject.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
-import type { Teacher } from "@/features/teachers-staff/api/types";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type { ClassSubject, SchoolClass, Subject } from "../api/types";
 import ClassSubjectForm from "../components/class-subject/ClassSubjectForm";
 import ClassSubjectDeleteDialog from "../components/class-subject/ClassSubjectDeleteDialog";
@@ -298,12 +298,12 @@ export default function ClassSubjectsPage() {
           </label>
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Guru</span>
-            <AppSelect
-              options={teacherFilterOptions}
-              value={teacherFilter}
-              onChange={(v) => handleTeacherChange(v ?? "all")}
-              placeholder="Pilih Guru"
-            />
+              <AppSelect
+                options={teacherFilterOptions}
+                value={teacherFilter}
+                onChange={(v) => handleTeacherChange(v ?? "all")}
+                placeholder="Pilih Guru"
+              />
           </label>
         </div>
 

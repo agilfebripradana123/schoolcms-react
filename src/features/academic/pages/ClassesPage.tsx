@@ -11,7 +11,7 @@ import type { ApiError } from "@/types";
 import { classService } from "../api/class.service";
 import type { SchoolClass } from "../api/types";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
-import type { Teacher } from "@/features/teachers-staff/api/types";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import ClassForm from "../components/class/ClassForm";
 import ClassDeleteDialog from "../components/class/ClassDeleteDialog";
 
@@ -61,7 +61,7 @@ export default function ClassesPage() {
   const teacherNameById = useMemo(() => {
     const map: Record<number, string> = {};
     for (const t of teachers) {
-      map[t.id] = t.name;
+      map[t.id] = formatTeacherName(t);
     }
     return map;
   }, [teachers]);

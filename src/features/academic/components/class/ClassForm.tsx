@@ -13,7 +13,7 @@ import type {
   SchoolClass,
 } from "../../api/types";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
-import type { Teacher } from "@/features/teachers-staff/api/types";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 
 interface ClassFormProps {
   open: boolean;
@@ -117,7 +117,7 @@ export default function ClassForm({
 
   const teacherOptions = teachers.map((t) => ({
     value: String(t.id),
-    label: t.name,
+    label: formatTeacherName(t),
   }));
 
   return (

@@ -14,7 +14,7 @@ import { classService } from "../api/class.service";
 import { subjectService } from "../api/subject.service";
 import { academicYearService } from "../api/academic-year.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
-import type { Teacher } from "@/features/teachers-staff/api/types";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type {
   AcademicYear,
   SchoolClass,
@@ -321,12 +321,12 @@ export default function TeacherAssignmentsPage() {
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Guru</span>
-            <AppSelect
-              options={teacherFilterOptions}
-              value={teacherFilter}
-              onChange={(v) => handleTeacherChange(v ?? "all")}
-              placeholder="Pilih Guru"
-            />
+              <AppSelect
+                options={teacherFilterOptions}
+                value={teacherFilter}
+                onChange={(v) => handleTeacherChange(v ?? "all")}
+                placeholder="Pilih Guru"
+              />
           </label>
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Kelas</span>
