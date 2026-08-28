@@ -4,8 +4,7 @@ import {
   type TextareaHTMLAttributes,
   type ReactNode,
 } from "react";
-import ReactSelect from "react-select";
-import type { CSSObjectWithLabel, GroupBase, OptionProps as RSOptionProps } from "react-select";
+import AppSelect from "./Select";
 
 export type SelectOption = { value: string; label: string };
 
@@ -83,7 +82,7 @@ export const Textarea = forwardRef<
 ));
 Textarea.displayName = "Textarea";
 
-/* ── Select (react-select, drop-in API) ── */
+/* ── Select (react-select via AppSelect, drop-in API) ── */
 interface SelectProps {
   options: SelectOption[];
   value?: string | number;
@@ -92,88 +91,21 @@ interface SelectProps {
   disabled?: boolean;
   className?: string;
   id?: string;
-  name?: string;
-  isSearchable?: boolean;
 }
 
-// Gaya react-select agar selaras dengan Input (rounded-2xl, border slate, focus ring primary)
-const rsSelect = {
-  control: (provided: CSSObjectWithLabel, state: { isFocused: boolean }) => ({
-    ...provided,
-    minHeight: "46px",
-    borderRadius: "1rem",
-    borderColor: state.isFocused ? "rgb(97 77 168)" : "rgb(226 232 240)",
-    boxShadow: state.isFocused ? "0 0 0 3px rgb(97 77 168 / 0.3)" : provided.boxShadow,
-    backgroundColor: "#ffffff",
-    cursor: "pointer",
-    "&:hover": { borderColor: "rgb(97 77 168)" },
-  }),
-  menu: (provided: CSSObjectWithLabel) => ({
-    ...provided,
-    borderRadius: "1rem",
-    overflow: "hidden",
-    zIndex: 50,
-  }),
-  option: (
-    provided: CSSObjectWithLabel,
-    state: RSOptionProps<SelectOption, false, GroupBase<SelectOption>>,
-  ) => ({
-    ...provided,
-    cursor: "pointer",
-    backgroundColor: state.isSelected
-      ? "rgb(97 77 168)"
-      : state.isFocused
-        ? "rgba(97 77 168, 0.08)"
-        : "#fff",
-    color: state.isSelected ? "#fff" : "rgb(15 23 42)",
-    "&:active": {
-      backgroundColor: state.isSelected ? "rgb(97 77 168)" : "rgba(97 77 168, 0.15)",
-    },
-  }),
-  placeholder: (provided: CSSObjectWithLabel) => ({
-    ...provided,
-    color: "rgb(148 163 184)",
-  }),
-  singleValue: (provided: CSSObjectWithLabel) => ({
-    ...provided,
-    color: "rgb(15 23 42)",
-  }),
-  indicatorSeparator: () => ({ display: "none" }),
-};
-
 export const Select = forwardRef<HTMLDivElement, SelectProps>(
-  (
-    {
-      className = "",
-      options,
-      value,
-      onChange,
-      placeholder,
-      disabled,
-      id,
-      name,
-      isSearchable,
-    },
-    ref,
-  ) => {
+  ({ className = "", options, value, onChange, placeholder, disabled, id }, ref) => {
     const strValue = value === undefined || value === null ? "" : String(value);
-    const selected = options.find((o) => o.value === strValue) ?? null;
     return (
       <div ref={ref} className={className}>
-        <ReactSelect
-          inputId={id ? `${id}-input` : undefined}
-          name={name}
+        <AppSelect
+          id={id}
           options={options}
-          value={selected}
+          value={strValue}
+          onChange={(v) => onChange?.({ target: { value: String(v ?? "") } })}
           placeholder={placeholder}
           isDisabled={disabled}
-          isSearchable={isSearchable ?? options.length > 8}
-          classNamePrefix="rs"
-          styles={rsSelect}
-          menuPortalTarget={typeof document !== "undefined" ? document.body : undefined}
-          onChange={(option) => {
-            onChange?.({ target: { value: option?.value ?? "" } });
-          }}
+          isSearchable={options.length > 8}
         />
       </div>
     );

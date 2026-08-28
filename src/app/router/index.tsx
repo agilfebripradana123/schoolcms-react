@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { StudentListPage, ParentListPage, GuardianListPage, HistoryListPage, AttendanceListPage, TransferListPage, AlumniListPage, StudentIdCardListPage } from "@/features/students";
+import { StudentListPage, HistoryListPage, AttendanceListPage, TransferListPage, AlumniListPage, StudentIdCardListPage } from "@/features/students";
 import AppLayout from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -148,8 +148,6 @@ const router = createBrowserRouter([
           { path: "academic/class-students", element: <ClassStudentsPage /> },
           { path: "academic/teacher-assignments", element: <TeacherAssignmentsPage /> },
           { path: "students", element: <StudentListPage /> },
-          { path: "students/parents", element: <ParentListPage /> },
-          { path: "students/guardians", element: <GuardianListPage /> },
           { path: "students/history", element: <HistoryListPage /> },
           { path: "students/attendance", element: <AttendanceListPage /> },
           { path: "students/transfers", element: <TransferListPage /> },
@@ -162,8 +160,7 @@ const router = createBrowserRouter([
           { path: "teachers/leave", element: <TeacherLeaveListPage /> },
           { path: "teachers/documents", element: <TeacherDocumentListPage /> },
           ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects" && m.path !== "class-students")),
-          ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),
-          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave" && m.path !== "documents")),
+          ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave" && m.path !== "documents")),
           ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
           ...createModuleRoutes("/finance", "Finance", financeModules),
           ...createModuleRoutes("/development", "Student Development", developmentModules),
