@@ -81,6 +81,10 @@ function buildStyles(errorFlag?: boolean) {
       ...base,
       maxHeight: 240,
     }),
+    menuPortal: (base: object) => ({
+      ...base,
+      zIndex: 60,
+    }),
     option: (base: object, state: { isFocused: boolean; isSelected: boolean }) => ({
       ...base,
       backgroundColor: state.isSelected
@@ -137,7 +141,7 @@ export default function AppSelect<T = string | number>({
       loadingMessage={() => "Memuat data..."}
       styles={styles}
       menuPortalTarget={typeof document !== "undefined" ? document.body : undefined}
-      menuPosition="absolute"
+      menuPosition="fixed"
       className={`w-full text-sm ${className}`}
     />
   );
