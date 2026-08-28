@@ -64,11 +64,27 @@ export default function TeacherLeaveForm({
 
   useEffect(() => {
     if (open) {
-      teacherService.list().then((res) => setTeachers(res.data)).catch(() => {
-        toast.error("Gagal memuat data guru");
-      });
+      teacherService
+        .list({ per_page: 100 })
+        .then((res) => {
+          // Pastikan guru yang sedang diedit selalu ada di daftar opsi
+          const list = res.data;
+          if (initialData?.teacher && !list.some((t) => t.id === initialData.teacher!.id)) {
+            setTeachers([initialData.teacher, ...list]);
+          } else {
+            setTeachers(list);
+          }
+        })
+        .catch(() => {
+          // Jika gagal memuat, setidaknya tampilkan guru yang sedang diedit
+          if (initialData?.teacher) {
+            setTeachers([initialData.teacher]);
+          } else {
+            toast.error("Gagal memuat data guru");
+          }
+        });
     }
-  }, [open]);
+  }, [open, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -7,7 +7,7 @@ import Login from "@/pages/Login";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
 import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage } from "@/features/academic";
-import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage } from "@/features/teachers-staff";
+import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
 
 const academicModules = [
   { path: "semesters", title: "Semester" },
@@ -160,9 +160,10 @@ const router = createBrowserRouter([
           { path: "teachers/assignments", element: <TeacherAssignmentsPage /> },
           { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
           { path: "teachers/leave", element: <TeacherLeaveListPage /> },
+          { path: "teachers/documents", element: <TeacherDocumentListPage /> },
           ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects" && m.path !== "class-students")),
           ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),
-          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave")),
+          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave" && m.path !== "documents")),
           ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
           ...createModuleRoutes("/finance", "Finance", financeModules),
           ...createModuleRoutes("/development", "Student Development", developmentModules),
