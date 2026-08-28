@@ -14,7 +14,7 @@ import type {
 interface AcademicYearFormProps {
   open: boolean;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (saved: AcademicYear) => void;
   initialData?: AcademicYear | null;
 }
 
@@ -76,11 +76,12 @@ export default function AcademicYearForm({
       if (initialData) {
         await academicYearService.update(initialData.id, payload);
         toast.success("Tahun ajaran berhasil diperbarui.");
+        onSaved({ ...initialData, name: payload.name, is_active: isActive });
       } else {
-        await academicYearService.create(payload);
+        const res = await academicYearService.create(payload);
         toast.success("Tahun ajaran berhasil ditambahkan.");
+        onSaved(res.data);
       }
-      onSaved();
     } catch (err) {
       const apiError = toApiError(err);
       setError(apiError);
