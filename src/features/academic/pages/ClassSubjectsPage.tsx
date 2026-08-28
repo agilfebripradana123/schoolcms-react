@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
@@ -241,6 +242,28 @@ export default function ClassSubjectsPage() {
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
+  const classFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Kelas" },
+      ...classes.map((c) => ({ value: String(c.id), label: c.name })),
+    ],
+    [classes],
+  );
+  const subjectFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Mata Pelajaran" },
+      ...subjects.map((s) => ({ value: String(s.id), label: s.name })),
+    ],
+    [subjects],
+  );
+  const teacherFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Guru" },
+      ...teachers.map((t) => ({ value: String(t.id), label: t.name })),
+    ],
+    [teachers],
+  );
+
   return (
     <PageContainer className="py-6">
       <PageHeader
@@ -255,50 +278,32 @@ export default function ClassSubjectsPage() {
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Kelas:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Kelas</span>
+            <AppSelect
+              options={classFilterOptions}
               value={classFilter}
-              onChange={(e) => handleClassChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Kelas</option>
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleClassChange(v ?? "all")}
+              placeholder="Pilih Kelas"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Mata Pelajaran:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Mata Pelajaran</span>
+            <AppSelect
+              options={subjectFilterOptions}
               value={subjectFilter}
-              onChange={(e) => handleSubjectChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Mata Pelajaran</option>
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleSubjectChange(v ?? "all")}
+              placeholder="Pilih Mata Pelajaran"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Guru:</span>
-            <select
-              value={teacherFilter}
-              onChange={(e) => handleTeacherChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Guru</option>
-              {teachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {formatTeacherName(t)}
-                </option>
-              ))}
-            </select>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Guru</span>
+              <AppSelect
+                options={teacherFilterOptions}
+                value={teacherFilter}
+                onChange={(v) => handleTeacherChange(v ?? "all")}
+                placeholder="Pilih Guru"
+              />
           </label>
         </div>
 

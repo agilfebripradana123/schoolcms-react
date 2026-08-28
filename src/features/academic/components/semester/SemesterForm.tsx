@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import { FormField, Select } from "@/components/ui/Form";
+import { FormField } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
@@ -179,12 +180,12 @@ export default function SemesterForm({
               melalui menu Tahun Ajaran.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={academicYearId}
-              onChange={(e) => setAcademicYearId(e.target.value)}
+              onChange={(v) => setAcademicYearId(v ?? "")}
               options={yearOptions}
               placeholder="Pilih Tahun Ajaran"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -194,12 +195,13 @@ export default function SemesterForm({
           required
           error={fieldErrors.name?.[0]}
         >
-          <Select
+          <AppSelect
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(v) => setName(v ?? "")}
             options={SEMESTER_OPTIONS}
             placeholder="Pilih Semester"
-            disabled={submitting}
+            isSearchable={false}
+            isDisabled={submitting}
           />
         </FormField>
 

@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
@@ -278,6 +279,34 @@ export default function ClassStudentsPage() {
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
+  const classFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Kelas" },
+      ...classes.map((c) => ({ value: String(c.id), label: c.name })),
+    ],
+    [classes],
+  );
+  const studentFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Siswa" },
+      ...students.map((s) => ({ value: String(s.id), label: s.name })),
+    ],
+    [students],
+  );
+  const yearFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Tahun Ajaran" },
+      ...years.map((y) => ({ value: String(y.id), label: y.name })),
+    ],
+    [years],
+  );
+  const statusFilterOptions = [
+    { value: "all", label: "Semua Status" },
+    { value: "active", label: "Aktif" },
+    { value: "moved", label: "Pindah" },
+    { value: "graduated", label: "Lulus" },
+  ];
+
   return (
     <PageContainer className="py-6">
       <PageHeader
@@ -292,63 +321,42 @@ export default function ClassStudentsPage() {
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Kelas:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Kelas</span>
+            <AppSelect
+              options={classFilterOptions}
               value={classFilter}
-              onChange={(e) => handleClassChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Kelas</option>
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleClassChange(v ?? "all")}
+              placeholder="Pilih Kelas"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Siswa:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Siswa</span>
+            <AppSelect
+              options={studentFilterOptions}
               value={studentFilter}
-              onChange={(e) => handleStudentChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Siswa</option>
-              {students.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleStudentChange(v ?? "all")}
+              placeholder="Pilih Siswa"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Tahun Ajaran:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Tahun Ajaran</span>
+            <AppSelect
+              options={yearFilterOptions}
               value={yearFilter}
-              onChange={(e) => handleYearChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Tahun Ajaran</option>
-              {years.map((y) => (
-                <option key={y.id} value={y.id}>
-                  {y.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleYearChange(v ?? "all")}
+              placeholder="Pilih Tahun Ajaran"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Status:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Status</span>
+            <AppSelect
+              options={statusFilterOptions}
               value={statusFilter}
-              onChange={(e) => handleStatusChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Status</option>
-              <option value="active">Aktif</option>
-              <option value="moved">Pindah</option>
-              <option value="graduated">Lulus</option>
-            </select>
+              onChange={(v) => handleStatusChange(v ?? "all")}
+              placeholder="Pilih Status"
+              isSearchable={false}
+            />
           </label>
         </div>
 

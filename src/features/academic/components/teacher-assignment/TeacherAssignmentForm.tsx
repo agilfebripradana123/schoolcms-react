@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import { FormField, Select } from "@/components/ui/Form";
+import { FormField } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
@@ -214,6 +215,7 @@ export default function TeacherAssignmentForm({
         className="space-y-6"
         noValidate
       >
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <FormField label="Guru" required error={fieldErrors.teacher_id?.[0]}>
           {teachersLoading ? (
             <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
@@ -238,12 +240,12 @@ export default function TeacherAssignmentForm({
               Tidak ada guru tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={teacherId}
-              onChange={(e) => setTeacherId(e.target.value)}
+              onChange={(v) => setTeacherId(v ?? "")}
               options={teacherOptions}
               placeholder="Pilih Guru"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -272,12 +274,12 @@ export default function TeacherAssignmentForm({
               Tidak ada kelas tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={classId}
-              onChange={(e) => setClassId(e.target.value)}
+              onChange={(v) => setClassId(v ?? "")}
               options={classOptions}
               placeholder="Pilih Kelas"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -306,12 +308,12 @@ export default function TeacherAssignmentForm({
               Tidak ada mata pelajaran tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={subjectId}
-              onChange={(e) => setSubjectId(e.target.value)}
+              onChange={(v) => setSubjectId(v ?? "")}
               options={subjectOptions}
               placeholder="Pilih Mata Pelajaran"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -340,15 +342,16 @@ export default function TeacherAssignmentForm({
               Tidak ada tahun ajaran tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={academicYearId}
-              onChange={(e) => setAcademicYearId(e.target.value)}
+              onChange={(v) => setAcademicYearId(v ?? "")}
               options={yearOptions}
               placeholder="Pilih Tahun Ajaran"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
+        </div>
 
         {error && !error.errors && (
           <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">

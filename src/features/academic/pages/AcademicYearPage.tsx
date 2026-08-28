@@ -6,6 +6,7 @@ import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Search from "@/components/ui/Search";
+import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
@@ -186,6 +187,12 @@ export default function AcademicYearPage() {
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
+  const statusFilterOptions = [
+    { value: "all", label: "Semua" },
+    { value: "active", label: "Aktif" },
+    { value: "inactive", label: "Tidak Aktif" },
+  ];
+
   return (
     <PageContainer className="py-6">
       <PageHeader
@@ -207,17 +214,16 @@ export default function AcademicYearPage() {
               placeholder="Cari nama tahun ajaran..."
             />
           </div>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Status:</span>
-            <select
+          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+            <span className="whitespace-nowrap">Status</span>
+            <AppSelect
+              options={statusFilterOptions}
               value={status}
-              onChange={(e) => handleStatusChange(e.target.value as StatusFilter)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua</option>
-              <option value="active">Aktif</option>
-              <option value="inactive">Tidak Aktif</option>
-            </select>
+              onChange={(v) => handleStatusChange((v ?? "all") as StatusFilter)}
+              placeholder="Pilih Status"
+              isSearchable={false}
+              className="min-w-[180px]"
+            />
           </label>
         </div>
 

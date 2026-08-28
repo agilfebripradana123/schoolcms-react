@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import { FormField, Select } from "@/components/ui/Form";
+import { FormField } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
@@ -220,12 +221,12 @@ export default function ClassStudentForm({
               Tidak ada kelas tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={classId}
-              onChange={(e) => setClassId(e.target.value)}
+              onChange={(v) => setClassId(v ?? "")}
               options={classOptions}
               placeholder="Pilih Kelas"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -254,12 +255,12 @@ export default function ClassStudentForm({
               Tidak ada siswa tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
+              onChange={(v) => setStudentId(v ?? "")}
               options={studentOptions}
               placeholder="Pilih Siswa"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -292,22 +293,23 @@ export default function ClassStudentForm({
               Tidak ada tahun ajaran tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={academicYearId}
-              onChange={(e) => setAcademicYearId(e.target.value)}
+              onChange={(v) => setAcademicYearId(v ?? "")}
               options={yearOptions}
               placeholder="Pilih Tahun Ajaran"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
 
         <FormField label="Status" required error={fieldErrors.status?.[0]}>
-          <Select
+          <AppSelect
             value={status}
-            onChange={(e) => setStatus(e.target.value as ClassStudentStatus)}
+            onChange={(v) => setStatus((v ?? "active") as ClassStudentStatus)}
             options={STATUS_OPTIONS}
-            disabled={submitting}
+            isSearchable={false}
+            isDisabled={submitting}
           />
         </FormField>
 

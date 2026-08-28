@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import { FormField, Select } from "@/components/ui/Form";
+import { FormField } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
@@ -211,12 +212,12 @@ export default function ClassSubjectForm({
               Tidak ada kelas tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={classId}
-              onChange={(e) => setClassId(e.target.value)}
+              onChange={(v) => setClassId(v ?? "")}
               options={classOptions}
               placeholder="Pilih Kelas"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -245,12 +246,12 @@ export default function ClassSubjectForm({
               Tidak ada mata pelajaran tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={subjectId}
-              onChange={(e) => setSubjectId(e.target.value)}
+              onChange={(v) => setSubjectId(v ?? "")}
               options={subjectOptions}
               placeholder="Pilih Mata Pelajaran"
-              disabled={submitting}
+              isDisabled={submitting}
             />
           )}
         </FormField>
@@ -283,12 +284,13 @@ export default function ClassSubjectForm({
               Tidak ada guru tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={teacherId}
-              onChange={(e) => setTeacherId(e.target.value)}
+              onChange={(v) => setTeacherId(v ?? "")}
               options={teacherOptions}
               placeholder="Pilih Guru"
-              disabled={submitting}
+              isClearable
+              isDisabled={submitting}
             />
           )}
         </FormField>
