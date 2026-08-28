@@ -120,22 +120,58 @@ export interface CreateClassSubjectPayload {
 export interface UpdateClassSubjectPayload extends Partial<CreateClassSubjectPayload> {}
 
 // ---- Class Student ----
+export type ClassStudentStatus = "active" | "moved" | "graduated";
+
+export interface Student {
+  id: number;
+  name: string;
+}
+
 export interface ClassStudent {
   id: number;
   class_id: number;
   student_id: number;
-  academic_year_id?: number;
+  academic_year_id: number;
+  status: ClassStudentStatus;
   created_at?: string;
   updated_at?: string;
+  class?: SchoolClass;
+  student?: Student;
+  academic_year?: AcademicYear;
 }
 
 export interface CreateClassStudentPayload {
   class_id: number;
   student_id: number;
-  academic_year_id?: number;
+  academic_year_id: number;
+  status: ClassStudentStatus;
 }
 
 export interface UpdateClassStudentPayload extends Partial<CreateClassStudentPayload> {}
+
+// ---- Teacher Assignment ----
+export interface TeacherAssignment {
+  id: number;
+  teacher_id: number;
+  class_id: number;
+  subject_id: number;
+  academic_year_id: number;
+  created_at?: string;
+  updated_at?: string;
+  teacher?: Teacher;
+  class?: SchoolClass;
+  subject?: Subject;
+  academic_year?: AcademicYear;
+}
+
+export interface CreateTeacherAssignmentPayload {
+  teacher_id: number;
+  class_id: number;
+  subject_id: number;
+  academic_year_id: number;
+}
+
+export interface UpdateTeacherAssignmentPayload extends Partial<CreateTeacherAssignmentPayload> {}
 
 // ---- Schedule ----
 export interface Schedule {
