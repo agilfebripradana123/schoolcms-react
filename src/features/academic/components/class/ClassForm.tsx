@@ -2,7 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import { FormField, Input, Select } from "@/components/ui/Form";
+import { FormField, Input } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
@@ -210,12 +211,13 @@ export default function ClassForm({
               Tidak ada guru tersedia.
             </p>
           ) : (
-            <Select
+            <AppSelect
               value={teacherId}
-              onChange={(e) => setTeacherId(e.target.value)}
+              onChange={(v) => setTeacherId(v ?? "")}
               options={teacherOptions}
               placeholder="Pilih Wali Kelas"
-              disabled={submitting}
+              isClearable
+              isDisabled={submitting}
             />
           )}
         </FormField>

@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
@@ -198,6 +199,12 @@ export default function TeacherAssignmentsPage() {
     setDeleteOpen(true);
   }, []);
 
+  const teacherName = useCallback(
+    (row: TeacherAssignment) =>
+      row.teacher ? row.teacher.full_name ?? `#${row.teacher_id}` : `#${row.teacher_id}`,
+    [],
+  );
+
   const columns = useMemo(() => {
     type Row = TeacherAssignment;
     return [
@@ -205,18 +212,14 @@ export default function TeacherAssignmentsPage() {
         header: "Guru",
         accessor: "teacher" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">
-            {row.teacher
-              ? row.teacher.full_name ?? `#${row.teacher_id}`
-              : `#${row.teacher_id}`}
-          </span>
+          <span className="font-medium text-on-surface">{teacherName(row)}</span>
         ),
       },
       {
         header: "Kelas",
         accessor: "class" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span className="text-sm text-on-surface-variant">
             {row.class?.name ?? `#${row.class_id}`}
           </span>
         ),
@@ -225,7 +228,7 @@ export default function TeacherAssignmentsPage() {
         header: "Mata Pelajaran",
         accessor: "subject" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span className="text-sm text-on-surface-variant">
             {row.subject?.name ?? `#${row.subject_id}`}
           </span>
         ),
@@ -234,7 +237,7 @@ export default function TeacherAssignmentsPage() {
         header: "Tahun Ajaran",
         accessor: "academic_year" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span className="text-sm text-on-surface-variant">
             {row.academic_year?.name ?? `#${row.academic_year_id}`}
           </span>
         ),
@@ -245,39 +248,68 @@ export default function TeacherAssignmentsPage() {
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-center text-sm text-slate-700",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
-              aria-label={`Edit penugasan ${row.teacher?.full_name ?? row.teacher_id}`}
+              aria-label={`Edit penugasan ${teacherName(row)}`}
             >
-              <Pencil className="h-4 w-4" strokeWidth={1.75} />
+              <Pencil className="h-4 w-4" strokeWidth={2} />
             </button>
             <button
               type="button"
               onClick={() => openDelete(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
-              aria-label={`Hapus penugasan ${row.teacher?.full_name ?? row.teacher_id}`}
+              aria-label={`Hapus penugasan ${teacherName(row)}`}
             >
-              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+              <Trash2 className="h-4 w-4" strokeWidth={2} />
             </button>
           </div>
         ),
       },
     ];
-  }, [openEdit, openDelete]);
+  }, [openEdit, openDelete, teacherName]);
 
   const isFirstPage = meta.current_page <= 1;
   const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
+  const teacherFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Guru" },
+      ...teachers.map((t) => ({ value: String(t.id), label: t.name })),
+    ],
+    [teachers],
+  );
+  const classFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Kelas" },
+      ...classes.map((c) => ({ value: String(c.id), label: c.name })),
+    ],
+    [classes],
+  );
+  const subjectFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Mata Pelajaran" },
+      ...subjects.map((s) => ({ value: String(s.id), label: s.name })),
+    ],
+    [subjects],
+  );
+  const yearFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Tahun Ajaran" },
+      ...years.map((y) => ({ value: String(y.id), label: y.name })),
+    ],
+    [years],
+  );
+
   return (
     <PageContainer className="py-6">
       <PageHeader
         title="Penugasan Guru"
-        description="Kelola penugasan guru pada mata pelajaran dan kelas."
+        description="Kelola penugasan guru berdasarkan kelas, mata pelajaran, dan tahun ajaran."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -287,65 +319,41 @@ export default function TeacherAssignmentsPage() {
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Guru:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Guru</span>
+            <AppSelect
+              options={teacherFilterOptions}
               value={teacherFilter}
-              onChange={(e) => handleTeacherChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Guru</option>
-              {teachers.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleTeacherChange(v ?? "all")}
+              placeholder="Pilih Guru"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Kelas:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Kelas</span>
+            <AppSelect
+              options={classFilterOptions}
               value={classFilter}
-              onChange={(e) => handleClassChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Kelas</option>
-              {classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleClassChange(v ?? "all")}
+              placeholder="Pilih Kelas"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Mata Pelajaran:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Mata Pelajaran</span>
+            <AppSelect
+              options={subjectFilterOptions}
               value={subjectFilter}
-              onChange={(e) => handleSubjectChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Mata Pelajaran</option>
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleSubjectChange(v ?? "all")}
+              placeholder="Pilih Mata Pelajaran"
+            />
           </label>
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Tahun Ajaran:</span>
-            <select
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Tahun Ajaran</span>
+            <AppSelect
+              options={yearFilterOptions}
               value={yearFilter}
-              onChange={(e) => handleYearChange(e.target.value)}
-              className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            >
-              <option value="all">Semua Tahun Ajaran</option>
-              {years.map((y) => (
-                <option key={y.id} value={y.id}>
-                  {y.name}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => handleYearChange(v ?? "all")}
+              placeholder="Pilih Tahun Ajaran"
+            />
           </label>
         </div>
 
@@ -360,12 +368,68 @@ export default function TeacherAssignmentsPage() {
             </Button>
           </div>
         ) : (
-          <DataTable
-            columns={columns}
-            data={data}
-            loading={loading}
-            emptyMessage="Tidak ada penugasan guru."
-          />
+          <>
+            {/* Kartu untuk mobile */}
+            <div className="space-y-3 sm:hidden">
+              {loading ? (
+                <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
+              ) : data.length === 0 ? (
+                <div className="py-10 text-center text-sm text-slate-500">
+                  Tidak ada penugasan guru.
+                </div>
+              ) : (
+                data.map((row) => (
+                  <div
+                    key={row.id}
+                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-semibold text-on-surface">{teacherName(row)}</p>
+                        <p className="mt-0.5 text-xs text-on-surface-variant">
+                          {row.subject?.name ?? `#${row.subject_id}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 space-y-1 text-sm text-on-surface-variant">
+                      <p>
+                        Kelas: {row.class?.name ?? `#${row.class_id}`}
+                      </p>
+                      <p>
+                        Tahun Ajaran: {row.academic_year?.name ?? `#${row.academic_year_id}`}
+                      </p>
+                    </div>
+                    <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => openEdit(row)}
+                      >
+                        <Pencil className="h-4 w-4" /> Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => openDelete(row)}
+                      >
+                        <Trash2 className="h-4 w-4" /> Hapus
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Tabel untuk desktop */}
+            <div className="hidden sm:block">
+              <DataTable
+                columns={columns}
+                data={data}
+                loading={loading}
+                emptyMessage="Tidak ada penugasan guru."
+              />
+            </div>
+          </>
         )}
 
         {!error && !loading && meta.total > 0 && (

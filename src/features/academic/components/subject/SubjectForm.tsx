@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import { FormField, Input, Select, Textarea } from "@/components/ui/Form";
+import { FormField, Input, Textarea } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
@@ -133,11 +134,12 @@ export default function SubjectForm({
             required
             error={fieldErrors.type?.[0]}
           >
-            <Select
+            <AppSelect
               value={type}
-              onChange={(e) => setType(e.target.value as SubjectType)}
+              onChange={(v) => setType((v ?? "wajib") as SubjectType)}
               options={TYPE_OPTIONS}
-              disabled={submitting}
+              isSearchable={false}
+              isDisabled={submitting}
             />
           </FormField>
         </div>
