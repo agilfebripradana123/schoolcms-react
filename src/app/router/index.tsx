@@ -6,7 +6,7 @@ import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
-import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage } from "@/features/academic";
+import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage } from "@/features/academic";
 
 const academicModules = [
   { path: "semesters", title: "Semester" },
@@ -144,6 +144,8 @@ const router = createBrowserRouter([
           { path: "academic/subjects", element: <SubjectsPage /> },
           { path: "academic/classes", element: <ClassesPage /> },
           { path: "academic/class-subjects", element: <ClassSubjectsPage /> },
+          { path: "academic/class-students", element: <ClassStudentsPage /> },
+          { path: "academic/teacher-assignments", element: <TeacherAssignmentsPage /> },
           { path: "students", element: <StudentListPage /> },
           { path: "students/parents", element: <ParentListPage /> },
           { path: "students/guardians", element: <GuardianListPage /> },
@@ -152,7 +154,7 @@ const router = createBrowserRouter([
           { path: "students/transfers", element: <TransferListPage /> },
           { path: "students/alumni", element: <AlumniListPage /> },
           { path: "students/id-card", element: <StudentIdCardListPage /> },
-          ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects")),
+          ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects" && m.path !== "class-students")),
           ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),
           ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules),
           ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
