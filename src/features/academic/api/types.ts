@@ -79,20 +79,16 @@ export interface UpdateSubjectPayload extends Partial<CreateSubjectPayload> {}
 export interface SchoolClass {
   id: number;
   name: string;
-  code?: string;
-  grade?: string;
-  academic_year_id?: number;
-  teacher_id?: number;
-  created_at?: string;
-  updated_at?: string;
+  teacher_id?: number | null;
+  level?: string;
+  academic_year?: string;
 }
 
 export interface CreateSchoolClassPayload {
   name: string;
-  code?: string;
-  grade?: string;
-  academic_year_id?: number;
-  teacher_id?: number;
+  teacher_id?: number | null;
+  level?: string;
+  academic_year?: string;
 }
 
 export interface UpdateSchoolClassPayload extends Partial<CreateSchoolClassPayload> {}
