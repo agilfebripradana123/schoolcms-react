@@ -259,7 +259,7 @@ export default function ClassSubjectsPage() {
   const teacherFilterOptions = useMemo(
     () => [
       { value: "all", label: "Semua Guru" },
-      ...teachers.map((t) => ({ value: String(t.id), label: t.name })),
+      ...teachers.map((t) => ({ value: String(t.id), label: formatTeacherName(t) })),
     ],
     [teachers],
   );

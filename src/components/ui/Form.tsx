@@ -2,9 +2,12 @@ import {
   forwardRef,
   type InputHTMLAttributes,
   type TextareaHTMLAttributes,
-  type SelectHTMLAttributes,
   type ReactNode,
 } from "react";
+import ReactSelect from "react-select";
+import type { CSSObjectWithLabel, GroupBase, OptionProps as RSOptionProps } from "react-select";
+
+export type SelectOption = { value: string; label: string };
 
 // ponytail: komponen form minimal — tambah date picker / file upload saat modul butuh
 
@@ -13,7 +16,7 @@ const baseInput =
 
 /* ── FormField wrapper ── */
 interface FormFieldProps {
-  label?: string;
+  label?: string; 
   error?: string;
   hint?: string;
   required?: boolean;
@@ -80,30 +83,100 @@ export const Textarea = forwardRef<
 ));
 Textarea.displayName = "Textarea";
 
-/* ── Select ── */
-interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  options: { value: string; label: string }[];
+/* ── Select (react-select, drop-in API) ── */
+interface SelectProps {
+  options: SelectOption[];
+  value?: string | number;
+  onChange?: (event: { target: { value: string } }) => void;
   placeholder?: string;
+  disabled?: boolean;
+  className?: string;
+  id?: string;
+  name?: string;
+  isSearchable?: boolean;
 }
 
-export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className = "", options, placeholder, ...props }, ref) => (
-    <select
-      ref={ref}
-      className={`${baseInput} appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%237b7487%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_12px_center] bg-no-repeat pr-10 ${className}`}
-      {...props}
-    >
-      {placeholder && (
-        <option value="" disabled>
-          {placeholder}
-        </option>
-      )}
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
-  ),
+// Gaya react-select agar selaras dengan Input (rounded-2xl, border slate, focus ring primary)
+const rsSelect = {
+  control: (provided: CSSObjectWithLabel, state: { isFocused: boolean }) => ({
+    ...provided,
+    minHeight: "46px",
+    borderRadius: "1rem",
+    borderColor: state.isFocused ? "rgb(97 77 168)" : "rgb(226 232 240)",
+    boxShadow: state.isFocused ? "0 0 0 3px rgb(97 77 168 / 0.3)" : provided.boxShadow,
+    backgroundColor: "#ffffff",
+    cursor: "pointer",
+    "&:hover": { borderColor: "rgb(97 77 168)" },
+  }),
+  menu: (provided: CSSObjectWithLabel) => ({
+    ...provided,
+    borderRadius: "1rem",
+    overflow: "hidden",
+    zIndex: 50,
+  }),
+  option: (
+    provided: CSSObjectWithLabel,
+    state: RSOptionProps<SelectOption, false, GroupBase<SelectOption>>,
+  ) => ({
+    ...provided,
+    cursor: "pointer",
+    backgroundColor: state.isSelected
+      ? "rgb(97 77 168)"
+      : state.isFocused
+        ? "rgba(97 77 168, 0.08)"
+        : "#fff",
+    color: state.isSelected ? "#fff" : "rgb(15 23 42)",
+    "&:active": {
+      backgroundColor: state.isSelected ? "rgb(97 77 168)" : "rgba(97 77 168, 0.15)",
+    },
+  }),
+  placeholder: (provided: CSSObjectWithLabel) => ({
+    ...provided,
+    color: "rgb(148 163 184)",
+  }),
+  singleValue: (provided: CSSObjectWithLabel) => ({
+    ...provided,
+    color: "rgb(15 23 42)",
+  }),
+  indicatorSeparator: () => ({ display: "none" }),
+};
+
+export const Select = forwardRef<HTMLDivElement, SelectProps>(
+  (
+    {
+      className = "",
+      options,
+      value,
+      onChange,
+      placeholder,
+      disabled,
+      id,
+      name,
+      isSearchable,
+    },
+    ref,
+  ) => {
+    const strValue = value === undefined || value === null ? "" : String(value);
+    const selected = options.find((o) => o.value === strValue) ?? null;
+    return (
+      <div ref={ref} className={className}>
+        <ReactSelect
+          inputId={id ? `${id}-input` : undefined}
+          name={name}
+          options={options}
+          value={selected}
+          placeholder={placeholder}
+          isDisabled={disabled}
+          isSearchable={isSearchable ?? options.length > 8}
+          classNamePrefix="rs"
+          styles={rsSelect}
+          menuPortalTarget={typeof document !== "undefined" ? document.body : undefined}
+          onChange={(option) => {
+            onChange?.({ target: { value: option?.value ?? "" } });
+          }}
+        />
+      </div>
+    );
+  },
 );
 Select.displayName = "Select";
