@@ -57,7 +57,7 @@ export default function SidebarSection({
       </button>
 
       {expanded && (
-        <div className="ml-2 mt-0.5 space-y-0.5 border-l border-white/10 pl-2">
+        <div className="ml-2 mt-2 mb-2 space-y-0.5 border-l border-white/10 pl-2">
           {group.items.map((item) => (
             <SidebarItem
               key={item.path}
