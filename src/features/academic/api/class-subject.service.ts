@@ -2,15 +2,39 @@ import { api } from "@/lib/api";
 import { ACADEMIC } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
-  AcademicListParams,
   ClassSubject,
   CreateClassSubjectPayload,
   UpdateClassSubjectPayload,
 } from "./types";
 
+export interface ClassSubjectListParams {
+  class_id?: number;
+  subject_id?: number;
+  teacher_id?: number;
+  page?: number;
+  per_page?: number;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+export interface ClassSubjectListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface ClassSubjectListResponse {
+  success: boolean;
+  message: string;
+  data: ClassSubject[];
+  meta: ClassSubjectListMeta;
+}
+
 export const classSubjectService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<ClassSubject[]>> {
-    return api.get<ApiEnvelope<ClassSubject[]>>(ACADEMIC.CLASS_SUBJECTS, params);
+  async list(
+    params?: ClassSubjectListParams,
+  ): Promise<ClassSubjectListResponse> {
+    return api.get<ClassSubjectListResponse>(ACADEMIC.CLASS_SUBJECTS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<ClassSubject>> {

@@ -94,19 +94,27 @@ export interface CreateSchoolClassPayload {
 export interface UpdateSchoolClassPayload extends Partial<CreateSchoolClassPayload> {}
 
 // ---- Class Subject ----
+export interface Teacher {
+  id: number;
+  full_name?: string;
+}
+
 export interface ClassSubject {
   id: number;
   class_id: number;
   subject_id: number;
-  teacher_id?: number;
+  teacher_id?: number | null;
   created_at?: string;
   updated_at?: string;
+  class?: SchoolClass;
+  subject?: Subject;
+  teacher?: Teacher;
 }
 
 export interface CreateClassSubjectPayload {
   class_id: number;
   subject_id: number;
-  teacher_id?: number;
+  teacher_id?: number | null;
 }
 
 export interface UpdateClassSubjectPayload extends Partial<CreateClassSubjectPayload> {}
