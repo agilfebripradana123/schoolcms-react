@@ -13,7 +13,7 @@ import { classService } from "../api/class.service";
 import { subjectService } from "../api/subject.service";
 import { academicYearService } from "../api/academic-year.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
-import type { Teacher } from "@/features/teachers-staff/api/types";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type {
   AcademicYear,
   SchoolClass,
@@ -297,7 +297,7 @@ export default function TeacherAssignmentsPage() {
               <option value="all">Semua Guru</option>
               {teachers.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.name}
+                  {formatTeacherName(t)}
                 </option>
               ))}
             </select>

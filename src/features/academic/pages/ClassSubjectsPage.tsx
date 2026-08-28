@@ -12,7 +12,7 @@ import { classSubjectService } from "../api/class-subject.service";
 import { classService } from "../api/class.service";
 import { subjectService } from "../api/subject.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
-import type { Teacher } from "@/features/teachers-staff/api/types";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type { ClassSubject, SchoolClass, Subject } from "../api/types";
 import ClassSubjectForm from "../components/class-subject/ClassSubjectForm";
 import ClassSubjectDeleteDialog from "../components/class-subject/ClassSubjectDeleteDialog";
@@ -295,7 +295,7 @@ export default function ClassSubjectsPage() {
               <option value="all">Semua Guru</option>
               {teachers.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.name}
+                  {formatTeacherName(t)}
                 </option>
               ))}
             </select>
