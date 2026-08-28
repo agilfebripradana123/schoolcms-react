@@ -2,15 +2,38 @@ import { api } from "@/lib/api";
 import { ACADEMIC } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
-  AcademicListParams,
   CreateCurriculumPayload,
   Curriculum,
   UpdateCurriculumPayload,
 } from "./types";
 
+export interface CurriculumListParams {
+  q?: string;
+  is_active?: boolean;
+  page?: number;
+  per_page?: number;
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+export interface CurriculumListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface CurriculumListResponse {
+  success: boolean;
+  message: string;
+  data: Curriculum[];
+  meta: CurriculumListMeta;
+}
+
 export const curriculumService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<Curriculum[]>> {
-    return api.get<ApiEnvelope<Curriculum[]>>(ACADEMIC.CURRICULUMS, params);
+  async list(
+    params?: CurriculumListParams,
+  ): Promise<CurriculumListResponse> {
+    return api.get<CurriculumListResponse>(ACADEMIC.CURRICULUMS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Curriculum>> {
