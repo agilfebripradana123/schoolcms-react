@@ -371,12 +371,76 @@ export default function ClassStudentsPage() {
             </Button>
           </div>
         ) : (
-          <DataTable
-            columns={columns}
-            data={data}
-            loading={loading}
-            emptyMessage="Tidak ada siswa dalam kelas."
-          />
+          <>
+            {/* Kartu untuk mobile */}
+            <div className="space-y-3 sm:hidden">
+              {loading ? (
+                <div className="py-10 text-center text-sm text-slate-500">
+                  Memuat data...
+                </div>
+              ) : data.length === 0 ? (
+                <div className="py-10 text-center text-sm text-slate-500">
+                  Tidak ada siswa dalam kelas.
+                </div>
+              ) : (
+                data.map((row) => {
+                  const meta =
+                    STATUS_META[row.status] ?? { label: row.status, variant: "secondary" as const };
+                  return (
+                    <div
+                      key={row.id}
+                      className="rounded-2xl border border-slate-200 bg-white p-4"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-on-surface">
+                            {row.student?.name ?? `#${row.student_id}`}
+                          </p>
+                          <p className="mt-0.5 text-xs text-on-surface-variant">
+                            {row.class?.name ?? `#${row.class_id}`}
+                          </p>
+                          <p className="text-xs text-on-surface-variant">
+                            {row.academic_year?.name ?? `#${row.academic_year_id}`}
+                          </p>
+                        </div>
+                        <Badge
+                          variant={meta.variant}
+                          className="shrink-0 px-2.5 py-1 text-xs leading-4"
+                        >
+                          {meta.label}
+                        </Badge>
+                      </div>
+                      <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => openEdit(row)}
+                        >
+                          <Pencil className="h-4 w-4" /> Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => openDelete(row)}
+                        >
+                          <Trash2 className="h-4 w-4" /> Hapus
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="hidden sm:block">
+              <DataTable
+                columns={columns}
+                data={data}
+                loading={loading}
+                emptyMessage="Tidak ada siswa dalam kelas."
+              />
+            </div>
+          </>
         )}
 
         {!error && !loading && meta.total > 0 && (

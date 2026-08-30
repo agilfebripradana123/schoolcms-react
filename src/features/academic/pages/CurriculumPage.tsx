@@ -249,12 +249,69 @@ export default function CurriculumPage() {
             </Button>
           </div>
         ) : (
-          <DataTable
-            columns={columns}
-            data={data}
-            loading={loading}
-            emptyMessage="Tidak ada kurikulum."
-          />
+          <>
+            {/* Kartu untuk mobile */}
+            <div className="space-y-3 sm:hidden">
+              {loading ? (
+                <div className="py-10 text-center text-sm text-slate-500">
+                  Memuat data...
+                </div>
+              ) : data.length === 0 ? (
+                <div className="py-10 text-center text-sm text-slate-500">
+                  Tidak ada kurikulum.
+                </div>
+              ) : (
+                data.map((row) => (
+                  <div
+                    key={row.id}
+                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-on-surface">{row.name}</p>
+                        {row.description && (
+                          <p className="mt-0.5 text-xs text-on-surface-variant">
+                            {row.description}
+                          </p>
+                        )}
+                      </div>
+                      <Badge
+                        variant={row.is_active ? "success" : "secondary"}
+                        className="shrink-0 px-2.5 py-1 text-xs leading-4"
+                      >
+                        {row.is_active ? "Aktif" : "Tidak Aktif"}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => openEdit(row)}
+                      >
+                        <Pencil className="h-4 w-4" /> Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => openDelete(row)}
+                      >
+                        <Trash2 className="h-4 w-4" /> Hapus
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="hidden sm:block">
+              <DataTable
+                columns={columns}
+                data={data}
+                loading={loading}
+                emptyMessage="Tidak ada kurikulum."
+              />
+            </div>
+          </>
         )}
 
         {!error && !loading && meta.total > 0 && (
