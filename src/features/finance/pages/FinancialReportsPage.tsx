@@ -1,64 +1,80 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
-import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import type { ApiError } from "@/types";
-import { curriculumService } from "../api/curriculum.service";
-import type { Curriculum } from "../api/types";
-import CurriculumForm from "../components/curriculum/CurriculumForm";
-import CurriculumDeleteDialog from "../components/curriculum/CurriculumDeleteDialog";
+import { financialReportService } from "../api/financial-report.service";
+import type { FinancialReport, FinancialReportType } from "../api/types";
+import FinancialReportForm from "../components/financial-report/FinancialReportForm";
+import FinancialReportDeleteDialog from "../components/financial-report/FinancialReportDeleteDialog";
 
 const PER_PAGE = 10;
 
-type StatusFilter = "all" | "active" | "inactive";
+const TYPE_LABELS: Record<FinancialReportType, string> = {
+  harian: "Harian",
+  bulanan: "Bulanan",
+  semester: "Semester",
+  tahunan: "Tahunan",
+  custom: "Kustom",
+};
+
+const TYPE_VARIANTS: Record<FinancialReportType, "primary" | "secondary" | "warning" | "success" | "neutral"> = {
+  harian: "primary",
+  bulanan: "success",
+  semester: "warning",
+  tahunan: "neutral",
+  custom: "secondary",
+};
+
+const TYPE_OPTIONS: Array<{ value: FinancialReportType; label: string }> = [
+  { value: "harian", label: "Harian" },
+  { value: "bulanan", label: "Bulanan" },
+  { value: "semester", label: "Semester" },
+  { value: "tahunan", label: "Tahunan" },
+  { value: "custom", label: "Kustom" },
+];
+
+type TypeFilter = "all" | FinancialReportType;
 
 interface QueryState {
-  q: string;
-  is_active: boolean | undefined;
+  report_type: FinancialReportType | undefined;
   page: number;
 }
 
-function statusToFilter(status: StatusFilter): boolean | undefined {
-  if (status === "all") return undefined;
-  return status === "active";
-}
-
-export default function CurriculumPage() {
-  const [data, setData] = useState<Curriculum[]>([]);
+export default function FinancialReportsPage() {
+  const [data, setData] = useState<FinancialReport[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [page, setPage] = useState(1);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
 
-  const [query, setQuery] = useState<QueryState>({ q: "", is_active: undefined, page: 1 });
+  const [query, setQuery] = useState<QueryState>({
+    report_type: undefined,
+    page: 1,
+  });
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Curriculum | null>(null);
+  const [editing, setEditing] = useState<FinancialReport | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState<Curriculum | null>(null);
-
-  const searchTimeout = useRef<number | null>(null);
+  const [toDelete, setToDelete] = useState<FinancialReport | null>(null);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError(null);
 
-    curriculumService
+    financialReportService
       .list({
-        q: query.q || undefined,
-        is_active: query.is_active,
+        report_type: query.report_type,
         page: query.page,
         per_page: PER_PAGE,
       })
@@ -66,13 +82,12 @@ export default function CurriculumPage() {
         if (!active) return;
         setData(res.data);
         setMeta(res.meta);
-        setPage(res.meta.current_page);
       })
       .catch((err) => {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
-        toast.error("Gagal memuat data kurikulum", {
+        toast.error("Gagal memuat data laporan keuangan", {
           description: toApiError(err).message,
         });
       })
@@ -85,17 +100,13 @@ export default function CurriculumPage() {
     };
   }, [query]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
-    searchTimeout.current = window.setTimeout(() => {
-      setQuery((prev) => ({ ...prev, q: value, page: 1 }));
-    }, 400);
-  }, []);
-
-  const handleStatusChange = useCallback((value: StatusFilter) => {
-    setStatus(value);
-    setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
+  const handleTypeChange = useCallback((value: TypeFilter) => {
+    setTypeFilter(value);
+    setQuery((prev) => ({
+      ...prev,
+      report_type: value === "all" ? undefined : value,
+      page: 1,
+    }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
@@ -105,63 +116,96 @@ export default function CurriculumPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
-    setQuery((prev) => ({ ...prev, page: 1 }));
+    setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
-    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
-    setQuery((prev) => ({
-      ...prev,
-      page: isLastPage ? page - 1 : page,
-    }));
-  }, [page, meta.total, meta.per_page]);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
 
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
   }, []);
 
-  const openEdit = useCallback((row: Curriculum) => {
+  const openEdit = useCallback((row: FinancialReport) => {
     setEditing(row);
     setFormOpen(true);
   }, []);
 
-  const openDelete = useCallback((row: Curriculum) => {
+  const openDelete = useCallback((row: FinancialReport) => {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
 
+  const periodLabel = useCallback((row: FinancialReport) => {
+    if (row.period_start && row.period_end) {
+      return `${formatDate(row.period_start)} - ${formatDate(row.period_end)}`;
+    }
+    if (row.period_start) return formatDate(row.period_start);
+    if (row.period_end) return formatDate(row.period_end);
+    return "-";
+  }, []);
+
   const columns = useMemo(() => {
-    type Row = Curriculum;
+    type Row = FinancialReport;
     return [
       {
-        header: "Nama",
-        accessor: "name" as keyof Row,
+        header: "Judul",
+        accessor: "title" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{row.name}</span>
+          <span className="font-medium text-on-surface">{row.title}</span>
         ),
       },
       {
-        header: "Deskripsi",
-        accessor: "description" as keyof Row,
+        header: "Jenis",
+        accessor: "report_type" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.description || "-"}</span>
-        ),
-      },
-      {
-        header: "Status",
-        accessor: "is_active" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
-        render: (_value: Row[keyof Row], row: Row) => (
-          <Badge
-            variant={row.is_active ? "success" : "secondary"}
-            className="px-2.5 py-1 text-xs leading-4"
-          >
-            {row.is_active ? "Aktif" : "Tidak Aktif"}
+          <Badge variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}>
+            {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
           </Badge>
+        ),
+      },
+      {
+        header: "Periode",
+        accessor: "period_start" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">{periodLabel(row)}</span>
+        ),
+      },
+      {
+        header: "Total Tagihan",
+        accessor: "total_billed" as keyof Row,
+        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">
+            {row.total_billed != null ? formatCurrency(row.total_billed) : "-"}
+          </span>
+        ),
+      },
+      {
+        header: "Total Dibayar",
+        accessor: "total_paid" as keyof Row,
+        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="font-semibold text-tertiary">
+            {row.total_paid != null ? formatCurrency(row.total_paid) : "-"}
+          </span>
+        ),
+      },
+      {
+        header: "Total Tertunggak",
+        accessor: "total_outstanding" as keyof Row,
+        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="font-semibold text-error">
+            {row.total_outstanding != null ? formatCurrency(row.total_outstanding) : "-"}
+          </span>
         ),
       },
       {
@@ -175,7 +219,7 @@ export default function CurriculumPage() {
               type="button"
               onClick={() => openEdit(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
-              aria-label={`Edit ${row.name}`}
+              aria-label={`Edit ${row.title}`}
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
             </button>
@@ -183,7 +227,7 @@ export default function CurriculumPage() {
               type="button"
               onClick={() => openDelete(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
-              aria-label={`Hapus ${row.name}`}
+              aria-label={`Hapus ${row.title}`}
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
             </button>
@@ -191,24 +235,23 @@ export default function CurriculumPage() {
         ),
       },
     ];
-  }, [openEdit, openDelete]);
+  }, [periodLabel, openEdit, openDelete]);
 
   const isFirstPage = meta.current_page <= 1;
   const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
-  const statusFilterOptions = [
-    { value: "all", label: "Semua Status" },
-    { value: "active", label: "Aktif" },
-    { value: "inactive", label: "Tidak Aktif" },
-  ];
+  const typeFilterOptions = useMemo(
+    () => [{ value: "all", label: "Semua Jenis" }, ...TYPE_OPTIONS],
+    [],
+  );
 
   return (
     <PageContainer className="py-6">
       <PageHeader
-        title="Kurikulum"
-        description="Kelola data kurikulum yang digunakan dalam sistem akademik."
+        title="Laporan Keuangan"
+        description="Kelola laporan keuangan sekolah."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -217,30 +260,22 @@ export default function CurriculumPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="w-full sm:max-w-xs">
-            <Search
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Cari nama kurikulum..."
-            />
-          </div>
-          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
-            <span className="whitespace-nowrap">Status</span>
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Jenis Laporan</span>
             <AppSelect
-              options={statusFilterOptions}
-              value={status}
-              onChange={(v) => handleStatusChange((v ?? "all") as StatusFilter)}
-              placeholder="Pilih Status"
+              options={typeFilterOptions}
+              value={typeFilter}
+              onChange={(v) => handleTypeChange((v ?? "all") as TypeFilter)}
+              placeholder="Pilih Jenis"
               isSearchable={false}
-              className="min-w-[180px]"
             />
           </label>
         </div>
 
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">Gagal memuat data kurikulum.</p>
+            <p className="text-sm text-error">Gagal memuat data laporan keuangan.</p>
             <Button
               variant="secondary"
               onClick={() => setQuery((prev) => ({ ...prev }))}
@@ -258,7 +293,7 @@ export default function CurriculumPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Tidak ada kurikulum.
+                  Belum ada data laporan keuangan.
                 </div>
               ) : (
                 data.map((row) => (
@@ -268,18 +303,38 @@ export default function CurriculumPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-on-surface">{row.name}</p>
-                        {row.description && (
-                          <p className="mt-0.5 text-xs text-on-surface-variant">
-                            {row.description}
+                        <p className="font-semibold text-on-surface">{row.title}</p>
+                        <p className="mt-0.5 text-xs text-on-surface-variant">
+                          {periodLabel(row)}
+                        </p>
+                        <div className="mt-2 space-y-0.5 text-xs text-on-surface-variant">
+                          <p>
+                            Total Tagihan:{" "}
+                            <span className="font-semibold text-on-surface">
+                              {row.total_billed != null ? formatCurrency(row.total_billed) : "-"}
+                            </span>
                           </p>
-                        )}
+                          <p>
+                            Total Dibayar:{" "}
+                            <span className="font-semibold text-tertiary">
+                              {row.total_paid != null ? formatCurrency(row.total_paid) : "-"}
+                            </span>
+                          </p>
+                          <p>
+                            Total Tertunggak:{" "}
+                            <span className="font-semibold text-error">
+                              {row.total_outstanding != null
+                                ? formatCurrency(row.total_outstanding)
+                                : "-"}
+                            </span>
+                          </p>
+                        </div>
                       </div>
                       <Badge
-                        variant={row.is_active ? "success" : "secondary"}
+                        variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}
                         className="shrink-0 px-2.5 py-1 text-xs leading-4"
                       >
-                        {row.is_active ? "Aktif" : "Tidak Aktif"}
+                        {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
                       </Badge>
                     </div>
                     <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
@@ -308,7 +363,7 @@ export default function CurriculumPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Tidak ada kurikulum."
+                emptyMessage="Belum ada data laporan keuangan."
               />
             </div>
           </>
@@ -344,7 +399,7 @@ export default function CurriculumPage() {
         )}
       </Card>
 
-      <CurriculumForm
+      <FinancialReportForm
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -354,7 +409,7 @@ export default function CurriculumPage() {
         initialData={editing}
       />
 
-      <CurriculumDeleteDialog
+      <FinancialReportDeleteDialog
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false);

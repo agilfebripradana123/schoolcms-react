@@ -1,64 +1,91 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
-import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import type { ApiError } from "@/types";
-import { curriculumService } from "../api/curriculum.service";
-import type { Curriculum } from "../api/types";
-import CurriculumForm from "../components/curriculum/CurriculumForm";
-import CurriculumDeleteDialog from "../components/curriculum/CurriculumDeleteDialog";
+import { scholarshipService } from "../api/scholarship.service";
+import { studentService } from "@/features/students/api/student.service";
+import type { Scholarship, ScholarshipStatus } from "../api/types";
+import type { Student } from "@/features/students/api/types";
+import ScholarshipForm from "../components/scholarship/ScholarshipForm";
+import ScholarshipDeleteDialog from "../components/scholarship/ScholarshipDeleteDialog";
 
 const PER_PAGE = 10;
 
-type StatusFilter = "all" | "active" | "inactive";
+const STATUS_LABELS: Record<ScholarshipStatus, string> = {
+  aktif: "Aktif",
+  selesai: "Selesai",
+  dibatalkan: "Dibatalkan",
+};
+
+const STATUS_VARIANTS: Record<ScholarshipStatus, "success" | "secondary" | "danger"> = {
+  aktif: "success",
+  selesai: "secondary",
+  dibatalkan: "danger",
+};
+
+const STATUS_OPTIONS: Array<{ value: ScholarshipStatus; label: string }> = [
+  { value: "aktif", label: "Aktif" },
+  { value: "selesai", label: "Selesai" },
+  { value: "dibatalkan", label: "Dibatalkan" },
+];
+
+type StatusFilter = "all" | ScholarshipStatus;
 
 interface QueryState {
-  q: string;
-  is_active: boolean | undefined;
+  student_id: number | undefined;
+  status: ScholarshipStatus | undefined;
   page: number;
 }
 
-function statusToFilter(status: StatusFilter): boolean | undefined {
-  if (status === "all") return undefined;
-  return status === "active";
-}
-
-export default function CurriculumPage() {
-  const [data, setData] = useState<Curriculum[]>([]);
+export default function ScholarshipsPage() {
+  const [data, setData] = useState<Scholarship[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [page, setPage] = useState(1);
+  const [students, setStudents] = useState<Student[]>([]);
 
-  const [query, setQuery] = useState<QueryState>({ q: "", is_active: undefined, page: 1 });
+  const [studentFilter, setStudentFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+
+  const [query, setQuery] = useState<QueryState>({
+    student_id: undefined,
+    status: undefined,
+    page: 1,
+  });
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Curriculum | null>(null);
+  const [editing, setEditing] = useState<Scholarship | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState<Curriculum | null>(null);
+  const [toDelete, setToDelete] = useState<Scholarship | null>(null);
 
-  const searchTimeout = useRef<number | null>(null);
+  useEffect(() => {
+    studentService
+      .list({ per_page: 200 })
+      .then((res) => setStudents(res.data))
+      .catch(() => {
+        toast.error("Gagal memuat data siswa");
+      });
+  }, []);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError(null);
 
-    curriculumService
+    scholarshipService
       .list({
-        q: query.q || undefined,
-        is_active: query.is_active,
+        student_id: query.student_id,
+        status: query.status,
         page: query.page,
         per_page: PER_PAGE,
       })
@@ -66,13 +93,12 @@ export default function CurriculumPage() {
         if (!active) return;
         setData(res.data);
         setMeta(res.meta);
-        setPage(res.meta.current_page);
       })
       .catch((err) => {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
-        toast.error("Gagal memuat data kurikulum", {
+        toast.error("Gagal memuat data beasiswa", {
           description: toApiError(err).message,
         });
       })
@@ -85,17 +111,22 @@ export default function CurriculumPage() {
     };
   }, [query]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
-    searchTimeout.current = window.setTimeout(() => {
-      setQuery((prev) => ({ ...prev, q: value, page: 1 }));
-    }, 400);
+  const handleStudentChange = useCallback((value: string) => {
+    setStudentFilter(value);
+    setQuery((prev) => ({
+      ...prev,
+      student_id: value === "all" ? undefined : Number(value),
+      page: 1,
+    }));
   }, []);
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
-    setStatus(value);
-    setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
+    setStatusFilter(value);
+    setQuery((prev) => ({
+      ...prev,
+      status: value === "all" ? undefined : value,
+      page: 1,
+    }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
@@ -105,62 +136,99 @@ export default function CurriculumPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
-    setQuery((prev) => ({ ...prev, page: 1 }));
+    setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
-    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
-    setQuery((prev) => ({
-      ...prev,
-      page: isLastPage ? page - 1 : page,
-    }));
-  }, [page, meta.total, meta.per_page]);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
 
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
   }, []);
 
-  const openEdit = useCallback((row: Curriculum) => {
+  const openEdit = useCallback((row: Scholarship) => {
     setEditing(row);
     setFormOpen(true);
   }, []);
 
-  const openDelete = useCallback((row: Curriculum) => {
+  const openDelete = useCallback((row: Scholarship) => {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
 
+  const studentMap = useMemo(() => {
+    const map: Record<number, string> = {};
+    for (const s of students) map[s.id] = s.name;
+    return map;
+  }, [students]);
+
+  const studentName = useCallback(
+    (row: Scholarship) =>
+      row.student?.name ??
+      (row.student_id != null ? studentMap[row.student_id] ?? `#${row.student_id}` : "-"),
+    [studentMap],
+  );
+  const periodLabel = useCallback((row: Scholarship) => {
+    if (row.start_date && row.end_date) {
+      return `${formatDate(row.start_date)} - ${formatDate(row.end_date)}`;
+    }
+    if (row.start_date) return formatDate(row.start_date);
+    if (row.end_date) return formatDate(row.end_date);
+    return "-";
+  }, []);
+
   const columns = useMemo(() => {
-    type Row = Curriculum;
+    type Row = Scholarship;
     return [
       {
-        header: "Nama",
+        header: "Nama Beasiswa",
         accessor: "name" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
           <span className="font-medium text-on-surface">{row.name}</span>
         ),
       },
       {
-        header: "Deskripsi",
-        accessor: "description" as keyof Row,
+        header: "Siswa",
+        accessor: "student_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.description || "-"}</span>
+          <span className="text-slate-700">{studentName(row)}</span>
+        ),
+      },
+      {
+        header: "Penyedia",
+        accessor: "provider" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">{row.provider || "-"}</span>
+        ),
+      },
+      {
+        header: "Jumlah",
+        accessor: "amount" as keyof Row,
+        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="font-semibold text-on-surface">
+            {row.amount != null ? formatCurrency(row.amount) : "-"}
+          </span>
+        ),
+      },
+      {
+        header: "Periode",
+        accessor: "start_date" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">{periodLabel(row)}</span>
         ),
       },
       {
         header: "Status",
-        accessor: "is_active" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        accessor: "status" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge
-            variant={row.is_active ? "success" : "secondary"}
-            className="px-2.5 py-1 text-xs leading-4"
-          >
-            {row.is_active ? "Aktif" : "Tidak Aktif"}
+          <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
+            {STATUS_LABELS[row.status] ?? row.status ?? "-"}
           </Badge>
         ),
       },
@@ -191,24 +259,30 @@ export default function CurriculumPage() {
         ),
       },
     ];
-  }, [openEdit, openDelete]);
+  }, [studentName, periodLabel, openEdit, openDelete]);
 
   const isFirstPage = meta.current_page <= 1;
   const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
-  const statusFilterOptions = [
-    { value: "all", label: "Semua Status" },
-    { value: "active", label: "Aktif" },
-    { value: "inactive", label: "Tidak Aktif" },
-  ];
+  const studentFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Siswa" },
+      ...students.map((s) => ({ value: String(s.id), label: s.name })),
+    ],
+    [students],
+  );
+  const statusFilterOptions = useMemo(
+    () => [{ value: "all", label: "Semua Status" }, ...STATUS_OPTIONS],
+    [],
+  );
 
   return (
     <PageContainer className="py-6">
       <PageHeader
-        title="Kurikulum"
-        description="Kelola data kurikulum yang digunakan dalam sistem akademik."
+        title="Beasiswa"
+        description="Kelola beasiswa yang diterima siswa."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -217,30 +291,31 @@ export default function CurriculumPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="w-full sm:max-w-xs">
-            <Search
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Cari nama kurikulum..."
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Siswa</span>
+            <AppSelect
+              options={studentFilterOptions}
+              value={studentFilter}
+              onChange={(v) => handleStudentChange(v ?? "all")}
+              placeholder="Pilih Siswa"
             />
-          </div>
-          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Status</span>
             <AppSelect
               options={statusFilterOptions}
-              value={status}
+              value={statusFilter}
               onChange={(v) => handleStatusChange((v ?? "all") as StatusFilter)}
               placeholder="Pilih Status"
               isSearchable={false}
-              className="min-w-[180px]"
             />
           </label>
         </div>
 
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">Gagal memuat data kurikulum.</p>
+            <p className="text-sm text-error">Gagal memuat data beasiswa.</p>
             <Button
               variant="secondary"
               onClick={() => setQuery((prev) => ({ ...prev }))}
@@ -258,7 +333,7 @@ export default function CurriculumPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Tidak ada kurikulum.
+                  Belum ada data beasiswa.
                 </div>
               ) : (
                 data.map((row) => (
@@ -269,17 +344,26 @@ export default function CurriculumPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-on-surface">{row.name}</p>
-                        {row.description && (
-                          <p className="mt-0.5 text-xs text-on-surface-variant">
-                            {row.description}
+                        <p className="mt-0.5 text-xs text-on-surface-variant">
+                          {studentName(row)}
+                        </p>
+                        {row.provider && (
+                          <p className="text-xs text-on-surface-variant">
+                            Penyedia: {row.provider}
                           </p>
                         )}
+                        <p className="mt-1 font-semibold text-on-surface">
+                          {row.amount != null ? formatCurrency(row.amount) : "-"}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                          Periode: {periodLabel(row)}
+                        </p>
                       </div>
                       <Badge
-                        variant={row.is_active ? "success" : "secondary"}
+                        variant={STATUS_VARIANTS[row.status] ?? "secondary"}
                         className="shrink-0 px-2.5 py-1 text-xs leading-4"
                       >
-                        {row.is_active ? "Aktif" : "Tidak Aktif"}
+                        {STATUS_LABELS[row.status] ?? row.status ?? "-"}
                       </Badge>
                     </div>
                     <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
@@ -308,7 +392,7 @@ export default function CurriculumPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Tidak ada kurikulum."
+                emptyMessage="Belum ada data beasiswa."
               />
             </div>
           </>
@@ -344,7 +428,7 @@ export default function CurriculumPage() {
         )}
       </Card>
 
-      <CurriculumForm
+      <ScholarshipForm
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -354,7 +438,7 @@ export default function CurriculumPage() {
         initialData={editing}
       />
 
-      <CurriculumDeleteDialog
+      <ScholarshipDeleteDialog
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false);

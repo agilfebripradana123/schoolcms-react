@@ -9,58 +9,82 @@ import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import type { ApiError } from "@/types";
-import { academicYearService } from "../api/academic-year.service";
-import { semesterService } from "../api/semester.service";
-import type { AcademicYear, Semester } from "../api/types";
-import SemesterForm from "../components/semester/SemesterForm";
-import SemesterDeleteDialog from "../components/semester/SemesterDeleteDialog";
+import { paymentService } from "../api/payment.service";
+import { feeTypeService } from "../api/fee-type.service";
+import { studentService } from "@/features/students/api/student.service";
+import type { FeeType, Payment, PaymentMethod } from "../api/types";
+import type { Student } from "@/features/students/api/types";
+import PaymentForm from "../components/payment/PaymentForm";
+import PaymentDeleteDialog from "../components/payment/PaymentDeleteDialog";
 
 const PER_PAGE = 10;
 
-type StatusFilter = "all" | "active" | "inactive";
+const METHOD_LABELS: Record<PaymentMethod, string> = {
+  cash: "Tunai",
+  transfer: "Transfer",
+  qris: "QRIS",
+  lainnya: "Lainnya",
+};
+
+const METHOD_VARIANTS: Record<PaymentMethod, "primary" | "secondary" | "warning" | "neutral"> = {
+  cash: "secondary",
+  transfer: "primary",
+  qris: "warning",
+  lainnya: "neutral",
+};
+
+const METHOD_OPTIONS: Array<{ value: PaymentMethod; label: string }> = [
+  { value: "cash", label: "Tunai" },
+  { value: "transfer", label: "Transfer" },
+  { value: "qris", label: "QRIS" },
+  { value: "lainnya", label: "Lainnya" },
+];
+
+type MethodFilter = "all" | PaymentMethod;
 
 interface QueryState {
-  academic_year_id: number | undefined;
-  is_active: boolean | undefined;
+  student_id: number | undefined;
+  method: PaymentMethod | undefined;
   page: number;
 }
 
-function statusToFilter(status: StatusFilter): boolean | undefined {
-  if (status === "all") return undefined;
-  return status === "active";
-}
-
-export default function SemesterPage() {
-  const [data, setData] = useState<Semester[]>([]);
+export default function PaymentsPage() {
+  const [data, setData] = useState<Payment[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [academicYearFilter, setAcademicYearFilter] = useState<string>("all");
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [page, setPage] = useState(1);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [feeTypes, setFeeTypes] = useState<FeeType[]>([]);
+
+  const [studentFilter, setStudentFilter] = useState<string>("all");
+  const [methodFilter, setMethodFilter] = useState<MethodFilter>("all");
 
   const [query, setQuery] = useState<QueryState>({
-    academic_year_id: undefined,
-    is_active: undefined,
+    student_id: undefined,
+    method: undefined,
     page: 1,
   });
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Semester | null>(null);
+  const [editing, setEditing] = useState<Payment | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState<Semester | null>(null);
+  const [toDelete, setToDelete] = useState<Payment | null>(null);
 
   useEffect(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => setYears(res.data))
+    studentService
+      .list({ per_page: 200 })
+      .then((res) => setStudents(res.data))
       .catch(() => {
-        toast.error("Gagal memuat tahun ajaran", {
-          description: "Filter tahun ajaran tidak tersedia.",
-        });
+        toast.error("Gagal memuat data siswa");
+      });
+    feeTypeService
+      .list({ per_page: 100 })
+      .then((res) => setFeeTypes(res.data))
+      .catch(() => {
+        toast.error("Gagal memuat data jenis tagihan");
       });
   }, []);
 
@@ -69,10 +93,10 @@ export default function SemesterPage() {
     setLoading(true);
     setError(null);
 
-    semesterService
+    paymentService
       .list({
-        academic_year_id: query.academic_year_id,
-        is_active: query.is_active,
+        student_id: query.student_id,
+        method: query.method,
         page: query.page,
         per_page: PER_PAGE,
       })
@@ -80,13 +104,12 @@ export default function SemesterPage() {
         if (!active) return;
         setData(res.data);
         setMeta(res.meta);
-        setPage(res.meta.current_page);
       })
       .catch((err) => {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
-        toast.error("Gagal memuat data semester", {
+        toast.error("Gagal memuat data pembayaran", {
           description: toApiError(err).message,
         });
       })
@@ -99,18 +122,22 @@ export default function SemesterPage() {
     };
   }, [query]);
 
-  const handleAcademicYearChange = useCallback((value: string) => {
-    setAcademicYearFilter(value);
+  const handleStudentChange = useCallback((value: string) => {
+    setStudentFilter(value);
     setQuery((prev) => ({
       ...prev,
-      academic_year_id: value === "all" ? undefined : Number(value),
+      student_id: value === "all" ? undefined : Number(value),
       page: 1,
     }));
   }, []);
 
-  const handleStatusChange = useCallback((value: StatusFilter) => {
-    setStatus(value);
-    setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
+  const handleMethodChange = useCallback((value: MethodFilter) => {
+    setMethodFilter(value);
+    setQuery((prev) => ({
+      ...prev,
+      method: value === "all" ? undefined : value,
+      page: 1,
+    }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
@@ -120,66 +147,116 @@ export default function SemesterPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
-    setQuery((prev) => ({
-      ...prev,
-      page: Math.max(1, Math.min(prev.page, meta.last_page)),
-    }));
-  }, [meta.last_page]);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
-    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
-    setQuery((prev) => ({
-      ...prev,
-      page: isLastPage ? page - 1 : page,
-    }));
-  }, [page, meta.total, meta.per_page]);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
 
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
   }, []);
 
-  const openEdit = useCallback((row: Semester) => {
+  const openEdit = useCallback((row: Payment) => {
     setEditing(row);
     setFormOpen(true);
   }, []);
 
-  const openDelete = useCallback((row: Semester) => {
+  const openDelete = useCallback((row: Payment) => {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
 
+  const studentMap = useMemo(() => {
+    const map: Record<number, string> = {};
+    for (const s of students) map[s.id] = s.name;
+    return map;
+  }, [students]);
+
+  const feeTypeMap = useMemo(() => {
+    const map: Record<number, string> = {};
+    for (const f of feeTypes) map[f.id] = f.name;
+    return map;
+  }, [feeTypes]);
+
+  const studentName = useCallback(
+    (row: Payment) =>
+      row.student?.name ??
+      (row.student_id != null ? studentMap[row.student_id] ?? `#${row.student_id}` : "-"),
+    [studentMap],
+  );
+  const billingFeeType = useCallback(
+    (row: Payment) => {
+      const feeTypeId = row.billing?.fee_type_id;
+      return feeTypeId != null
+        ? feeTypeMap[feeTypeId] ?? `#${feeTypeId}`
+        : row.billing_id != null
+          ? `Tagihan #${row.billing_id}`
+          : "-";
+    },
+    [feeTypeMap],
+  );
+  const cashierName = useCallback(
+    (row: Payment) =>
+      row.cashier?.name ?? (row.received_by != null ? `#${row.received_by}` : "-"),
+    [],
+  );
+
   const columns = useMemo(() => {
-    type Row = Semester;
+    type Row = Payment;
     return [
       {
-        header: "Semester",
-        accessor: "name" as keyof Row,
+        header: "Siswa",
+        accessor: "student_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">Semester {row.name}</span>
+          <span className="font-medium text-on-surface">{studentName(row)}</span>
         ),
       },
       {
-        header: "Tahun Ajaran",
-        accessor: "academic_year" as keyof Row,
+        header: "Jenis Tagihan",
+        accessor: "billing_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700"> {row.academic_year?.name ?? "-"}</span>
+          <span className="text-slate-700">{billingFeeType(row)}</span>
         ),
       },
       {
-        header: "Status",
-        accessor: "is_active" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        header: "Tanggal Bayar",
+        accessor: "payment_date" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge
-            variant={row.is_active ? "success" : "secondary"}
-            className="px-2.5 py-1 text-xs leading-4"
-          >
-            {row.is_active ? "Aktif" : "Tidak Aktif"}
+          <span className="text-slate-700">
+            {row.payment_date ? formatDate(row.payment_date) : "-"}
+          </span>
+        ),
+      },
+      {
+        header: "Jumlah",
+        accessor: "amount" as keyof Row,
+        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="font-semibold text-on-surface">
+            {row.amount != null ? formatCurrency(row.amount) : "-"}
+          </span>
+        ),
+      },
+      {
+        header: "Metode",
+        accessor: "method" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <Badge variant={METHOD_VARIANTS[row.method] ?? "secondary"}>
+            {METHOD_LABELS[row.method] ?? row.method ?? "-"}
           </Badge>
+        ),
+      },
+      {
+        header: "Kasir",
+        accessor: "received_by" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">{cashierName(row)}</span>
         ),
       },
       {
@@ -193,7 +270,7 @@ export default function SemesterPage() {
               type="button"
               onClick={() => openEdit(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
-              aria-label={`Edit Semester ${row.name}`}
+              aria-label="Edit pembayaran"
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
             </button>
@@ -201,7 +278,7 @@ export default function SemesterPage() {
               type="button"
               onClick={() => openDelete(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
-              aria-label={`Hapus Semester ${row.name}`}
+              aria-label="Hapus pembayaran"
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
             </button>
@@ -209,31 +286,30 @@ export default function SemesterPage() {
         ),
       },
     ];
-  }, [openEdit, openDelete]);
+  }, [studentName, billingFeeType, cashierName, openEdit, openDelete]);
 
   const isFirstPage = meta.current_page <= 1;
   const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
-  const yearFilterOptions = useMemo(
+  const studentFilterOptions = useMemo(
     () => [
-      { value: "all", label: "Semua Tahun Ajaran" },
-      ...years.map((y) => ({ value: String(y.id), label: y.name })),
+      { value: "all", label: "Semua Siswa" },
+      ...students.map((s) => ({ value: String(s.id), label: s.name })),
     ],
-    [years],
+    [students],
   );
-  const statusFilterOptions = [
-    { value: "all", label: "Semua Status" },
-    { value: "active", label: "Aktif" },
-    { value: "inactive", label: "Tidak Aktif" },
-  ];
+  const methodFilterOptions = useMemo(
+    () => [{ value: "all", label: "Semua Metode" }, ...METHOD_OPTIONS],
+    [],
+  );
 
   return (
     <PageContainer className="py-6">
       <PageHeader
-        title="Semester"
-        description="Kelola semester berdasarkan tahun ajaran."
+        title="Pembayaran"
+        description="Kelola pencatatan pembayaran dari siswa."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -242,23 +318,23 @@ export default function SemesterPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:flex-wrap">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
-            <span className="whitespace-nowrap">Tahun Ajaran</span>
+            <span className="whitespace-nowrap">Siswa</span>
             <AppSelect
-              options={yearFilterOptions}
-              value={academicYearFilter}
-              onChange={(v) => handleAcademicYearChange(v ?? "all")}
-              placeholder="Pilih Tahun Ajaran"
+              options={studentFilterOptions}
+              value={studentFilter}
+              onChange={(v) => handleStudentChange(v ?? "all")}
+              placeholder="Pilih Siswa"
             />
           </label>
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
-            <span className="whitespace-nowrap">Status</span>
+            <span className="whitespace-nowrap">Metode</span>
             <AppSelect
-              options={statusFilterOptions}
-              value={status}
-              onChange={(v) => handleStatusChange((v ?? "all") as StatusFilter)}
-              placeholder="Pilih Status"
+              options={methodFilterOptions}
+              value={methodFilter}
+              onChange={(v) => handleMethodChange((v ?? "all") as MethodFilter)}
+              placeholder="Pilih Metode"
               isSearchable={false}
             />
           </label>
@@ -266,7 +342,7 @@ export default function SemesterPage() {
 
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">Gagal memuat data semester.</p>
+            <p className="text-sm text-error">Gagal memuat data pembayaran.</p>
             <Button
               variant="secondary"
               onClick={() => setQuery((prev) => ({ ...prev }))}
@@ -284,7 +360,7 @@ export default function SemesterPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Tidak ada semester.
+                  Belum ada data pembayaran.
                 </div>
               ) : (
                 data.map((row) => (
@@ -295,17 +371,26 @@ export default function SemesterPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-on-surface">
-                          Semester {row.name}
+                          {studentName(row)}
                         </p>
                         <p className="mt-0.5 text-xs text-on-surface-variant">
-                          {row.academic_year?.name ?? "-"}
+                          {billingFeeType(row)}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                          {row.payment_date ? formatDate(row.payment_date) : "-"}
+                        </p>
+                        <p className="mt-1 font-semibold text-on-surface">
+                          {row.amount != null ? formatCurrency(row.amount) : "-"}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                          Kasir: {cashierName(row)}
                         </p>
                       </div>
                       <Badge
-                        variant={row.is_active ? "success" : "secondary"}
+                        variant={METHOD_VARIANTS[row.method] ?? "secondary"}
                         className="shrink-0 px-2.5 py-1 text-xs leading-4"
                       >
-                        {row.is_active ? "Aktif" : "Tidak Aktif"}
+                        {METHOD_LABELS[row.method] ?? row.method ?? "-"}
                       </Badge>
                     </div>
                     <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
@@ -334,7 +419,7 @@ export default function SemesterPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Tidak ada semester."
+                emptyMessage="Belum ada data pembayaran."
               />
             </div>
           </>
@@ -370,7 +455,7 @@ export default function SemesterPage() {
         )}
       </Card>
 
-      <SemesterForm
+      <PaymentForm
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -380,7 +465,7 @@ export default function SemesterPage() {
         initialData={editing}
       />
 
-      <SemesterDeleteDialog
+      <PaymentDeleteDialog
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false);

@@ -8,9 +8,23 @@ import type {
   UpdatePaymentPayload,
 } from "./types";
 
+export interface PaymentListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface PaymentListResponse {
+  success: boolean;
+  message: string;
+  data: Payment[];
+  meta: PaymentListMeta;
+}
+
 export const paymentService = {
-  async list(params?: FinanceListParams): Promise<ApiEnvelope<Payment[]>> {
-    return api.get<ApiEnvelope<Payment[]>>(FINANCE.PAYMENTS, params);
+  async list(params?: FinanceListParams): Promise<PaymentListResponse> {
+    return api.get<PaymentListResponse>(FINANCE.PAYMENTS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Payment>> {

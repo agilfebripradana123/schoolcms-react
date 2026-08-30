@@ -8,11 +8,25 @@ import type {
   UpdatePaymentTransactionPayload,
 } from "./types";
 
+export interface PaymentTransactionListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface PaymentTransactionListResponse {
+  success: boolean;
+  message: string;
+  data: PaymentTransaction[];
+  meta: PaymentTransactionListMeta;
+}
+
 export const paymentTransactionService = {
   async list(
     params?: FinanceListParams,
-  ): Promise<ApiEnvelope<PaymentTransaction[]>> {
-    return api.get<ApiEnvelope<PaymentTransaction[]>>(
+  ): Promise<PaymentTransactionListResponse> {
+    return api.get<PaymentTransactionListResponse>(
       FINANCE.PAYMENT_TRANSACTIONS,
       params,
     );

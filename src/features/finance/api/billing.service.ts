@@ -8,9 +8,23 @@ import type {
   UpdateBillingPayload,
 } from "./types";
 
+export interface BillingListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface BillingListResponse {
+  success: boolean;
+  message: string;
+  data: Billing[];
+  meta: BillingListMeta;
+}
+
 export const billingService = {
-  async list(params?: FinanceListParams): Promise<ApiEnvelope<Billing[]>> {
-    return api.get<ApiEnvelope<Billing[]>>(FINANCE.BILLINGS, params);
+  async list(params?: FinanceListParams): Promise<BillingListResponse> {
+    return api.get<BillingListResponse>(FINANCE.BILLINGS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Billing>> {

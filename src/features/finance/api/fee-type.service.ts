@@ -8,9 +8,23 @@ import type {
   UpdateFeeTypePayload,
 } from "./types";
 
+export interface FeeTypeListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface FeeTypeListResponse {
+  success: boolean;
+  message: string;
+  data: FeeType[];
+  meta: FeeTypeListMeta;
+}
+
 export const feeTypeService = {
-  async list(params?: FinanceListParams): Promise<ApiEnvelope<FeeType[]>> {
-    return api.get<ApiEnvelope<FeeType[]>>(FINANCE.FEE_TYPES, params);
+  async list(params?: FinanceListParams): Promise<FeeTypeListResponse> {
+    return api.get<FeeTypeListResponse>(FINANCE.FEE_TYPES, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<FeeType>> {

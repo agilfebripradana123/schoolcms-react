@@ -9,70 +9,99 @@ import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import type { ApiError } from "@/types";
-import { academicYearService } from "../api/academic-year.service";
-import { semesterService } from "../api/semester.service";
-import type { AcademicYear, Semester } from "../api/types";
-import SemesterForm from "../components/semester/SemesterForm";
-import SemesterDeleteDialog from "../components/semester/SemesterDeleteDialog";
+import { paymentTransactionService } from "../api/payment-transaction.service";
+import type {
+  PaymentTransaction,
+  TransactionStatus,
+  TransactionType,
+} from "../api/types";
+import TransactionForm from "../components/transaction/TransactionForm";
+import TransactionDeleteDialog from "../components/transaction/TransactionDeleteDialog";
 
 const PER_PAGE = 10;
 
-type StatusFilter = "all" | "active" | "inactive";
+const TYPE_LABELS: Record<TransactionType, string> = {
+  payment: "Pembayaran",
+  refund: "Pengembalian",
+  adjustment: "Penyesuaian",
+};
+
+const TYPE_VARIANTS: Record<TransactionType, "success" | "danger" | "warning"> = {
+  payment: "success",
+  refund: "danger",
+  adjustment: "warning",
+};
+
+const STATUS_LABELS: Record<TransactionStatus, string> = {
+  success: "Berhasil",
+  pending: "Menunggu",
+  failed: "Gagal",
+};
+
+const STATUS_VARIANTS: Record<TransactionStatus, "success" | "warning" | "danger"> = {
+  success: "success",
+  pending: "warning",
+  failed: "danger",
+};
+
+const TYPE_OPTIONS: Array<{ value: TransactionType; label: string }> = [
+  { value: "payment", label: "Pembayaran" },
+  { value: "refund", label: "Pengembalian" },
+  { value: "adjustment", label: "Penyesuaian" },
+];
+
+const STATUS_OPTIONS: Array<{ value: TransactionStatus; label: string }> = [
+  { value: "success", label: "Berhasil" },
+  { value: "pending", label: "Menunggu" },
+  { value: "failed", label: "Gagal" },
+];
+
+type TypeFilter = "all" | TransactionType;
+type StatusFilter = "all" | TransactionStatus;
 
 interface QueryState {
-  academic_year_id: number | undefined;
-  is_active: boolean | undefined;
+  type: TransactionType | undefined;
+  status: TransactionStatus | undefined;
   page: number;
 }
 
-function statusToFilter(status: StatusFilter): boolean | undefined {
-  if (status === "all") return undefined;
-  return status === "active";
+function formatTransactionDate(value?: string): string {
+  if (!value) return "-";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? value.substring(0, 10) : formatDate(value);
 }
 
-export default function SemesterPage() {
-  const [data, setData] = useState<Semester[]>([]);
+export default function TransactionsPage() {
+  const [data, setData] = useState<PaymentTransaction[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [academicYearFilter, setAcademicYearFilter] = useState<string>("all");
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [page, setPage] = useState(1);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const [query, setQuery] = useState<QueryState>({
-    academic_year_id: undefined,
-    is_active: undefined,
+    type: undefined,
+    status: undefined,
     page: 1,
   });
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Semester | null>(null);
+  const [editing, setEditing] = useState<PaymentTransaction | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState<Semester | null>(null);
-
-  useEffect(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => setYears(res.data))
-      .catch(() => {
-        toast.error("Gagal memuat tahun ajaran", {
-          description: "Filter tahun ajaran tidak tersedia.",
-        });
-      });
-  }, []);
+  const [toDelete, setToDelete] = useState<PaymentTransaction | null>(null);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError(null);
 
-    semesterService
+    paymentTransactionService
       .list({
-        academic_year_id: query.academic_year_id,
-        is_active: query.is_active,
+        type: query.type,
+        status: query.status,
         page: query.page,
         per_page: PER_PAGE,
       })
@@ -80,13 +109,12 @@ export default function SemesterPage() {
         if (!active) return;
         setData(res.data);
         setMeta(res.meta);
-        setPage(res.meta.current_page);
       })
       .catch((err) => {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
-        toast.error("Gagal memuat data semester", {
+        toast.error("Gagal memuat data transaksi", {
           description: toApiError(err).message,
         });
       })
@@ -99,18 +127,22 @@ export default function SemesterPage() {
     };
   }, [query]);
 
-  const handleAcademicYearChange = useCallback((value: string) => {
-    setAcademicYearFilter(value);
+  const handleTypeChange = useCallback((value: TypeFilter) => {
+    setTypeFilter(value);
     setQuery((prev) => ({
       ...prev,
-      academic_year_id: value === "all" ? undefined : Number(value),
+      type: value === "all" ? undefined : value,
       page: 1,
     }));
   }, []);
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
-    setStatus(value);
-    setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
+    setStatusFilter(value);
+    setQuery((prev) => ({
+      ...prev,
+      status: value === "all" ? undefined : value,
+      page: 1,
+    }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
@@ -120,65 +152,112 @@ export default function SemesterPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
-    setQuery((prev) => ({
-      ...prev,
-      page: Math.max(1, Math.min(prev.page, meta.last_page)),
-    }));
-  }, [meta.last_page]);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
-    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
-    setQuery((prev) => ({
-      ...prev,
-      page: isLastPage ? page - 1 : page,
-    }));
-  }, [page, meta.total, meta.per_page]);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
 
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
   }, []);
 
-  const openEdit = useCallback((row: Semester) => {
+  const openEdit = useCallback((row: PaymentTransaction) => {
     setEditing(row);
     setFormOpen(true);
   }, []);
 
-  const openDelete = useCallback((row: Semester) => {
+  const openDelete = useCallback((row: PaymentTransaction) => {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
 
+  const paymentStudent = useCallback(
+    (row: PaymentTransaction) => row.payment?.student?.name ?? `#${row.payment_id}`,
+    [],
+  );
+
   const columns = useMemo(() => {
-    type Row = Semester;
+    type Row = PaymentTransaction;
     return [
       {
-        header: "Semester",
-        accessor: "name" as keyof Row,
+        header: "Kode Transaksi",
+        accessor: "transaction_code" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">Semester {row.name}</span>
+          <span className="font-medium text-on-surface">{row.transaction_code || "-"}</span>
         ),
       },
       {
-        header: "Tahun Ajaran",
-        accessor: "academic_year" as keyof Row,
+        header: "Siswa",
+        accessor: "payment_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700"> {row.academic_year?.name ?? "-"}</span>
+          <span className="text-slate-700">{paymentStudent(row)}</span>
+        ),
+      },
+      {
+        header: "Tipe",
+        accessor: "type" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <Badge variant={TYPE_VARIANTS[row.type] ?? "secondary"}>
+            {TYPE_LABELS[row.type] ?? row.type ?? "-"}
+          </Badge>
+        ),
+      },
+      {
+        header: "Jumlah",
+        accessor: "amount" as keyof Row,
+        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span
+            className={
+              row.type === "refund"
+                ? "font-semibold text-error"
+                : row.type === "payment"
+                  ? "font-semibold text-tertiary"
+                  : "font-semibold text-on-surface"
+            }
+          >
+            {row.amount != null
+              ? `${row.type === "refund" ? "−" : row.type === "payment" ? "+" : ""}${formatCurrency(row.amount)}`
+              : "-"}
+          </span>
+        ),
+      },
+      {
+        header: "Metode",
+        accessor: "method" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => {
+          const labels = {
+            cash: "Tunai",
+            transfer: "Transfer",
+            qris: "QRIS",
+            lainnya: "Lainnya",
+          } as const;
+          return (
+            <span className="text-slate-700">
+              {row.method ? (labels[row.method] ?? row.method) : "-"}
+            </span>
+          );
+        },
+      },
+      {
+        header: "Tanggal",
+        accessor: "transaction_date" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">{formatTransactionDate(row.transaction_date)}</span>
         ),
       },
       {
         header: "Status",
-        accessor: "is_active" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        accessor: "status" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge
-            variant={row.is_active ? "success" : "secondary"}
-            className="px-2.5 py-1 text-xs leading-4"
-          >
-            {row.is_active ? "Aktif" : "Tidak Aktif"}
+          <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
+            {STATUS_LABELS[row.status] ?? row.status ?? "-"}
           </Badge>
         ),
       },
@@ -193,7 +272,7 @@ export default function SemesterPage() {
               type="button"
               onClick={() => openEdit(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
-              aria-label={`Edit Semester ${row.name}`}
+              aria-label={`Edit ${row.transaction_code}`}
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
             </button>
@@ -201,7 +280,7 @@ export default function SemesterPage() {
               type="button"
               onClick={() => openDelete(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
-              aria-label={`Hapus Semester ${row.name}`}
+              aria-label={`Hapus ${row.transaction_code}`}
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
             </button>
@@ -209,31 +288,27 @@ export default function SemesterPage() {
         ),
       },
     ];
-  }, [openEdit, openDelete]);
+  }, [paymentStudent, openEdit, openDelete]);
 
   const isFirstPage = meta.current_page <= 1;
   const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
-  const yearFilterOptions = useMemo(
-    () => [
-      { value: "all", label: "Semua Tahun Ajaran" },
-      ...years.map((y) => ({ value: String(y.id), label: y.name })),
-    ],
-    [years],
+  const typeFilterOptions = useMemo(
+    () => [{ value: "all", label: "Semua Tipe" }, ...TYPE_OPTIONS],
+    [],
   );
-  const statusFilterOptions = [
-    { value: "all", label: "Semua Status" },
-    { value: "active", label: "Aktif" },
-    { value: "inactive", label: "Tidak Aktif" },
-  ];
+  const statusFilterOptions = useMemo(
+    () => [{ value: "all", label: "Semua Status" }, ...STATUS_OPTIONS],
+    [],
+  );
 
   return (
     <PageContainer className="py-6">
       <PageHeader
-        title="Semester"
-        description="Kelola semester berdasarkan tahun ajaran."
+        title="Transaksi"
+        description="Kelola transaksi pembayaran, pengembalian, dan penyesuaian."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -242,21 +317,22 @@ export default function SemesterPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:flex-wrap">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
-            <span className="whitespace-nowrap">Tahun Ajaran</span>
+            <span className="whitespace-nowrap">Tipe</span>
             <AppSelect
-              options={yearFilterOptions}
-              value={academicYearFilter}
-              onChange={(v) => handleAcademicYearChange(v ?? "all")}
-              placeholder="Pilih Tahun Ajaran"
+              options={typeFilterOptions}
+              value={typeFilter}
+              onChange={(v) => handleTypeChange((v ?? "all") as TypeFilter)}
+              placeholder="Pilih Tipe"
+              isSearchable={false}
             />
           </label>
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Status</span>
             <AppSelect
               options={statusFilterOptions}
-              value={status}
+              value={statusFilter}
               onChange={(v) => handleStatusChange((v ?? "all") as StatusFilter)}
               placeholder="Pilih Status"
               isSearchable={false}
@@ -266,7 +342,7 @@ export default function SemesterPage() {
 
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">Gagal memuat data semester.</p>
+            <p className="text-sm text-error">Gagal memuat data transaksi.</p>
             <Button
               variant="secondary"
               onClick={() => setQuery((prev) => ({ ...prev }))}
@@ -284,7 +360,7 @@ export default function SemesterPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Tidak ada semester.
+                  Belum ada data transaksi.
                 </div>
               ) : (
                 data.map((row) => (
@@ -294,19 +370,37 @@ export default function SemesterPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-on-surface">
-                          Semester {row.name}
+                        <p className="font-medium text-on-surface">
+                          {row.transaction_code || "-"}
                         </p>
                         <p className="mt-0.5 text-xs text-on-surface-variant">
-                          {row.academic_year?.name ?? "-"}
+                          {paymentStudent(row)}
+                        </p>
+                        <p className="text-xs text-on-surface-variant">
+                          {formatTransactionDate(row.transaction_date)}
+                        </p>
+                        <p
+                          className={`mt-1 font-semibold ${
+                            row.type === "refund"
+                              ? "text-error"
+                              : row.type === "payment"
+                                ? "text-tertiary"
+                                : "text-on-surface"
+                          }`}
+                        >
+                          {row.amount != null
+                            ? `${row.type === "refund" ? "−" : row.type === "payment" ? "+" : ""}${formatCurrency(row.amount)}`
+                            : "-"}
                         </p>
                       </div>
-                      <Badge
-                        variant={row.is_active ? "success" : "secondary"}
-                        className="shrink-0 px-2.5 py-1 text-xs leading-4"
-                      >
-                        {row.is_active ? "Aktif" : "Tidak Aktif"}
-                      </Badge>
+                      <div className="flex shrink-0 flex-col items-end gap-1">
+                        <Badge variant={TYPE_VARIANTS[row.type] ?? "secondary"}>
+                          {TYPE_LABELS[row.type] ?? row.type ?? "-"}
+                        </Badge>
+                        <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
+                          {STATUS_LABELS[row.status] ?? row.status ?? "-"}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
                       <Button
@@ -334,7 +428,7 @@ export default function SemesterPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Tidak ada semester."
+                emptyMessage="Belum ada data transaksi."
               />
             </div>
           </>
@@ -370,7 +464,7 @@ export default function SemesterPage() {
         )}
       </Card>
 
-      <SemesterForm
+      <TransactionForm
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -380,7 +474,7 @@ export default function SemesterPage() {
         initialData={editing}
       />
 
-      <SemesterDeleteDialog
+      <TransactionDeleteDialog
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false);

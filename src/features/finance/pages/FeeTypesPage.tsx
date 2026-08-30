@@ -10,15 +10,16 @@ import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
+import { formatCurrency } from "@/lib/utils";
 import type { ApiError } from "@/types";
-import { curriculumService } from "../api/curriculum.service";
-import type { Curriculum } from "../api/types";
-import CurriculumForm from "../components/curriculum/CurriculumForm";
-import CurriculumDeleteDialog from "../components/curriculum/CurriculumDeleteDialog";
+import { feeTypeService } from "../api/fee-type.service";
+import type { FeeType } from "../api/types";
+import FeeTypeForm from "../components/fee-type/FeeTypeForm";
+import FeeTypeDeleteDialog from "../components/fee-type/FeeTypeDeleteDialog";
 
 const PER_PAGE = 10;
 
-type StatusFilter = "all" | "active" | "inactive";
+type ActivityFilter = "all" | "active" | "inactive";
 
 interface QueryState {
   q: string;
@@ -26,27 +27,25 @@ interface QueryState {
   page: number;
 }
 
-function statusToFilter(status: StatusFilter): boolean | undefined {
+function activityToFilter(status: ActivityFilter): boolean | undefined {
   if (status === "all") return undefined;
   return status === "active";
 }
 
-export default function CurriculumPage() {
-  const [data, setData] = useState<Curriculum[]>([]);
+export default function FeeTypesPage() {
+  const [data, setData] = useState<FeeType[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
 
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [page, setPage] = useState(1);
-
+  const [activity, setActivity] = useState<ActivityFilter>("all");
   const [query, setQuery] = useState<QueryState>({ q: "", is_active: undefined, page: 1 });
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Curriculum | null>(null);
+  const [editing, setEditing] = useState<FeeType | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState<Curriculum | null>(null);
+  const [toDelete, setToDelete] = useState<FeeType | null>(null);
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -55,7 +54,7 @@ export default function CurriculumPage() {
     setLoading(true);
     setError(null);
 
-    curriculumService
+    feeTypeService
       .list({
         q: query.q || undefined,
         is_active: query.is_active,
@@ -66,13 +65,12 @@ export default function CurriculumPage() {
         if (!active) return;
         setData(res.data);
         setMeta(res.meta);
-        setPage(res.meta.current_page);
       })
       .catch((err) => {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
-        toast.error("Gagal memuat data kurikulum", {
+        toast.error("Gagal memuat data jenis tagihan", {
           description: toApiError(err).message,
         });
       })
@@ -93,9 +91,9 @@ export default function CurriculumPage() {
     }, 400);
   }, []);
 
-  const handleStatusChange = useCallback((value: StatusFilter) => {
-    setStatus(value);
-    setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
+  const handleActivityChange = useCallback((value: ActivityFilter) => {
+    setActivity(value);
+    setQuery((prev) => ({ ...prev, is_active: activityToFilter(value), page: 1 }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
@@ -105,42 +103,49 @@ export default function CurriculumPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
-    setQuery((prev) => ({ ...prev, page: 1 }));
+    setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
-    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
-    setQuery((prev) => ({
-      ...prev,
-      page: isLastPage ? page - 1 : page,
-    }));
-  }, [page, meta.total, meta.per_page]);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
 
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
   }, []);
 
-  const openEdit = useCallback((row: Curriculum) => {
+  const openEdit = useCallback((row: FeeType) => {
     setEditing(row);
     setFormOpen(true);
   }, []);
 
-  const openDelete = useCallback((row: Curriculum) => {
+  const openDelete = useCallback((row: FeeType) => {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
 
   const columns = useMemo(() => {
-    type Row = Curriculum;
+    type Row = FeeType;
     return [
       {
-        header: "Nama",
+        header: "Nama Tagihan",
         accessor: "name" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
           <span className="font-medium text-on-surface">{row.name}</span>
+        ),
+      },
+      {
+        header: "Jumlah",
+        accessor: "amount" as keyof Row,
+        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-slate-700",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="font-semibold text-on-surface">
+            {row.amount != null ? formatCurrency(row.amount) : "-"}
+          </span>
         ),
       },
       {
@@ -153,13 +158,8 @@ export default function CurriculumPage() {
       {
         header: "Status",
         accessor: "is_active" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge
-            variant={row.is_active ? "success" : "secondary"}
-            className="px-2.5 py-1 text-xs leading-4"
-          >
+          <Badge variant={row.is_active ? "success" : "secondary"}>
             {row.is_active ? "Aktif" : "Tidak Aktif"}
           </Badge>
         ),
@@ -198,17 +198,20 @@ export default function CurriculumPage() {
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
-  const statusFilterOptions = [
-    { value: "all", label: "Semua Status" },
-    { value: "active", label: "Aktif" },
-    { value: "inactive", label: "Tidak Aktif" },
-  ];
+  const activityFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Status" },
+      { value: "active", label: "Aktif" },
+      { value: "inactive", label: "Tidak Aktif" },
+    ],
+    [],
+  );
 
   return (
     <PageContainer className="py-6">
       <PageHeader
-        title="Kurikulum"
-        description="Kelola data kurikulum yang digunakan dalam sistem akademik."
+        title="Jenis Tagihan"
+        description="Kelola jenis tagihan yang akan ditagihkan kepada siswa."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -217,30 +220,29 @@ export default function CurriculumPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="w-full sm:max-w-xs">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
+          <div className="md:min-w-[220px] md:flex-1">
             <Search
               value={search}
               onChange={handleSearchChange}
-              placeholder="Cari nama kurikulum..."
+              placeholder="Cari nama tagihan..."
             />
           </div>
-          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Status</span>
             <AppSelect
-              options={statusFilterOptions}
-              value={status}
-              onChange={(v) => handleStatusChange((v ?? "all") as StatusFilter)}
+              options={activityFilterOptions}
+              value={activity}
+              onChange={(v) => handleActivityChange((v ?? "all") as ActivityFilter)}
               placeholder="Pilih Status"
               isSearchable={false}
-              className="min-w-[180px]"
             />
           </label>
         </div>
 
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">Gagal memuat data kurikulum.</p>
+            <p className="text-sm text-error">Gagal memuat data jenis tagihan.</p>
             <Button
               variant="secondary"
               onClick={() => setQuery((prev) => ({ ...prev }))}
@@ -258,7 +260,7 @@ export default function CurriculumPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Tidak ada kurikulum.
+                  Belum ada data jenis tagihan.
                 </div>
               ) : (
                 data.map((row) => (
@@ -269,8 +271,11 @@ export default function CurriculumPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-on-surface">{row.name}</p>
+                        <p className="mt-0.5 text-xs text-on-surface-variant">
+                          {row.amount != null ? formatCurrency(row.amount) : "-"}
+                        </p>
                         {row.description && (
-                          <p className="mt-0.5 text-xs text-on-surface-variant">
+                          <p className="text-xs text-on-surface-variant">
                             {row.description}
                           </p>
                         )}
@@ -308,7 +313,7 @@ export default function CurriculumPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Tidak ada kurikulum."
+                emptyMessage="Belum ada data jenis tagihan."
               />
             </div>
           </>
@@ -344,7 +349,7 @@ export default function CurriculumPage() {
         )}
       </Card>
 
-      <CurriculumForm
+      <FeeTypeForm
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -354,7 +359,7 @@ export default function CurriculumPage() {
         initialData={editing}
       />
 
-      <CurriculumDeleteDialog
+      <FeeTypeDeleteDialog
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false);
