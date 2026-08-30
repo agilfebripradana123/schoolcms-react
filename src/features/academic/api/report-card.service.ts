@@ -8,9 +8,23 @@ import type {
   UpdateReportCardPayload,
 } from "./types";
 
+export interface ReportCardListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface ReportCardListResponse {
+  success: boolean;
+  message: string;
+  data: ReportCard[];
+  meta: ReportCardListMeta;
+}
+
 export const reportCardService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<ReportCard[]>> {
-    return api.get<ApiEnvelope<ReportCard[]>>(ACADEMIC.REPORT_CARDS, params);
+  async list(params?: AcademicListParams): Promise<ReportCardListResponse> {
+    return api.get<ReportCardListResponse>(ACADEMIC.REPORT_CARDS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<ReportCard>> {

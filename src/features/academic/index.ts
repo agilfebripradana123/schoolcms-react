@@ -7,3 +7,8 @@ export { default as ClassesPage } from "./pages/ClassesPage";
 export { default as ClassSubjectsPage } from "./pages/ClassSubjectsPage";
 export { default as ClassStudentsPage } from "./pages/ClassStudentsPage";
 export { default as TeacherAssignmentsPage } from "./pages/TeacherAssignmentsPage";
+export { default as SchedulesPage } from "./pages/SchedulesPage";
+export { default as PeriodsPage } from "./pages/PeriodsPage";
+export { default as AssignmentsPage } from "./pages/AssignmentsPage";
+export { default as GradesPage } from "./pages/GradesPage";
+export { default as ReportCardsPage } from "./pages/ReportCardsPage";
