@@ -8,9 +8,23 @@ import type {
   UpdateScholarshipPayload,
 } from "./types";
 
+export interface ScholarshipListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface ScholarshipListResponse {
+  success: boolean;
+  message: string;
+  data: Scholarship[];
+  meta: ScholarshipListMeta;
+}
+
 export const scholarshipService = {
-  async list(params?: FinanceListParams): Promise<ApiEnvelope<Scholarship[]>> {
-    return api.get<ApiEnvelope<Scholarship[]>>(FINANCE.SCHOLARSHIPS, params);
+  async list(params?: FinanceListParams): Promise<ScholarshipListResponse> {
+    return api.get<ScholarshipListResponse>(FINANCE.SCHOLARSHIPS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Scholarship>> {

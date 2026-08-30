@@ -8,6 +8,7 @@ import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
 import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage, SchedulesPage, PeriodsPage, AssignmentsPage, GradesPage, ReportCardsPage } from "@/features/academic";
 import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
+import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
 
 const academicModules = [
   { path: "semesters", title: "Semester" },
@@ -158,6 +159,12 @@ const router = createBrowserRouter([
           { path: "students/transfers", element: <TransferListPage /> },
           { path: "students/alumni", element: <AlumniListPage /> },
           { path: "students/id-card", element: <StudentIdCardListPage /> },
+          { path: "finance/fee-types", element: <FeeTypesPage /> },
+          { path: "finance/billing", element: <BillingsPage /> },
+          { path: "finance/payments", element: <PaymentsPage /> },
+          { path: "finance/transactions", element: <TransactionsPage /> },
+          { path: "finance/scholarships", element: <ScholarshipsPage /> },
+          { path: "finance/reports", element: <FinancialReportsPage /> },
           { path: "teachers", element: <TeacherListPage /> },
           { path: "teachers/staff", element: <StaffListPage /> },
           { path: "teachers/assignments", element: <TeacherAssignmentsPage /> },
@@ -167,7 +174,7 @@ const router = createBrowserRouter([
           ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects" && m.path !== "class-students" && m.path !== "schedules" && m.path !== "periods" && m.path !== "assignments" && m.path !== "grades" && m.path !== "report-cards")),
           ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave" && m.path !== "documents")),
           ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
-          ...createModuleRoutes("/finance", "Finance", financeModules),
+          ...createModuleRoutes("/finance", "Finance", financeModules.filter(m => m.path !== "fee-types" && m.path !== "billing" && m.path !== "payments" && m.path !== "transactions" && m.path !== "scholarships" && m.path !== "reports")),
           ...createModuleRoutes("/development", "Student Development", developmentModules),
           ...createModuleRoutes("/facilities", "Facilities", facilityModules),
           ...createModuleRoutes("/administration", "Administration", adminModules),

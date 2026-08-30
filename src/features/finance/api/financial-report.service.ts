@@ -8,9 +8,23 @@ import type {
   UpdateFinancialReportPayload,
 } from "./types";
 
+export interface FinancialReportListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface FinancialReportListResponse {
+  success: boolean;
+  message: string;
+  data: FinancialReport[];
+  meta: FinancialReportListMeta;
+}
+
 export const financialReportService = {
-  async list(params?: FinanceListParams): Promise<ApiEnvelope<FinancialReport[]>> {
-    return api.get<ApiEnvelope<FinancialReport[]>>(
+  async list(params?: FinanceListParams): Promise<FinancialReportListResponse> {
+    return api.get<FinancialReportListResponse>(
       FINANCE.FINANCIAL_REPORTS,
       params,
     );
