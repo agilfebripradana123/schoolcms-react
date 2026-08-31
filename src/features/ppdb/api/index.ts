@@ -4,4 +4,5 @@ export {
   verificationService,
   selectionService,
   reRegistrationService,
+  documentService,
 } from "./registration.service";
