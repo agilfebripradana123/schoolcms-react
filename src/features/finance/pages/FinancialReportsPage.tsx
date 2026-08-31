@@ -267,7 +267,7 @@ export default function FinancialReportsPage() {
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+          <label className="flex w-full flex-col gap-1 text-sm text-on-surface-variant sm:w-56">
             <span className="whitespace-nowrap">Jenis Laporan</span>
             <AppSelect
               options={typeFilterOptions}

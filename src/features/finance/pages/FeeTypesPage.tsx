@@ -226,7 +226,7 @@ export default function FeeTypesPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:items-end">
           <div className="md:min-w-[220px] md:flex-1">
             <Search
               value={search}
