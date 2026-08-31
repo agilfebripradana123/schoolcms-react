@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Eye, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -26,6 +26,7 @@ import type {
 import type { Student } from "@/features/students/api/types";
 import BillingForm from "../components/billing/BillingForm";
 import BillingDeleteDialog from "../components/billing/BillingDeleteDialog";
+import BillingDetail from "../components/billing/BillingDetail";
 
 const PER_PAGE = 10;
 
@@ -91,6 +92,7 @@ export default function BillingsPage() {
   const [editing, setEditing] = useState<Billing | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Billing | null>(null);
+  const [detail, setDetail] = useState<Billing | null>(null);
 
   useEffect(() => {
     studentService
@@ -212,6 +214,10 @@ export default function BillingsPage() {
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
+  }, []);
+
+  const openDetail = useCallback((row: Billing) => {
+    setDetail(row);
   }, []);
 
   const openEdit = useCallback((row: Billing) => {
@@ -338,9 +344,11 @@ export default function BillingsPage() {
         headerClassName:"px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-4 py-4 text-center",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
-            {STATUS_LABELS[row.status] ?? row.status ?? "-"}
-          </Badge>
+          <div className="flex justify-center">    
+            <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
+              {STATUS_LABELS[row.status] ?? row.status ?? "-"}
+            </Badge>
+          </div>
         ),
       },
       {
@@ -350,6 +358,14 @@ export default function BillingsPage() {
         className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => openDetail(row)}
+              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              aria-label="Lihat detail tagihan"
+            >
+              <Eye className="h-4 w-4" strokeWidth={1.75} />
+            </button>
             <button
               type="button"
               onClick={() => openEdit(row)}
@@ -370,7 +386,7 @@ export default function BillingsPage() {
         ),
       },
     ];
-  }, [studentName, feeTypeName, yearName, semesterName, openEdit, openDelete]);
+  }, [studentName, feeTypeName, yearName, semesterName, openDetail, openEdit, openDelete]);
 
   const isFirstPage = meta.current_page <= 1;
   const isLastPage = meta.current_page >= meta.last_page;
@@ -522,6 +538,13 @@ export default function BillingsPage() {
                       <Button
                         variant="secondary"
                         size="sm"
+                        onClick={() => openDetail(row)}
+                      >
+                        <Eye className="h-4 w-4" /> Detail
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={() => openEdit(row)}
                       >
                         <Pencil className="h-4 w-4" /> Edit
@@ -588,6 +611,12 @@ export default function BillingsPage() {
         }}
         onSaved={handleSaved}
         initialData={editing}
+      />
+
+      <BillingDetail
+        open={Boolean(detail)}
+        onClose={() => setDetail(null)}
+        billingId={detail?.id ?? null}
       />
 
       <BillingDeleteDialog

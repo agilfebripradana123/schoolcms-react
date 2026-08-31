@@ -230,11 +230,14 @@ export default function ScholarshipsPage() {
       {
         header: "Status",
         accessor: "status" as keyof Row,
+        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
-            {STATUS_LABELS[row.status] ?? row.status ?? "-"}
-          </Badge>
+          <div className="flex justify-center">
+            <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
+              {STATUS_LABELS[row.status] ?? row.status ?? "-"}
+            </Badge>
+          </div>
         ),
       },
       {
