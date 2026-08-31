@@ -163,11 +163,14 @@ export default function FinancialReportsPage() {
       {
         header: "Jenis",
         accessor: "report_type" as keyof Row,
+        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}>
-            {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
-          </Badge>
+          <div className="flex justify-center">
+            <Badge variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}>
+              {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
+            </Badge>
+          </div>
         ),
       },
       {
@@ -264,7 +267,7 @@ export default function FinancialReportsPage() {
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+          <label className="flex w-full flex-col gap-1 text-sm text-on-surface-variant sm:w-56">
             <span className="whitespace-nowrap">Jenis Laporan</span>
             <AppSelect
               options={typeFilterOptions}

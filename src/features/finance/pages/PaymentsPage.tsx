@@ -249,11 +249,14 @@ export default function PaymentsPage() {
       {
         header: "Metode",
         accessor: "method" as keyof Row,
+        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={METHOD_VARIANTS[row.method] ?? "secondary"}>
-            {METHOD_LABELS[row.method] ?? row.method ?? "-"}
-          </Badge>
+          <div className="flex justify-center">
+            <Badge variant={METHOD_VARIANTS[row.method] ?? "secondary"}>
+              {METHOD_LABELS[row.method] ?? row.method ?? "-"}
+            </Badge>
+          </div>
         ),
       },
       {

@@ -17,14 +17,6 @@ import RegistrantDetail from "@/features/ppdb/components/RegistrantDetail";
 
 const PER_PAGE = 10;
 
-function fmtDate(value?: string | null): string {
-  if (!value) return "-";
-  const d = new Date(value);
-  return Number.isNaN(d.getTime())
-    ? value.substring(0, 10)
-    : d.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
-}
-
 export default function ReRegistrationPage() {
   const [data, setData] = useState<Registrant[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
