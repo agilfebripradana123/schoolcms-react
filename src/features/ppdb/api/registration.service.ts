@@ -5,13 +5,27 @@ import type {
   CreateRegistrantPayload,
   PPDBListParams,
   Registrant,
+  RegistrantDocument,
   RegistrationActionResponse,
   UpdateRegistrantPayload,
 } from "./types";
 
+// Daftar respons bisa berupa array + meta pagination
+export interface RegistrantListResponse {
+  success?: boolean;
+  message: string;
+  data: Registrant[];
+  meta?: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+}
+
 export const registrationService = {
-  async list(params?: PPDBListParams): Promise<ApiEnvelope<Registrant[]>> {
-    return api.get<ApiEnvelope<Registrant[]>>(PPDB.REGISTRATIONS, params);
+  async list(params?: PPDBListParams): Promise<RegistrantListResponse> {
+    return api.get<RegistrantListResponse>(PPDB.REGISTRATIONS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Registrant>> {
@@ -44,17 +58,25 @@ export const verificationService = {
     );
   },
 
-  async reject(id: number | string): Promise<RegistrationActionResponse> {
+  async reject(
+    id: number | string,
+    payload?: { verification_notes?: string },
+  ): Promise<RegistrationActionResponse> {
     return api.post<RegistrationActionResponse>(
       PPDB.REJECT.replace("{id}", String(id)),
+      payload,
     );
   },
 };
 
 export const selectionService = {
-  async select(id: number | string): Promise<RegistrationActionResponse> {
+  async select(
+    id: number | string,
+    payload: { selection_score?: number },
+  ): Promise<RegistrationActionResponse> {
     return api.post<RegistrationActionResponse>(
       PPDB.SELECT.replace("{id}", String(id)),
+      payload,
     );
   },
 
@@ -74,9 +96,33 @@ export const reRegistrationService = {
 
   async verifyReRegistration(
     id: number | string,
+    payload?: { re_registration_notes?: string },
   ): Promise<RegistrationActionResponse> {
     return api.post<RegistrationActionResponse>(
       PPDB.VERIFY_RE_REGISTER.replace("{id}", String(id)),
+      payload,
+    );
+  },
+};
+
+export const documentService = {
+  async list(id: number | string): Promise<ApiEnvelope<RegistrantDocument[]>> {
+    return api.get<ApiEnvelope<RegistrantDocument[]>>(
+      `${PPDB.REGISTRATIONS}/${id}/documents`,
+    );
+  },
+
+  async upload(id: number | string, formData: FormData): Promise<ApiEnvelope<RegistrantDocument>> {
+    return api.post<ApiEnvelope<RegistrantDocument>>(
+      `${PPDB.REGISTRATIONS}/${id}/documents`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
+
+  async remove(id: number | string, type: string): Promise<ApiMessage> {
+    return api.delete<ApiMessage>(
+      `${PPDB.REGISTRATIONS}/${id}/documents/${type}`,
     );
   },
 };

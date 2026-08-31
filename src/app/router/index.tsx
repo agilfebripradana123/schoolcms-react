@@ -6,9 +6,16 @@ import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
+<<<<<<< Updated upstream
 import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage, SchedulesPage, PeriodsPage, AssignmentsPage, GradesPage, ReportCardsPage } from "@/features/academic";
 import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
 import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
+=======
+import RoleRoute from "@/features/auth/RoleRoute";
+import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage } from "@/features/academic";
+import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
+import { RegistrationsPage, VerificationPage, SelectionPage, ReRegistrationPage } from "@/features/ppdb";
+>>>>>>> Stashed changes
 
 const academicModules = [
   { path: "semesters", title: "Semester" },
@@ -171,10 +178,26 @@ const router = createBrowserRouter([
           { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
           { path: "teachers/leave", element: <TeacherLeaveListPage /> },
           { path: "teachers/documents", element: <TeacherDocumentListPage /> },
+<<<<<<< Updated upstream
           ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects" && m.path !== "class-students" && m.path !== "schedules" && m.path !== "periods" && m.path !== "assignments" && m.path !== "grades" && m.path !== "report-cards")),
           ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave" && m.path !== "documents")),
           ...createModuleRoutes("/ppdb", "PPDB", ppdbModules),
           ...createModuleRoutes("/finance", "Finance", financeModules.filter(m => m.path !== "fee-types" && m.path !== "billing" && m.path !== "payments" && m.path !== "transactions" && m.path !== "scholarships" && m.path !== "reports")),
+=======
+          {
+            element: <RoleRoute allow={["admin", "administrator"]} />,
+            children: [
+              { path: "ppdb/registrations", element: <RegistrationsPage /> },
+              { path: "ppdb/verification", element: <VerificationPage /> },
+              { path: "ppdb/selection", element: <SelectionPage /> },
+              { path: "ppdb/re-registration", element: <ReRegistrationPage /> },
+            ],
+          },
+          ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects" && m.path !== "class-students")),
+          ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave" && m.path !== "documents")),
+          ...createModuleRoutes("/ppdb", "PPDB", ppdbModules.filter(() => false)),
+          ...createModuleRoutes("/finance", "Finance", financeModules),
+>>>>>>> Stashed changes
           ...createModuleRoutes("/development", "Student Development", developmentModules),
           ...createModuleRoutes("/facilities", "Facilities", facilityModules),
           ...createModuleRoutes("/administration", "Administration", adminModules),
