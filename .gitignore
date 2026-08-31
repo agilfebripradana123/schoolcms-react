@@ -36,4 +36,6 @@ dist-ssr/
 *.swp
 *.swo
 
-.opencodetsconfig.tsbuildinfo
+.opencode
+tsconfig.tsbuildinfo
+graphify-out/
