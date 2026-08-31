@@ -147,12 +147,12 @@ export default function ReRegistrationPage() {
             <p className="text-xs text-on-surface-variant">{row.full_name}</p>
           </div>
         ),
-      },
+      } as const,
       {
         header: "Nama",
         accessor: "full_name",
         render: (_v: unknown, row: Row) => <span className="font-medium text-on-surface">{row.full_name}</span>,
-      },
+      } as const,
       {
         header: "Status Daftar Ulang",
         accessor: "re_registration_status",
@@ -161,7 +161,7 @@ export default function ReRegistrationPage() {
             {row.re_registration_status ?? "pending"}
           </Badge>
         ),
-      },
+      } as const,
       {
         header: "Status Siswa",
         accessor: "student_id",
@@ -171,7 +171,7 @@ export default function ReRegistrationPage() {
           ) : (
             <Badge variant="neutral">Belum</Badge>
           ),
-      },
+      } as const,
       {
         header: "Aksi",
         accessor: "id",
@@ -215,7 +215,7 @@ export default function ReRegistrationPage() {
             </div>
           );
         },
-      },
+      } as const,
     ];
   }, [actingId, handleDaftarUlang, openVerify, openDetail]);
 

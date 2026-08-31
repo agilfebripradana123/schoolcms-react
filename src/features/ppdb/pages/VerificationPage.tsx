@@ -29,7 +29,6 @@ export default function VerificationPage() {
   const [error, setError] = useState<ApiError | null>(null);
 
   const [verificationFilter, setVerificationFilter] = useState("pending");
-  const [page, setPage] = useState(1);
 
   const [query, setQuery] = useState<Record<string, string | number | undefined>>({
     verification_status: "pending",
@@ -53,7 +52,6 @@ export default function VerificationPage() {
         setData(res.data);
         if (res.meta) {
           setMeta(res.meta);
-          setPage(res.meta.current_page);
         }
       })
       .catch((err) => {
@@ -127,7 +125,7 @@ export default function VerificationPage() {
     return [
       {
         header: "No. Pendaftaran",
-        accessor: "registration_number",
+        accessor: "registration_number" as const,
         render: (_v: unknown, row: Row) => (
           <div>
             <p className="font-semibold text-on-surface">{row.registration_number ?? "-"}</p>
@@ -137,12 +135,12 @@ export default function VerificationPage() {
       },
       {
         header: "Nama",
-        accessor: "full_name",
+        accessor: "full_name" as const,
         render: (_v: unknown, row: Row) => <span className="font-medium text-on-surface">{row.full_name}</span>,
       },
       {
         header: "Status",
-        accessor: "verification_status",
+        accessor: "verification_status" as const,
         render: (_v: unknown, row: Row) => (
           <Badge variant={row.verification_status === "verified" ? "success" : row.verification_status === "rejected" ? "danger" : "neutral"}>
             {row.verification_status ?? "pending"}
@@ -151,7 +149,7 @@ export default function VerificationPage() {
       },
       {
         header: "Aksi",
-        accessor: "id",
+        accessor: "id" as const,
         render: (_v: unknown, row: Row) => (
           <div className="flex items-center justify-end gap-2">
             <button

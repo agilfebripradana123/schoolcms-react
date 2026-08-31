@@ -5,24 +5,12 @@ import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import { api, toApiError } from "@/lib/api";
+import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import type { Registrant } from "../api/types";
 import { reRegistrantService } from "../api/registration.service";
 
 const PER_PAGE = 20;
-
-interface ExportListResponse {
-  success: boolean;
-  message: string;
-  data: Registrant[];
-  meta: {
-    current_page: number;
-    per_page: number;
-    total: number;
-    last_page: number;
-  };
-}
 
 export default function ExportDapodikPage() {
   const [data, setData] = useState<Registrant[]>([]);
@@ -91,26 +79,26 @@ export default function ExportDapodikPage() {
       });
   }, [selectedIds]);
 
-  const columns = useMemo(() => {
+const columns = useMemo(() => {
     type Row = Registrant;
-    const cell = (label: string, accessor: keyof Row) => ({
-      header: label,
-      accessor,
+    const c = (lbl: string, acc: keyof Row) => ({
+      header: lbl,
+      accessor: acc,
       render: (_v: unknown, row: Row) => (
         <span className="text-xs text-on-surface-variant whitespace-nowrap">
-          {String(row[accessor] ?? "-")}
+          {String(row[acc] ?? "-")}
         </span>
       ),
     });
-    const empty = (label: string) => ({
-      header: label,
+    const e = (lbl: string) => ({
+      header: lbl,
       accessor: "id" as const,
       render: () => <span className="text-xs text-on-surface-variant">-</span>,
     });
     return [
       {
         header: "Pilih",
-        accessor: "id",
+        accessor: "id" as const,
         render: (_v: unknown, row: Row) => (
           <input
             type="checkbox"
@@ -122,72 +110,71 @@ export default function ExportDapodikPage() {
           />
         ),
       },
-      cell("No", "id"),
-      cell("Nama", "full_name"),
-      cell("NIPD", "nisn"),
-      cell("JK", "gender"),
-      cell("NISN", "nisn"),
-      cell("Tempat Lahir", "birth_place"),
-      cell("Tanggal Lahir", "birth_date"),
-      cell("NIK", "nik"),
-      cell("Agama", "religion"),
-      cell("Alamat", "address"),
-      cell("RT", "rt"),
-      cell("RW", "rw"),
-      cell("Dusun", "village"),
-      cell("Kelurahan", "village"),
-      cell("Kecamatan", "district"),
-      cell("Kode Pos", "postal_code"),
-      empty("Jenis Tinggal"),
-      empty("Alat Transportasi"),
-      cell("Telepon", "phone"),
-      cell("HP", "phone"),
-      cell("E-Mail", "email"),
-      empty("SKHUN"),
-      empty("Penerima KPS"),
-      empty("No. KPS"),
-      cell("Ayah Nama", "father_name"),
-      cell("Ayah Tgl Lahir", "father_birth_date"),
-      cell("Ayah Pendidikan", "father_education"),
-      cell("Ayah Pekerjaan", "father_occupation"),
-      cell("Ayah Penghasilan", "father_income"),
-      cell("Ayah NIK", "father_nik"),
-      cell("Ibu Nama", "mother_name"),
-      cell("Ibu Tgl Lahir", "mother_birth_date"),
-      cell("Ibu Pendidikan", "mother_education"),
-      cell("Ibu Pekerjaan", "mother_occupation"),
-      cell("Ibu Penghasilan", "mother_income"),
-      cell("Ibu NIK", "mother_nik"),
-      cell("Wali Nama", "guardian_name"),
-      cell("Wali Tgl Lahir", "guardian_birth_date"),
-      cell("Wali Pendidikan", "guardian_education"),
-      cell("Wali Pekerjaan", "guardian_occupation"),
-      cell("Wali Penghasilan", "guardian_income"),
-      cell("Wali NIK", "guardian_nik"),
-      empty("Rombel Saat Ini"),
-      empty("No Peserta UN"),
-      cell("No Seri Ijazah", "diploma_number"),
-      empty("Penerima KIP"),
-      empty("Nomor KIP"),
-      empty("Nama di KIP"),
-      empty("Nomor KKS"),
-      empty("No Registrasi Akta Lahir"),
-      empty("Bank"),
-      empty("Nomor Rekening Bank"),
-      empty("Rekening Atas Nama"),
-      empty("Layak PIP"),
-      empty("Alasan Layak PIP"),
-      cell("Kebutuhan Khusus", "special_needs"),
-      cell("Sekolah Asal", "previous_school"),
-      cell("Anak ke", "birth_order"),
-      empty("Lintang"),
-      empty("Bujur"),
-      cell("No KK", "document_kk"),
-      empty("Berat Badan"),
-      empty("Tinggi Badan"),
-      empty("Lingkar Kepala"),
-      cell("Jml Saudara", "sibling_count"),
-      empty("Jarak Rumah"),
+      c("No", "id"),
+      c("Nama", "full_name"),
+      c("NIPD", "nisn"),
+      c("JK", "gender"),
+      c("NISN", "nisn"),
+      c("Tempat Lahir", "birth_place"),
+      c("Tanggal Lahir", "birth_date"),
+      c("NIK", "nik"),
+      c("Agama", "religion"),
+      c("Alamat", "address"),
+      c("RT", "rt"),
+      c("RW", "rw"),
+      c("Dusun", "village"),
+      c("Kelurahan", "village"),
+      c("Kecamatan", "district"),
+      c("Kode Pos", "postal_code"),
+      e("Jenis Tinggal"),
+      e("Alat Transportasi"),
+      c("Telepon", "phone"),
+      c("HP", "phone"),
+      c("E-Mail", "email"),
+      e("SKHUN"),
+      e("Penerima KPS"),
+      e("No. KPS"),
+      c("Ayah Nama", "father_name"),
+      c("Ayah Tgl Lahir", "father_birth_date"),
+      c("Ayah Pendidikan", "father_education"),
+      c("Ayah Pekerjaan", "father_occupation"),
+      c("Ayah Penghasilan", "father_income"),
+      c("Ayah NIK", "father_nik"),
+      c("Ibu Nama", "mother_name"),
+      c("Ibu Tgl Lahir", "mother_birth_date"),
+      c("Ibu Pendidikan", "mother_education"),
+      c("Ibu Pekerjaan", "mother_occupation"),
+      c("Ibu Penghasilan", "mother_income"),
+      c("Ibu NIK", "mother_nik"),
+      c("Wali Nama", "guardian_name"),
+      c("Wali Tgl Lahir", "guardian_birth_date"),
+      c("Wali Pendidikan", "guardian_education"),
+      c("Wali Pekerjaan", "guardian_occupation"),
+      c("Wali NIK", "guardian_nik"),
+      e("Rombel Saat Ini"),
+      e("No Peserta UN"),
+      c("No Seri Ijazah", "diploma_number"),
+      e("Penerima KIP"),
+      e("Nomor KIP"),
+      e("Nama di KIP"),
+      e("Nomor KKS"),
+      e("No Registrasi Akta Lahir"),
+      e("Bank"),
+      e("Nomor Rekening Bank"),
+      e("Rekening Atas Nama"),
+      e("Layak PIP"),
+      e("Alasan Layak PIP"),
+      c("Kebutuhan Khusus", "special_needs"),
+      c("Sekolah Asal", "previous_school"),
+      c("Anak ke", "birth_order"),
+      e("Lintang"),
+      e("Bujur"),
+      c("No KK", "document_kk"),
+      e("Berat Badan"),
+      e("Tinggi Badan"),
+      e("Lingkar Kepala"),
+      c("Jml Saudara", "sibling_count"),
+      e("Jarak Rumah"),
       {
         header: "No. Pendaftaran",
         accessor: "registration_number" as const,

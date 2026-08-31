@@ -184,12 +184,12 @@ export default function RegistrationsPage() {
     [],
   );
 
-  const columns = useMemo(() => {
+const columns = useMemo(() => {
     type Row = Registrant;
     return [
       {
         header: "No. Pendaftaran",
-        accessor: "registration_number",
+        accessor: "registration_number" as const,
         render: (_v: unknown, row: Row) => (
           <div>
             <p className="font-semibold text-on-surface">{row.registration_number ?? "-"}</p>
@@ -199,7 +199,7 @@ export default function RegistrationsPage() {
       },
       {
         header: "Nama",
-        accessor: "full_name",
+        accessor: "full_name" as const,
         render: (_v: unknown, row: Row) => (
           <div>
             <p className="font-medium text-on-surface">{row.full_name}</p>
@@ -207,28 +207,28 @@ export default function RegistrationsPage() {
           </div>
         ),
       },
-{
-         header: "NISN",
-         accessor: "nisn",
-         render: (_v: unknown, row: Row) => (
-           <span className="text-sm text-on-surface-variant">{row.nisn ?? "-"}</span>
-         ),
-       },
-       {
-         header: "Email",
-         accessor: "email",
-         render: (_v: unknown, row: Row) => (
-           <span className="text-sm text-on-surface-variant">{row.email ?? "-"}</span>
-         ),
-       },
+      {
+        header: "NISN",
+        accessor: "nisn" as const,
+        render: (_v: unknown, row: Row) => (
+          <span className="text-sm text-on-surface-variant">{row.nisn ?? "-"}</span>
+        ),
+      },
+      {
+        header: "Email",
+        accessor: "email" as const,
+        render: (_v: unknown, row: Row) => (
+          <span className="text-sm text-on-surface-variant">{row.email ?? "-"}</span>
+        ),
+      },
       {
         header: "Status",
-        accessor: "status",
+        accessor: "status" as const,
         render: (_v: unknown, row: Row) => statusBadge(row.status),
       },
       {
         header: "Verifikasi",
-        accessor: "verification_status",
+        accessor: "verification_status" as const,
         render: (_v: unknown, row: Row) => (
           <Badge variant={row.verification_status === "verified" ? "success" : row.verification_status === "rejected" ? "danger" : "neutral"}>
             {row.verification_status ?? "-"}
@@ -237,7 +237,7 @@ export default function RegistrationsPage() {
       },
       {
         header: "Aksi",
-        accessor: "id",
+        accessor: "id" as const,
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-center text-sm text-slate-700",
         render: (_v: unknown, row: Row) => (

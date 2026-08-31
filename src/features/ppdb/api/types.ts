@@ -46,17 +46,26 @@ export interface Registrant {
   father_education?: Education | null;
   father_occupation?: string | null;
   father_phone?: string | null;
+  father_income?: number | null;
+  father_birth_place?: string | null;
+  father_birth_date?: string | null;
   mother_name?: string | null;
   mother_nik?: string | null;
   mother_education?: Education | null;
   mother_occupation?: string | null;
   mother_phone?: string | null;
+  mother_income?: number | null;
+  mother_birth_place?: string | null;
+  mother_birth_date?: string | null;
   // Wali
   guardian_name?: string | null;
   guardian_nik?: string | null;
   guardian_education?: Education | null;
   guardian_occupation?: string | null;
   guardian_phone?: string | null;
+  guardian_income?: number | null;
+  guardian_birth_place?: string | null;
+  guardian_birth_date?: string | null;
   // PPDB
   academic_year_id?: number | null;
   registration_path?: RegistrationPath | null;
@@ -80,6 +89,32 @@ export interface Registrant {
   data_completed_at?: string | null;
   created_at?: string;
   updated_at?: string;
+  // Documents
+  document_kk?: string | null;
+  document_birth_certificate?: string | null;
+  document_diploma?: string | null;
+  document_parent_ktp?: string | null;
+  document_photo?: string | null;
+  document_kip_kks?: string | null;
+  document_other?: string | null;
+  // Additional
+  diploma_number?: string | null;
+  achievements?: string | null;
+  organizations?: string | null;
+  scholarship_info?: string | null;
+  declaration?: boolean;
+  special_needs?: string | null;
+  blood_type?: string | null;
+  nationality?: string | null;
+  marital_status?: string | null;
+  birth_order?: number | null;
+  sibling_count?: number | null;
+  average_score?: number | null;
+  previous_school_address?: string | null;
+  father_birth_year?: string | null;
+  mother_birth_year?: string | null;
+  guardian_birth_year?: string | null;
+  photo?: string | null;
 }
 
 export interface RegistrantAddressPayload {
