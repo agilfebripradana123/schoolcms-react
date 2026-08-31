@@ -187,31 +187,34 @@ export default function ScholarshipsPage() {
       {
         header: "Nama Beasiswa",
         accessor: "name" as keyof Row,
+        className: "px-6 py-4 text-sm font-medium text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{row.name}</span>
+          <span>{row.name}</span>
         ),
       },
       {
         header: "Siswa",
         accessor: "student_id" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{studentName(row)}</span>
+          <span>{studentName(row)}</span>
         ),
       },
       {
         header: "Penyedia",
         accessor: "provider" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.provider || "-"}</span>
+          <span>{row.provider || "-"}</span>
         ),
       },
       {
         header: "Jumlah",
         accessor: "amount" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-on-surface font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-semibold text-on-surface">
+          <span>
             {row.amount != null ? formatCurrency(row.amount) : "-"}
           </span>
         ),
@@ -219,13 +222,15 @@ export default function ScholarshipsPage() {
       {
         header: "Periode",
         accessor: "start_date" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{periodLabel(row)}</span>
+          <span>{periodLabel(row)}</span>
         ),
       },
       {
         header: "Status",
         accessor: "status" as keyof Row,
+        className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
             {STATUS_LABELS[row.status] ?? row.status ?? "-"}
@@ -235,10 +240,10 @@ export default function ScholarshipsPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}

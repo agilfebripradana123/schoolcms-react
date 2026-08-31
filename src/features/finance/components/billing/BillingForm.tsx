@@ -15,7 +15,6 @@ import { semesterService } from "@/features/academic/api/semester.service";
 import type {
   AcademicYear,
   Billing,
-  BillingStatus,
   CreateBillingPayload,
   FeeType,
   Semester,
@@ -29,13 +28,6 @@ interface BillingFormProps {
   initialData?: Billing | null;
 }
 
-const STATUS_OPTIONS: Array<{ value: BillingStatus; label: string }> = [
-  { value: "unpaid", label: "Belum Bayar" },
-  { value: "partial", label: "Sebagian" },
-  { value: "paid", label: "Lunas" },
-  { value: "cancelled", label: "Dibatalkan" },
-];
-
 export default function BillingForm({
   open,
   onClose,
@@ -48,7 +40,6 @@ export default function BillingForm({
   const [semesterId, setSemesterId] = useState<string>("");
   const [amount, setAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [status, setStatus] = useState<BillingStatus>("unpaid");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -156,7 +147,6 @@ export default function BillingForm({
         setSemesterId(initialData.semester_id != null ? String(initialData.semester_id) : "");
         setAmount(initialData.amount != null ? String(initialData.amount) : "");
         setDueDate(initialData.due_date ?? "");
-        setStatus(initialData.status);
         setNotes(initialData.notes ?? "");
       } else {
         setStudentId("");
@@ -165,7 +155,6 @@ export default function BillingForm({
         setSemesterId("");
         setAmount("");
         setDueDate("");
-        setStatus("unpaid");
         setNotes("");
       }
     }
@@ -196,7 +185,6 @@ export default function BillingForm({
       semester_id: semesterId ? Number(semesterId) : null,
       amount: amountNum,
       due_date: dueDate || undefined,
-      status,
       notes: notes.trim() || undefined,
     };
 
@@ -420,27 +408,15 @@ export default function BillingForm({
           </FormField>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <FormField label="Status" required error={fieldErrors.status?.[0]}>
-            <AppSelect
-              value={status}
-              onChange={(v) => setStatus((v ?? "unpaid") as BillingStatus)}
-              options={STATUS_OPTIONS}
-              isSearchable={false}
-              isDisabled={submitting}
-            />
-          </FormField>
-
-          <FormField label="Catatan" hint="Opsional." error={fieldErrors.notes?.[0]}>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Catatan penagihan..."
-              maxLength={255}
-              disabled={submitting}
-            />
-          </FormField>
-        </div>
+        <FormField label="Catatan" hint="Opsional." error={fieldErrors.notes?.[0]}>
+          <Textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Catatan penagihan..."
+            maxLength={255}
+            disabled={submitting}
+          />
+        </FormField>
 
         {error && !error.errors && (
           <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">

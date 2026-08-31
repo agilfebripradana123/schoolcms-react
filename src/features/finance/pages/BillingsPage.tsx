@@ -282,38 +282,42 @@ export default function BillingsPage() {
       {
         header: "Siswa",
         accessor: "student_id" as keyof Row,
+        className: "px-6 py-4 text-sm font-medium text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{studentName(row)}</span>
+          <span>{studentName(row)}</span>
         ),
       },
       {
         header: "Jenis Tagihan",
         accessor: "fee_type_id" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{feeTypeName(row)}</span>
+          <span>{feeTypeName(row)}</span>
         ),
       },
       {
         header: "Tahun Ajaran",
         accessor: "academic_year_id" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{yearName(row)}</span>
+          <span>{yearName(row)}</span>
         ),
       },
       {
         header: "Semester",
         accessor: "semester_id" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{semesterName(row)}</span>
+          <span>{semesterName(row)}</span>
         ),
       },
       {
         header: "Jumlah",
         accessor: "amount" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700",
+        headerClassName: "px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-left text-sm text-on-surface font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-semibold text-on-surface">
+          <span>
             {row.amount != null ? formatCurrency(row.amount) : "-"}
           </span>
         ),
@@ -321,8 +325,9 @@ export default function BillingsPage() {
       {
         header: "Jatuh Tempo",
         accessor: "due_date" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span>
             {row.due_date ? formatDate(row.due_date) : "-"}
           </span>
         ),
@@ -330,6 +335,8 @@ export default function BillingsPage() {
       {
         header: "Status",
         accessor: "status" as keyof Row,
+        headerClassName:"px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-4 py-4 text-center",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
             {STATUS_LABELS[row.status] ?? row.status ?? "-"}
@@ -339,10 +346,10 @@ export default function BillingsPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}
@@ -442,15 +449,6 @@ export default function BillingsPage() {
               value={yearFilter}
               onChange={(v) => handleYearChange(v ?? "all")}
               placeholder="Pilih Tahun Ajaran"
-            />
-          </label>
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
-            <span className="whitespace-nowrap">Semester</span>
-            <AppSelect
-              options={semesterFilterOptions}
-              value={semesterFilter}
-              onChange={(v) => handleSemesterChange(v ?? "all")}
-              placeholder="Pilih Semester"
             />
           </label>
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
