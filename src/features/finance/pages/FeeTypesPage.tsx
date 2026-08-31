@@ -160,11 +160,14 @@ export default function FeeTypesPage() {
       {
         header: "Status",
         accessor: "is_active" as keyof Row,
+        headerClassName: "px-6 py-3.5 text-sm font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={row.is_active ? "success" : "secondary"}>
-            {row.is_active ? "Aktif" : "Tidak Aktif"}
-          </Badge>
+          <div className="flex items-center justify-center gap-2">
+            <Badge variant={row.is_active ? "success" : "secondary"}>
+              {row.is_active ? "Aktif" : "Tidak Aktif"}
+            </Badge>
+          </div>
         ),
       },
       {
