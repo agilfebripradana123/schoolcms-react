@@ -6,7 +6,7 @@ import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Search from "@/components/ui/Search";
-import { FormField, Input, Select } from "@/components/ui/Form";
+import { FormField, Select } from "@/components/ui/Form";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -64,6 +64,14 @@ const PATH_OPTIONS = [
   { value: "mutasi", label: "Mutasi" },
 ];
 
+const PROGRAM_OPTIONS = [
+  { value: "", label: "Semua Program" },
+  { value: "ipa", label: "IPA" },
+  { value: "ips", label: "IPS" },
+  { value: "bahasa", label: "Bahasa" },
+  { value: "lainnya", label: "Lainnya" },
+];
+
 export default function RegistrationsPage() {
   const [data, setData] = useState<Registrant[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
@@ -75,7 +83,7 @@ export default function RegistrationsPage() {
   const [verificationFilter, setVerificationFilter] = useState("");
   const [selectionFilter, setSelectionFilter] = useState("");
   const [pathFilter, setPathFilter] = useState("");
-  const [page, setPage] = useState(1);
+  const [programFilter, setProgramFilter] = useState("");
 
   const [query, setQuery] = useState<Record<string, string | number | undefined>>({ page: 1, per_page: PER_PAGE });
 
@@ -97,7 +105,6 @@ export default function RegistrationsPage() {
         setData(res.data);
         if (res.meta) {
           setMeta(res.meta);
-          setPage(res.meta.current_page);
         }
       })
       .catch((err) => {
@@ -164,9 +171,18 @@ export default function RegistrationsPage() {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
-  const openDetail = useCallback((row: Registrant) => {
-    setDetail(row);
-  }, []);
+  const openDetail = useCallback(
+    async (row: Registrant) => {
+      try {
+        const res = await registrationService.get(row.id);
+        setDetail(res.data);
+      } catch (err) {
+        toast.error("Gagal memuat detail", { description: toApiError(err).message });
+        setDetail(row);
+      }
+    },
+    [],
+  );
 
   const columns = useMemo(() => {
     type Row = Registrant;
@@ -191,20 +207,20 @@ export default function RegistrationsPage() {
           </div>
         ),
       },
-      {
-        header: "Jalur",
-        accessor: "registration_path",
-        render: (_v: unknown, row: Row) => (
-          <span className="text-sm text-on-surface-variant capitalize">{row.registration_path ?? "-"}</span>
-        ),
-      },
-      {
-        header: "Program",
-        accessor: "program_choice",
-        render: (_v: unknown, row: Row) => (
-          <span className="text-sm text-on-surface-variant uppercase">{row.program_choice ?? "-"}</span>
-        ),
-      },
+{
+         header: "NISN",
+         accessor: "nisn",
+         render: (_v: unknown, row: Row) => (
+           <span className="text-sm text-on-surface-variant">{row.nisn ?? "-"}</span>
+         ),
+       },
+       {
+         header: "Email",
+         accessor: "email",
+         render: (_v: unknown, row: Row) => (
+           <span className="text-sm text-on-surface-variant">{row.email ?? "-"}</span>
+         ),
+       },
       {
         header: "Status",
         accessor: "status",
@@ -276,6 +292,9 @@ export default function RegistrationsPage() {
             </FormField>
             <FormField label="Jalur" className="w-full sm:w-48">
               <Select value={pathFilter} onChange={(e) => { setPathFilter(e.target.value); applyFilter({ registration_path: e.target.value || "none" }); }} options={PATH_OPTIONS} />
+            </FormField>
+            <FormField label="Program" className="w-full sm:w-48">
+              <Select value={programFilter} onChange={(e) => { setProgramFilter(e.target.value); applyFilter({ program_choice: e.target.value || "none" }); }} options={PROGRAM_OPTIONS} />
             </FormField>
           </div>
         </div>
