@@ -187,20 +187,23 @@ export default function TransactionsPage() {
       {
         header: "Kode Transaksi",
         accessor: "transaction_code" as keyof Row,
+        className: "px-6 py-4 text-sm font-medium text-on-surface whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{row.transaction_code || "-"}</span>
+          <span>{row.transaction_code || "-"}</span>
         ),
       },
       {
         header: "Siswa",
         accessor: "payment_id" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{paymentStudent(row)}</span>
+          <span>{paymentStudent(row)}</span>
         ),
       },
       {
         header: "Tipe",
         accessor: "type" as keyof Row,
+        className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge variant={TYPE_VARIANTS[row.type] ?? "secondary"}>
             {TYPE_LABELS[row.type] ?? row.type ?? "-"}
@@ -210,20 +213,20 @@ export default function TransactionsPage() {
       {
         header: "Jumlah",
         accessor: "amount" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <span
             className={
               row.type === "refund"
-                ? "font-semibold text-error"
+                ? "text-error"
                 : row.type === "payment"
-                  ? "font-semibold text-tertiary"
-                  : "font-semibold text-on-surface"
+                  ? "text-tertiary"
+                  : "text-on-surface"
             }
           >
             {row.amount != null
-              ? `${row.type === "refund" ? "−" : row.type === "payment" ? "+" : ""}${formatCurrency(row.amount)}`
+              ? `${row.type === "refund" ? "\u2212" : row.type === "payment" ? "+" : ""}${formatCurrency(row.amount)}`
               : "-"}
           </span>
         ),
@@ -231,6 +234,7 @@ export default function TransactionsPage() {
       {
         header: "Metode",
         accessor: "method" as keyof Row,
+        className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => {
           const labels = {
             cash: "Tunai",
@@ -239,22 +243,24 @@ export default function TransactionsPage() {
             lainnya: "Lainnya",
           } as const;
           return (
-            <span className="text-slate-700">
+            <Badge variant="secondary">
               {row.method ? (labels[row.method] ?? row.method) : "-"}
-            </span>
+            </Badge>
           );
         },
       },
       {
         header: "Tanggal",
         accessor: "transaction_date" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{formatTransactionDate(row.transaction_date)}</span>
+          <span>{formatTransactionDate(row.transaction_date)}</span>
         ),
       },
       {
         header: "Status",
         accessor: "status" as keyof Row,
+        className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
             {STATUS_LABELS[row.status] ?? row.status ?? "-"}
@@ -264,10 +270,10 @@ export default function TransactionsPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}
