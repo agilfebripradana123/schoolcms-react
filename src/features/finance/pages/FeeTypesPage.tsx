@@ -133,17 +133,18 @@ export default function FeeTypesPage() {
       {
         header: "Nama Tagihan",
         accessor: "name" as keyof Row,
+        className: "px-6 py-4 text-sm font-medium text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{row.name}</span>
+          <span>{row.name}</span>
         ),
       },
       {
         header: "Jumlah",
         accessor: "amount" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-on-surface font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-semibold text-on-surface">
+          <span>
             {row.amount != null ? formatCurrency(row.amount) : "-"}
           </span>
         ),
@@ -151,13 +152,15 @@ export default function FeeTypesPage() {
       {
         header: "Deskripsi",
         accessor: "description" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.description || "-"}</span>
+          <span>{row.description || "-"}</span>
         ),
       },
       {
         header: "Status",
         accessor: "is_active" as keyof Row,
+        className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge variant={row.is_active ? "success" : "secondary"}>
             {row.is_active ? "Aktif" : "Tidak Aktif"}
@@ -167,10 +170,10 @@ export default function FeeTypesPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}
@@ -229,7 +232,6 @@ export default function FeeTypesPage() {
             />
           </div>
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
-            <span className="whitespace-nowrap">Status</span>
             <AppSelect
               options={activityFilterOptions}
               value={activity}

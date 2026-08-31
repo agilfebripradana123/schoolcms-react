@@ -55,7 +55,6 @@ export interface CreateBillingPayload {
   semester_id?: number | null;
   amount: number;
   due_date?: string;
-  status: BillingStatus;
   notes?: string;
 }
 
@@ -173,6 +172,7 @@ export interface FinancialReport {
   total_paid?: number | null;
   total_outstanding?: number | null;
   generated_by?: number | null;
+  source_fingerprint?: string | null;
   notes?: string | null;
   generator?: User;
   created_at?: string;
@@ -184,10 +184,6 @@ export interface CreateFinancialReportPayload {
   report_type: FinancialReportType;
   period_start: string;
   period_end: string;
-  total_billed?: number;
-  total_paid?: number;
-  total_outstanding?: number;
-  generated_by?: number;
   notes?: string;
 }
 

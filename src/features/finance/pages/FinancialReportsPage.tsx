@@ -155,13 +155,15 @@ export default function FinancialReportsPage() {
       {
         header: "Judul",
         accessor: "title" as keyof Row,
+        className: "px-6 py-4 text-sm font-medium text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{row.title}</span>
+          <span className="line-clamp-2">{row.title}</span>
         ),
       },
       {
         header: "Jenis",
         accessor: "report_type" as keyof Row,
+        className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}>
             {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
@@ -171,17 +173,18 @@ export default function FinancialReportsPage() {
       {
         header: "Periode",
         accessor: "period_start" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{periodLabel(row)}</span>
+          <span>{periodLabel(row)}</span>
         ),
       },
       {
         header: "Total Tagihan",
         accessor: "total_billed" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span>
             {row.total_billed != null ? formatCurrency(row.total_billed) : "-"}
           </span>
         ),
@@ -189,10 +192,10 @@ export default function FinancialReportsPage() {
       {
         header: "Total Dibayar",
         accessor: "total_paid" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-tertiary font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-semibold text-tertiary">
+          <span>
             {row.total_paid != null ? formatCurrency(row.total_paid) : "-"}
           </span>
         ),
@@ -200,10 +203,10 @@ export default function FinancialReportsPage() {
       {
         header: "Total Tertunggak",
         accessor: "total_outstanding" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-error font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-semibold text-error">
+          <span>
             {row.total_outstanding != null ? formatCurrency(row.total_outstanding) : "-"}
           </span>
         ),
@@ -211,10 +214,10 @@ export default function FinancialReportsPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}

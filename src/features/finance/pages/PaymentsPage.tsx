@@ -212,22 +212,25 @@ export default function PaymentsPage() {
       {
         header: "Siswa",
         accessor: "student_id" as keyof Row,
+        className: "px-6 py-4 text-sm font-medium text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{studentName(row)}</span>
+          <span>{studentName(row)}</span>
         ),
       },
       {
         header: "Jenis Tagihan",
         accessor: "billing_id" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{billingFeeType(row)}</span>
+          <span>{billingFeeType(row)}</span>
         ),
       },
       {
         header: "Tanggal Bayar",
         accessor: "payment_date" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span>
             {row.payment_date ? formatDate(row.payment_date) : "-"}
           </span>
         ),
@@ -235,10 +238,10 @@ export default function PaymentsPage() {
       {
         header: "Jumlah",
         accessor: "amount" as keyof Row,
-        headerClassName: "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-on-surface font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-semibold text-on-surface">
+          <span>
             {row.amount != null ? formatCurrency(row.amount) : "-"}
           </span>
         ),
@@ -246,6 +249,7 @@ export default function PaymentsPage() {
       {
         header: "Metode",
         accessor: "method" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge variant={METHOD_VARIANTS[row.method] ?? "secondary"}>
             {METHOD_LABELS[row.method] ?? row.method ?? "-"}
@@ -255,17 +259,18 @@ export default function PaymentsPage() {
       {
         header: "Kasir",
         accessor: "received_by" as keyof Row,
+        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{cashierName(row)}</span>
+          <span>{cashierName(row)}</span>
         ),
       },
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}

@@ -143,11 +143,6 @@ export default function TransactionForm({
       setSubmitting(false);
       return;
     }
-    if (amountNum < 0) {
-      setError({ message: "Jumlah transaksi tidak boleh kurang dari 0." });
-      setSubmitting(false);
-      return;
-    }
 
     const payload: CreatePaymentTransactionPayload = {
       payment_id: Number(paymentId),
@@ -265,17 +260,16 @@ export default function TransactionForm({
           <FormField
             label="Jumlah"
             required
-            hint="Nominal rupiah."
+            hint={type === "refund" ? "Gunakan nilai negatif untuk pengembalian." : "Nominal rupiah."}
             error={fieldErrors.amount?.[0]}
           >
             <Input
               type="number"
               inputMode="decimal"
               step="0.01"
-              min="0"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="250000"
+              placeholder={type === "refund" ? "-250000" : "250000"}
               disabled={submitting}
             />
           </FormField>
