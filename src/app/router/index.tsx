@@ -7,59 +7,10 @@ import Login from "@/pages/Login";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
 import RoleRoute from "@/features/auth/RoleRoute";
-import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage } from "@/features/academic";
+import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage, SchedulesPage, PeriodsPage, AssignmentsPage, GradesPage, ReportCardsPage } from "@/features/academic";
 import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
 import { RegistrationsPage, VerificationPage, SelectionPage, ReRegistrationPage } from "@/features/ppdb";
-
-const academicModules = [
-  { path: "semesters", title: "Semester" },
-  { path: "curriculum", title: "Kurikulum" },
-  { path: "subjects", title: "Mata Pelajaran" },
-  { path: "classes", title: "Kelas" },
-  { path: "class-subjects", title: "Mata Pelajaran Kelas" },
-  { path: "class-students", title: "Siswa Kelas" },
-  { path: "schedules", title: "Jadwal" },
-  { path: "periods", title: "Jam Pelajaran" },
-  { path: "assignments", title: "Tugas" },
-  { path: "grades", title: "Nilai" },
-  { path: "report-cards", title: "Rapor" },
-];
-
-const studentModules = [
-  { path: "", title: "Data Siswa" },
-  { path: "parents", title: "Orang Tua" },
-  { path: "guardians", title: "Wali Siswa" },
-  { path: "history", title: "Riwayat Siswa" },
-  { path: "attendance", title: "Kehadiran" },
-  { path: "transfers", title: "Mutasi Siswa" },
-  { path: "alumni", title: "Alumni" },
-  { path: "id-card", title: "Kartu Pelajar" },
-];
-
-const teacherModules = [
-  { path: "", title: "Guru" },
-  { path: "staff", title: "Staf" },
-  { path: "assignments", title: "Penugasan Mengajar" },
-  { path: "attendance", title: "Kehadiran Guru" },
-  { path: "leave", title: "Cuti Guru" },
-  { path: "documents", title: "Dokumen Guru" },
-];
-
-const ppdbModules = [
-  { path: "registrations", title: "Pendaftaran" },
-  { path: "verification", title: "Verifikasi" },
-  { path: "selection", title: "Seleksi" },
-  { path: "re-registration", title: "Daftar Ulang" },
-];
-
-const financeModules = [
-  { path: "fee-types", title: "Jenis Tagihan" },
-  { path: "billing", title: "Penagihan" },
-  { path: "payments", title: "Pembayaran" },
-  { path: "transactions", title: "Transaksi" },
-  { path: "scholarships", title: "Beasiswa" },
-  { path: "reports", title: "Laporan Keuangan" },
-];
+import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
 
 const developmentModules = [
   { path: "counseling", title: "Bimbingan & Konseling" },
@@ -181,10 +132,6 @@ const router = createBrowserRouter([
               { path: "ppdb/re-registration", element: <ReRegistrationPage /> },
             ],
           },
-          ...createModuleRoutes("/academic", "Academic", academicModules.filter(m => m.path !== "years" && m.path !== "semesters" && m.path !== "curriculum" && m.path !== "subjects" && m.path !== "classes" && m.path !== "class-subjects" && m.path !== "class-students")),
-          ...createModuleRoutes("/students", "Students", studentModules.filter(m => m.path !== "" && m.path !== "parents" && m.path !== "guardians" && m.path !== "history" && m.path !== "attendance" && m.path !== "transfers" && m.path !== "alumni" && m.path !== "id-card")),          ...createModuleRoutes("/teachers", "Teachers & Staff", teacherModules.filter(m => m.path !== "" && m.path !== "staff" && m.path !== "assignments" && m.path !== "attendance" && m.path !== "leave" && m.path !== "documents")),
-          ...createModuleRoutes("/ppdb", "PPDB", ppdbModules.filter(() => false)),
-          ...createModuleRoutes("/finance", "Finance", financeModules),
           ...createModuleRoutes("/development", "Student Development", developmentModules),
           ...createModuleRoutes("/facilities", "Facilities", facilityModules),
           ...createModuleRoutes("/administration", "Administration", adminModules),
