@@ -203,11 +203,14 @@ export default function TransactionsPage() {
       {
         header: "Tipe",
         accessor: "type" as keyof Row,
+        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={TYPE_VARIANTS[row.type] ?? "secondary"}>
-            {TYPE_LABELS[row.type] ?? row.type ?? "-"}
-          </Badge>
+          <div className="flex justify-center">
+            <Badge variant={TYPE_VARIANTS[row.type] ?? "secondary"}>
+              {TYPE_LABELS[row.type] ?? row.type ?? "-"}
+            </Badge>
+          </div>
         ),
       },
       {
@@ -231,9 +234,12 @@ export default function TransactionsPage() {
           </span>
         ),
       },
+      
       {
         header: "Metode",
         accessor: "method" as keyof Row,
+        headerClassName:
+          "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => {
           const labels = {
@@ -242,10 +248,20 @@ export default function TransactionsPage() {
             qris: "QRIS",
             lainnya: "Lainnya",
           } as const;
+
+          const variants = {
+            cash: "success",
+            transfer: "primary",
+            qris: "secondary",
+            lainnya: "warning",
+          } as const;
+
           return (
-            <Badge variant="secondary">
-              {row.method ? (labels[row.method] ?? row.method) : "-"}
-            </Badge>
+            <div className="flex justify-center">
+              <Badge variant={row.method ? variants[row.method] : "neutral"}>
+                {row.method ? (labels[row.method] ?? row.method) : "-"}
+              </Badge>
+            </div>
           );
         },
       },
@@ -260,11 +276,14 @@ export default function TransactionsPage() {
       {
         header: "Status",
         accessor: "status" as keyof Row,
+        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
-            {STATUS_LABELS[row.status] ?? row.status ?? "-"}
-          </Badge>
+          <div className="flex justify-center">
+            <Badge variant={STATUS_VARIANTS[row.status] ?? "secondary"}>
+              {STATUS_LABELS[row.status] ?? row.status ?? "-"}
+            </Badge>
+          </div>
         ),
       },
       {

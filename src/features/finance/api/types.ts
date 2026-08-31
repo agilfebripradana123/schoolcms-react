@@ -40,6 +40,9 @@ export interface Billing {
   due_date?: string;
   status: BillingStatus;
   notes?: string | null;
+  paid?: number;
+  outstanding?: number;
+  payments?: Payment[];
   student?: Student;
   fee_type?: FeeType;
   academic_year?: AcademicYear;
@@ -76,6 +79,7 @@ export interface Payment {
   billing?: Billing;
   student?: Student;
   cashier?: User;
+  transactions?: PaymentTransaction[];
   created_at?: string;
   updated_at?: string;
 }

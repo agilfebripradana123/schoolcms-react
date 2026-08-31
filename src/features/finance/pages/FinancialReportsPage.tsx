@@ -163,11 +163,14 @@ export default function FinancialReportsPage() {
       {
         header: "Jenis",
         accessor: "report_type" as keyof Row,
+        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
-          <Badge variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}>
-            {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
-          </Badge>
+          <div className="flex justify-center">
+            <Badge variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}>
+              {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
+            </Badge>
+          </div>
         ),
       },
       {
