@@ -9,7 +9,7 @@ import ProtectedRoute from "@/features/auth/ProtectedRoute";
 import RoleRoute from "@/features/auth/RoleRoute";
 import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage, SchedulesPage, PeriodsPage, AssignmentsPage, GradesPage, ReportCardsPage } from "@/features/academic";
 import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
-import { RegistrationsPage, VerificationPage, SelectionPage, ReRegistrationPage } from "@/features/ppdb";
+import { RegistrationsPage, VerificationPage, ReRegistrationPage, ExportDapodikPage } from "@/features/ppdb";
 import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
 
 const developmentModules = [
@@ -128,8 +128,8 @@ const router = createBrowserRouter([
             children: [
               { path: "ppdb/registrations", element: <RegistrationsPage /> },
               { path: "ppdb/verification", element: <VerificationPage /> },
-              { path: "ppdb/selection", element: <SelectionPage /> },
               { path: "ppdb/re-registration", element: <ReRegistrationPage /> },
+              { path: "ppdb/export-dapodik", element: <ExportDapodikPage /> },
             ],
           },
           ...createModuleRoutes("/development", "Student Development", developmentModules),

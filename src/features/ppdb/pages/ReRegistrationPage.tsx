@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, ClipboardCheck } from "lucide-react";
+import { CheckCircle2, ClipboardCheck, Eye } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -11,8 +11,9 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { registrationService, reRegistrationService } from "../api/registration.service";
+import { reRegistrantService, reRegistrationService } from "../api/registration.service";
 import type { Registrant } from "../api/types";
+import RegistrantDetail from "@/features/ppdb/components/RegistrantDetail";
 
 const PER_PAGE = 10;
 
@@ -31,7 +32,6 @@ export default function ReRegistrationPage() {
   const [error, setError] = useState<ApiError | null>(null);
 
   const [query, setQuery] = useState<Record<string, string | number | undefined>>({
-    selection_status: "selected",
     page: 1,
     per_page: PER_PAGE,
   });
@@ -40,12 +40,30 @@ export default function ReRegistrationPage() {
   const [verifyTarget, setVerifyTarget] = useState<Registrant | null>(null);
   const [verifyOpen, setVerifyOpen] = useState(false);
   const [verifyNote, setVerifyNote] = useState("");
+  const [detailTarget, setDetailTarget] = useState<Registrant | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  const downloadBlob = useCallback((blob: Blob, filename: string) => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }, []);
+
+  const openDetail = useCallback((row: Registrant) => {
+    setDetailTarget(row);
+    setDetailOpen(true);
+  }, []);
 
   const fetchList = useCallback(() => {
     let active = true;
     setLoading(true);
     setError(null);
-    registrationService
+    reRegistrantService
       .list({ ...query })
       .then((res) => {
         if (!active) return;
@@ -73,12 +91,16 @@ export default function ReRegistrationPage() {
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
-  const handleReRegister = useCallback(
+  const handleDaftarUlang = useCallback(
     async (row: Registrant) => {
       setActingId(row.id);
       try {
-        const res = await reRegistrationService.reRegister(row.id);
-        toast.success(res.message || "Daftar ulang berhasil.");
+        // Step 1: tandai data lengkap / daftar ulang di backend
+        await reRegistrationService.completeData(row.id);
+        // Step 2: download excel Dapodik per-row
+        const blob = await reRegistrantService.exportDapodik({ id: row.id });
+        downloadBlob(blob, `dapodik-${row.registration_number ?? row.id}.csv`);
+        toast.success("Daftar ulang berhasil — file Dapodik terunduh.");
         fetchList();
       } catch (err) {
         toast.error("Gagal daftar ulang", { description: toApiError(err).message });
@@ -86,7 +108,7 @@ export default function ReRegistrationPage() {
         setActingId(null);
       }
     },
-    [fetchList],
+    [fetchList, downloadBlob],
   );
 
   const openVerify = useCallback((row: Registrant) => {
@@ -141,11 +163,6 @@ export default function ReRegistrationPage() {
         ),
       },
       {
-        header: "Tanggal Daftar Ulang",
-        accessor: "re_registration_date",
-        render: (_v: unknown, row: Row) => <span className="text-sm text-on-surface-variant">{fmtDate(row.re_registration_date)}</span>,
-      },
-      {
         header: "Status Siswa",
         accessor: "student_id",
         render: (_v: unknown, row: Row) =>
@@ -161,19 +178,27 @@ export default function ReRegistrationPage() {
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-center text-sm text-slate-700",
         render: (_v: unknown, row: Row) => {
-          const done = row.re_registration_status === "completed" || row.student_id;
+          const isCompleted = row.re_registration_status === "completed";
+          const hasStudent = !!row.student_id;
           return (
             <div className="flex items-center justify-center gap-2">
-              {!done ? (
+              <button
+                type="button"
+                onClick={() => openDetail(row)}
+                className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200"
+              >
+                <Eye className="h-4 w-4" /> Detail
+              </button>
+              {!isCompleted && !hasStudent ? (
                 <button
                   type="button"
-                  onClick={() => handleReRegister(row)}
+                  onClick={() => handleDaftarUlang(row)}
                   disabled={actingId === row.id}
                   className="inline-flex items-center gap-1 rounded-lg bg-tertiary-container/20 px-3 py-1.5 text-sm font-medium text-tertiary transition-colors hover:bg-tertiary-container/40 disabled:opacity-50"
                 >
                   <ClipboardCheck className="h-4 w-4" /> Daftar Ulang
                 </button>
-              ) : row.student_id ? (
+              ) : hasStudent ? (
                 <span className="inline-flex items-center gap-1 text-sm font-medium text-tertiary">
                   <CheckCircle2 className="h-4 w-4" /> Selesai
                 </span>
@@ -192,7 +217,7 @@ export default function ReRegistrationPage() {
         },
       },
     ];
-  }, [actingId, handleReRegister, openVerify]);
+  }, [actingId, handleDaftarUlang, openVerify, openDetail]);
 
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
@@ -238,6 +263,8 @@ export default function ReRegistrationPage() {
           </FormField>
         </div>
       </ConfirmDialog>
+
+      <RegistrantDetail open={detailOpen} registrant={detailTarget} onClose={() => setDetailOpen(false)} />
     </PageContainer>
   );
 }

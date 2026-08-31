@@ -20,6 +20,7 @@ export interface Registrant {
   full_name: string;
   nik?: string | null;
   nisn?: string | null;
+  nickname?: string | null;
   email?: string | null;
   phone?: string | null;
   gender?: Gender | null;
@@ -72,7 +73,11 @@ export interface Registrant {
   selected_at?: string | null;
   re_registration_status?: string;
   re_registration_date?: string | null;
+  re_registration_verified_by?: number | null;
+  re_registration_verified_at?: string | null;
   re_registration_notes?: string | null;
+  data_completed?: boolean;
+  data_completed_at?: string | null;
   created_at?: string;
   updated_at?: string;
 }

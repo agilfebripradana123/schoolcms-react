@@ -141,7 +141,7 @@ export default function VerificationPage() {
         render: (_v: unknown, row: Row) => <span className="font-medium text-on-surface">{row.full_name}</span>,
       },
       {
-        header: "Verifikasi",
+        header: "Status",
         accessor: "verification_status",
         render: (_v: unknown, row: Row) => (
           <Badge variant={row.verification_status === "verified" ? "success" : row.verification_status === "rejected" ? "danger" : "neutral"}>
@@ -150,22 +150,10 @@ export default function VerificationPage() {
         ),
       },
       {
-        header: "Oleh / Waktu",
-        accessor: "verified_at",
-        render: (_v: unknown, row: Row) => (
-          <div>
-            <p className="text-sm text-on-surface-variant">{row.verified_by ? `#${row.verified_by}` : "-"}</p>
-            <p className="text-xs text-outline">{row.verified_at?.substring(0, 16).replace("T", " ") ?? "-"}</p>
-          </div>
-        ),
-      },
-      {
         header: "Aksi",
         accessor: "id",
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
         render: (_v: unknown, row: Row) => (
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={() => handleVerify(row)}

@@ -47,6 +47,7 @@ export const PPDB = {
   NOT_SELECT: "/registrations/{id}/not-select",
   RE_REGISTER: "/registrations/{id}/re-register",
   VERIFY_RE_REGISTER: "/registrations/{id}/verify-re-registration",
+  RE_REGISTRANTS: "/re-registrants",
 } as const;
 
 export const FINANCE = {

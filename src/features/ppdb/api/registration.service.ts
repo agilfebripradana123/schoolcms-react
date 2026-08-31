@@ -69,39 +69,41 @@ export const verificationService = {
   },
 };
 
-export const selectionService = {
-  async select(
-    id: number | string,
-    payload: { selection_score?: number },
-  ): Promise<RegistrationActionResponse> {
-    return api.post<RegistrationActionResponse>(
-      PPDB.SELECT.replace("{id}", String(id)),
-      payload,
-    );
-  },
-
-  async notSelect(id: number | string): Promise<RegistrationActionResponse> {
-    return api.post<RegistrationActionResponse>(
-      PPDB.NOT_SELECT.replace("{id}", String(id)),
-    );
-  },
-};
-
 export const reRegistrationService = {
-  async reRegister(id: number | string): Promise<RegistrationActionResponse> {
-    return api.post<RegistrationActionResponse>(
-      PPDB.RE_REGISTER.replace("{id}", String(id)),
-    );
-  },
-
   async verifyReRegistration(
     id: number | string,
     payload?: { re_registration_notes?: string },
   ): Promise<RegistrationActionResponse> {
     return api.post<RegistrationActionResponse>(
-      PPDB.VERIFY_RE_REGISTER.replace("{id}", String(id)),
+      `/re-registrants/${id}/verify-re-registration`,
       payload,
     );
+  },
+
+  async completeData(
+    id: number | string,
+    payload?: { notes?: string },
+  ): Promise<RegistrationActionResponse> {
+    return api.post<RegistrationActionResponse>(
+      `/re-registrants/${id}/complete-data`,
+      payload,
+    );
+  },
+};
+
+export const reRegistrantService = {
+  async list(params?: PPDBListParams): Promise<RegistrantListResponse> {
+    return api.get<RegistrantListResponse>(PPDB.RE_REGISTRANTS, params);
+  },
+
+  async exportList(params?: PPDBListParams): Promise<RegistrantListResponse> {
+    return api.get<RegistrantListResponse>("/re-registrants/export-list", params);
+  },
+
+  async exportDapodik(params?: { id?: number | string; ids?: string }): Promise<Blob> {
+    return api.get<Blob>("/re-registrants/export-dapodik", params, {
+      responseType: "blob",
+    });
   },
 };
 

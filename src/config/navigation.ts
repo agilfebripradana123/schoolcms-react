@@ -93,8 +93,8 @@ export const navigation: NavigationGroup[] = [
     items: [
       { label: "Pendaftaran", path: "/ppdb/registrations", icon: UserPlus },
       { label: "Verifikasi", path: "/ppdb/verification", icon: ShieldCheck },
-      { label: "Seleksi", path: "/ppdb/selection", icon: ClipboardCheck },
       { label: "Daftar Ulang", path: "/ppdb/re-registration", icon: ArrowLeftRight },
+      { label: "Export Excel", path: "/ppdb/export-dapodik", icon: FileText },
     ],
   },
   {

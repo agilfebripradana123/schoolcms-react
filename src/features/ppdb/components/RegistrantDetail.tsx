@@ -127,6 +127,34 @@ export default function RegistrantDetail({ open, onClose, registrant }: Registra
           </Grid>
         </Section>
 
+        <Section title="Dokumen & Data Tambahan">
+          <Grid>
+            <Field label="KK" value={r?.document_kk ? "Ada" : "Belum diisi"} />
+            <Field label="Akta Kelahiran" value={r?.document_birth_certificate ? "Ada" : "Belum diisi"} />
+            <Field label="Ijazah" value={r?.document_diploma ? "Ada" : "Belum diisi"} />
+            <Field label="KTP Orang Tua" value={r?.document_parent_ktp ? "Ada" : "Belum diisi"} />
+            <Field label="Foto" value={r?.document_photo ? "Ada" : "Belum diisi"} />
+            <Field label="KIP/KKS" value={r?.document_kip_kks ? "Ada" : "Belum diisi"} />
+            <Field label="Foto Path" value={r?.photo} />
+            <Field label="Phone" value={r?.phone} />
+            <Field label="RT" value={r?.rt} />
+            <Field label="RW" value={r?.rw} />
+            <Field label="Dusun/Kelurahan" value={r?.village} />
+            <Field label="Kecamatan" value={r?.district} />
+            <Field label="Kota/Kab" value={r?.city} />
+            <Field label="Provinsi" value={r?.province} />
+            <Field label="Kode Pos" value={r?.postal_code} />
+            <Field label="Anak ke" value={r?.birth_order} />
+            <Field label="Jml. Saudara" value={r?.sibling_count} />
+            <Field label="Gol. Darah" value={r?.blood_type} />
+            <Field label="Kebutuhan Khusus" value={r?.special_needs} />
+            <Field label="No. Ijazah" value={r?.diploma_number} />
+            <Field label="Rata-rata Nilai" value={r?.average_score} />
+            <Field label="Tahun Lulus" value={r?.graduation_year} />
+            <Field label="Pernyataan (Declaration)" value={r?.declaration ? "Ya" : "Tidak"} />
+          </Grid>
+        </Section>
+
         <Section title="Penilaian & Status">
           <Grid>
             <Field label="Status" value={r?.status} />
@@ -138,10 +166,16 @@ export default function RegistrantDetail({ open, onClose, registrant }: Registra
             <Field label="Diterima At" value={fmtDate(r?.selected_at)} />
             <Field label="Status Daftar Ulang" value={r?.re_registration_status} />
             <Field label="Tanggal Daftar Ulang" value={fmtDate(r?.re_registration_date)} />
+            <Field label="Data Lengkap" value={r?.data_completed ? "Ya" : "Belum"} />
+            <Field label="Tanggal Data Lengkap" value={fmtDate(r?.data_completed_at)} />
             <Field label="Catatan Daftar Ulang" value={r?.re_registration_notes} />
-            {r?.student_id && (
+            {r?.student_id ? (
               <div className="sm:col-span-2">
                 <Badge variant="success">Sudah menjadi siswa (ID: {r.student_id})</Badge>
+              </div>
+            ) : (
+              <div className="sm:col-span-2">
+                <Badge variant="neutral">Belum menjadi siswa</Badge>
               </div>
             )}
           </Grid>
