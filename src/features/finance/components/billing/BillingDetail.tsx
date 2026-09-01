@@ -85,12 +85,26 @@ export default function BillingDetail({
   const [error, setError] = useState<ApiError | null>(null);
   const [billing, setBilling] = useState<Billing | null>(null);
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousBillingId, setPreviousBillingId] = useState(billingId);
+
+  if (
+    open !== previousOpen ||
+    billingId !== previousBillingId
+  ) {
+    setPreviousOpen(open);
+    setPreviousBillingId(billingId);
+
+    if (open) {
+      setLoading(true);
+      setError(null);
+      setBilling(null);
+    }
+  }
+
   const load = useCallback(() => {
     if (!open || billingId === null) return;
     let active = true;
-    setLoading(true);
-    setError(null);
-    setBilling(null);
 
     billingService
       .get(billingId)
@@ -204,7 +218,15 @@ export default function BillingDetail({
       ) : error ? (
         <div className="flex min-h-[160px] flex-col items-center justify-center gap-3 rounded-xl py-8">
           <p className="text-sm text-error">Gagal memuat data tagihan.</p>
-          <Button variant="secondary" onClick={load}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              setBilling(null);
+              load();
+            }}
+          >
             Muat Ulang
           </Button>
         </div>

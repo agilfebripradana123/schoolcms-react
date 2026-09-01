@@ -123,8 +123,6 @@ export default function BillingsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     billingService
       .list({
@@ -159,6 +157,8 @@ export default function BillingsPage() {
   }, [query]);
 
   const setFilter = useCallback((key: string, value: string) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       [key]: value === "all" ? undefined : Number(value),
@@ -188,6 +188,8 @@ export default function BillingsPage() {
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
     setStatusFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       status: value === "all" ? undefined : value,
@@ -196,18 +198,24 @@ export default function BillingsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -493,7 +501,11 @@ export default function BillingsPage() {
             <p className="text-sm text-error">Gagal memuat data penagihan.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

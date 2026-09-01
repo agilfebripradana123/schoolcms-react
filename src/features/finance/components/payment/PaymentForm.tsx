@@ -74,8 +74,6 @@ export default function PaymentForm({
   const isEdit = Boolean(initialData);
 
   const loadBillings = useCallback(() => {
-    setBillingsLoading(true);
-    setBillingsError(false);
     billingService
       .list({ per_page: 200 })
       .then((res) => {
@@ -91,8 +89,6 @@ export default function PaymentForm({
   }, []);
 
   const loadStudents = useCallback(() => {
-    setStudentsLoading(true);
-    setStudentsError(false);
     studentService
       .list({ per_page: 200 })
       .then((res) => {
@@ -108,8 +104,6 @@ export default function PaymentForm({
   }, []);
 
   const loadCashiers = useCallback(() => {
-    setCashiersLoading(true);
-    setCashiersError(false);
     userManagementService
       .list({ per_page: 100 })
       .then((res) => {
@@ -124,13 +118,22 @@ export default function PaymentForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadBillings();
-      loadStudents();
-      loadCashiers();
+      setBillingsLoading(true);
+      setBillingsError(false);
+      setStudentsLoading(true);
+      setStudentsError(false);
+      setCashiersLoading(true);
+      setCashiersError(false);
 
       if (initialData) {
         setBillingId(String(initialData.billing_id));
@@ -152,7 +155,15 @@ export default function PaymentForm({
         setNotes("");
       }
     }
-  }, [open, initialData, loadBillings, loadStudents, loadCashiers]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadBillings();
+      loadStudents();
+      loadCashiers();
+    }
+  }, [open, loadBillings, loadStudents, loadCashiers]);
 
   const handleBillingChange = useCallback((value: string) => {
     setBillingId(value);
@@ -256,7 +267,11 @@ export default function PaymentForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadBillings}
+                  onClick={() => {
+                    setBillingsLoading(true);
+                    setBillingsError(false);
+                    loadBillings();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -290,7 +305,11 @@ export default function PaymentForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadStudents}
+                  onClick={() => {
+                    setStudentsLoading(true);
+                    setStudentsError(false);
+                    loadStudents();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -375,7 +394,11 @@ export default function PaymentForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadCashiers}
+                  onClick={() => {
+                    setCashiersLoading(true);
+                    setCashiersError(false);
+                    loadCashiers();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang

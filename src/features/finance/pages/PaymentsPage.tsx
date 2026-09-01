@@ -90,8 +90,6 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     paymentService
       .list({
@@ -124,6 +122,8 @@ export default function PaymentsPage() {
 
   const handleStudentChange = useCallback((value: string) => {
     setStudentFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       student_id: value === "all" ? undefined : Number(value),
@@ -133,6 +133,8 @@ export default function PaymentsPage() {
 
   const handleMethodChange = useCallback((value: MethodFilter) => {
     setMethodFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       method: value === "all" ? undefined : value,
@@ -141,18 +143,24 @@ export default function PaymentsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -326,7 +334,7 @@ export default function PaymentsPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center *:md:gap-3">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Siswa</span>
             <AppSelect
@@ -353,7 +361,11 @@ export default function PaymentsPage() {
             <p className="text-sm text-error">Gagal memuat data pembayaran.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

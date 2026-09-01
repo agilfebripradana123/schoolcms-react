@@ -51,8 +51,6 @@ export default function FeeTypesPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     feeTypeService
       .list({
@@ -87,28 +85,38 @@ export default function FeeTypesPage() {
     setSearch(value);
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
     searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       setQuery((prev) => ({ ...prev, q: value, page: 1 }));
     }, 400);
   }, []);
 
   const handleActivityChange = useCallback((value: ActivityFilter) => {
     setActivity(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, is_active: activityToFilter(value), page: 1 }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -226,15 +234,15 @@ export default function FeeTypesPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:items-end">
-          <div className="md:min-w-[220px] md:flex-1">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:items-end *:sm:gap-3">
+          <div className="w-full sm:max-w-xs">
             <Search
               value={search}
               onChange={handleSearchChange}
               placeholder="Cari nama tagihan..."
             />
           </div>
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
             <span className="whitespace-nowrap">Status</span>
             <AppSelect
               options={activityFilterOptions}
@@ -251,7 +259,11 @@ export default function FeeTypesPage() {
             <p className="text-sm text-error">Gagal memuat data jenis tagihan.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

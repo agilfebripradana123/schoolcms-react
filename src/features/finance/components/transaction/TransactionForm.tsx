@@ -76,8 +76,6 @@ export default function TransactionForm({
   const isEdit = Boolean(initialData);
 
   const loadPayments = useCallback(() => {
-    setPaymentsLoading(true);
-    setPaymentsError(false);
     paymentService
       .list({ per_page: 200 })
       .then((res) => {
@@ -92,11 +90,18 @@ export default function TransactionForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadPayments();
+      setPaymentsLoading(true);
+      setPaymentsError(false);
 
       if (initialData) {
         setPaymentId(String(initialData.payment_id));
@@ -120,7 +125,13 @@ export default function TransactionForm({
         setTransactionDate("");
       }
     }
-  }, [open, initialData, loadPayments]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadPayments();
+    }
+  }, [open, loadPayments]);
 
   const handlePaymentChange = useCallback(
     (value: string) => {
@@ -216,7 +227,11 @@ export default function TransactionForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadPayments}
+                  onClick={() => {
+                    setPaymentsLoading(true);
+                    setPaymentsError(false);
+                    loadPayments();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
