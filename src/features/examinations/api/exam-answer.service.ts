@@ -4,13 +4,19 @@ import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateExamAnswerPayload,
   ExaminationListParams,
+  ExaminationPaginatedResponse,
   ExamAnswer,
   UpdateExamAnswerPayload,
 } from "./types";
 
 export const examAnswerService = {
-  async list(params?: ExaminationListParams): Promise<ApiEnvelope<ExamAnswer[]>> {
-    return api.get<ApiEnvelope<ExamAnswer[]>>(EXAMINATION.EXAM_ANSWERS, params);
+  async list(
+    params?: ExaminationListParams,
+  ): Promise<ExaminationPaginatedResponse<ExamAnswer[]>> {
+    return api.get<ExaminationPaginatedResponse<ExamAnswer[]>>(
+      EXAMINATION.EXAM_ANSWERS,
+      params,
+    );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<ExamAnswer>> {
