@@ -5,7 +5,8 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
-import { FormField, Textarea, Select } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
+import { FormField, Textarea } from "@/components/ui/Form";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -182,12 +183,18 @@ export default function VerificationPage() {
       <PageHeader title="Verifikasi Pendaftar" description="Verifikasi atau tolak pendaftaran PPDB." />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="w-full sm:w-72">
-            <FormField label="Filter Status Verifikasi">
-              <Select value={verificationFilter} onChange={(e) => changeFilter(e.target.value)} options={STATUS_FILTER_OPTIONS} />
-            </FormField>
-          </div>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center *:sm:gap-3">
+          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+            <span className="whitespace-nowrap">Status Verifikasi</span>
+            <AppSelect
+              options={STATUS_FILTER_OPTIONS}
+              value={verificationFilter}
+              onChange={(v) => changeFilter(v ?? "none")}
+              placeholder="Pilih Status"
+              isSearchable={false}
+              className="min-w-[180px]"
+            />
+          </label>
         </div>
 
         {error ? (

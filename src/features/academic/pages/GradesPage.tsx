@@ -364,7 +364,7 @@ export default function GradesPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 *:md:gap-3">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Siswa</span>
             <AppSelect

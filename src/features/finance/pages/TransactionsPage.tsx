@@ -342,7 +342,7 @@ export default function TransactionsPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center *:md:gap-3">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Tipe</span>
             <AppSelect

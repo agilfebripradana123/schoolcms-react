@@ -226,15 +226,15 @@ export default function FeeTypesPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center md:items-end">
-          <div className="md:min-w-[220px] md:flex-1">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:items-end *:sm:gap-3">
+          <div className="w-full sm:max-w-xs">
             <Search
               value={search}
               onChange={handleSearchChange}
               placeholder="Cari nama tagihan..."
             />
           </div>
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
             <span className="whitespace-nowrap">Status</span>
             <AppSelect
               options={activityFilterOptions}

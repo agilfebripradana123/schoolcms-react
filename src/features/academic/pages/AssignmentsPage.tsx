@@ -315,7 +315,7 @@ export default function AssignmentsPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end *:md:gap-3">
           <div className="md:min-w-[220px] md:flex-1">
             <Search
               value={search}
@@ -323,7 +323,7 @@ export default function AssignmentsPage() {
               placeholder="Cari judul tugas..."
             />
           </div>
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Mata Pelajaran</span>
             <AppSelect
               options={subjectFilterOptions}

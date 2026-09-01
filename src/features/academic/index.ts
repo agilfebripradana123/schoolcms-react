@@ -6,7 +6,7 @@ export { default as SubjectsPage } from "./pages/SubjectsPage";
 export { default as ClassesPage } from "./pages/ClassesPage";
 export { default as ClassSubjectsPage } from "./pages/ClassSubjectsPage";
 export { default as ClassStudentsPage } from "./pages/ClassStudentsPage";
-export { default as TeacherAssignmentsPage } from "./pages/TeacherAssignmentsPage";
+export { default as TeacherAssignmentsPage } from "../teachers-staff/pages/TeacherAssignmentsPage";
 export { default as SchedulesPage } from "./pages/SchedulesPage";
 export { default as PeriodsPage } from "./pages/PeriodsPage";
 export { default as AssignmentsPage } from "./pages/AssignmentsPage";

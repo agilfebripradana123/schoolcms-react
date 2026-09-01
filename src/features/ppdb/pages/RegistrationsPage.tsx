@@ -6,7 +6,7 @@ import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Search from "@/components/ui/Search";
-import { FormField, Select } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -271,32 +271,33 @@ const columns = useMemo(() => {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="w-full sm:max-w-xs">
-              <div className="flex gap-2">
-                <Search value={search} onChange={setSearch} placeholder="Cari nama / email..." />
-                <Button variant="secondary" onClick={handleSearch}>Cari</Button>
-              </div>
-            </div>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex w-full gap-2 sm:max-w-xs">
+            <Search value={search} onChange={setSearch} placeholder="Cari nama / email..." />
+            <Button variant="secondary" onClick={handleSearch}>Cari</Button>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <FormField label="Status" className="w-full sm:w-48">
-              <Select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); applyFilter({ status: e.target.value || "none" }); }} options={MAIN_STATUS_OPTIONS} />
-            </FormField>
-            <FormField label="Verifikasi" className="w-full sm:w-48">
-              <Select value={verificationFilter} onChange={(e) => { setVerificationFilter(e.target.value); applyFilter({ verification_status: e.target.value || "none" }); }} options={VERIFICATION_OPTIONS} />
-            </FormField>
-            <FormField label="Seleksi" className="w-full sm:w-48">
-              <Select value={selectionFilter} onChange={(e) => { setSelectionFilter(e.target.value); applyFilter({ selection_status: e.target.value || "none" }); }} options={SELECTION_OPTIONS} />
-            </FormField>
-            <FormField label="Jalur" className="w-full sm:w-48">
-              <Select value={pathFilter} onChange={(e) => { setPathFilter(e.target.value); applyFilter({ registration_path: e.target.value || "none" }); }} options={PATH_OPTIONS} />
-            </FormField>
-            <FormField label="Program" className="w-full sm:w-48">
-              <Select value={programFilter} onChange={(e) => { setProgramFilter(e.target.value); applyFilter({ program_choice: e.target.value || "none" }); }} options={PROGRAM_OPTIONS} />
-            </FormField>
-          </div>
+        </div>
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 *:md:gap-3">
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Status</span>
+            <AppSelect options={MAIN_STATUS_OPTIONS} value={statusFilter} onChange={(v) => { setStatusFilter(v ?? ""); applyFilter({ status: v || "none" }); }} placeholder="Pilih Status" isSearchable={false} />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Verifikasi</span>
+            <AppSelect options={VERIFICATION_OPTIONS} value={verificationFilter} onChange={(v) => { setVerificationFilter(v ?? ""); applyFilter({ verification_status: v || "none" }); }} placeholder="Pilih Verifikasi" isSearchable={false} />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Seleksi</span>
+            <AppSelect options={SELECTION_OPTIONS} value={selectionFilter} onChange={(v) => { setSelectionFilter(v ?? ""); applyFilter({ selection_status: v || "none" }); }} placeholder="Pilih Seleksi" isSearchable={false} />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Jalur</span>
+            <AppSelect options={PATH_OPTIONS} value={pathFilter} onChange={(v) => { setPathFilter(v ?? ""); applyFilter({ registration_path: v || "none" }); }} placeholder="Pilih Jalur" isSearchable={false} />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Program</span>
+            <AppSelect options={PROGRAM_OPTIONS} value={programFilter} onChange={(v) => { setProgramFilter(v ?? ""); applyFilter({ program_choice: v || "none" }); }} placeholder="Pilih Program" isSearchable={false} />
+          </label>
         </div>
 
         {error ? (

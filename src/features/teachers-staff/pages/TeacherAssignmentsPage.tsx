@@ -9,10 +9,10 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { teacherAssignmentService } from "../api/teacher-assignment.service";
-import { classService } from "../api/class.service";
-import { subjectService } from "../api/subject.service";
-import { academicYearService } from "../api/academic-year.service";
+import { teacherAssignmentService } from "../../academic/api/teacher-assignment.service";
+import { classService } from "../../academic/api/class.service";
+import { subjectService } from "../../academic/api/subject.service";
+import { academicYearService } from "../../academic/api/academic-year.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
 import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type {
@@ -20,9 +20,9 @@ import type {
   SchoolClass,
   Subject,
   TeacherAssignment,
-} from "../api/types";
-import TeacherAssignmentForm from "../components/teacher-assignment/TeacherAssignmentForm";
-import TeacherAssignmentDeleteDialog from "../components/teacher-assignment/TeacherAssignmentDeleteDialog";
+} from "../../academic/api/types";
+import TeacherAssignmentForm from "../../academic/components/teacher-assignment/TeacherAssignmentForm";
+import TeacherAssignmentDeleteDialog from "../../academic/components/teacher-assignment/TeacherAssignmentDeleteDialog";
 
 const PER_PAGE = 10;
 
@@ -318,7 +318,7 @@ export default function TeacherAssignmentsPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-center">
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 *:md:gap-3">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Guru</span>
               <AppSelect

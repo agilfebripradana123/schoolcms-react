@@ -176,12 +176,14 @@ export default function PeriodsPage() {
       />
 
       <Card>
-        <div className="mb-4">
-          <Search
-            value={search}
-            onChange={handleSearchChange}
-            placeholder="Cari nama jam pelajaran..."
-          />
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:max-w-xs">
+            <Search
+              value={search}
+              onChange={handleSearchChange}
+              placeholder="Cari nama jam pelajaran..."
+            />
+          </div>
         </div>
 
         {error ? (

@@ -217,7 +217,7 @@ export default function CurriculumPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:items-end *:sm:gap-3">
           <div className="w-full sm:max-w-xs">
             <Search
               value={search}
