@@ -23,6 +23,7 @@ export default function Search({
 
   const currentValue = controlledValue ?? internalValue;
 
+
   if (controlledValue !== undefined && controlledValue !== internalValue) {
     setInternalValue(controlledValue);
   }

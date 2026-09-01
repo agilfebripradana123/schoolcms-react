@@ -10,7 +10,9 @@ interface SidebarProps {
 
 export default function Sidebar({
   collapsed = false,
+
   onToggleCollapse: _onToggleCollapse,
+
 }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;

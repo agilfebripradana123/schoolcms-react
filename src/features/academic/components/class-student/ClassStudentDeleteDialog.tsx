@@ -1,0 +1,83 @@
+import { toast } from "sonner";
+import { useState } from "react";
+import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
+import { toApiError } from "@/lib/api";
+import type { ApiError } from "@/types";
+import { classStudentService } from "../../api/class-student.service";
+import type { ClassStudent } from "../../api/types";
+
+interface ClassStudentDeleteDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onDeleted: () => void;
+  data: ClassStudent | null;
+}
+
+export default function ClassStudentDeleteDialog({
+  open,
+  onClose,
+  onDeleted,
+  data,
+}: ClassStudentDeleteDialogProps) {
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<ApiError | null>(null);
+
+  const className = data?.class?.name;
+  const studentName = data?.student?.name;
+
+  const handleDelete = async () => {
+    if (!data) return;
+    setDeleting(true);
+    setError(null);
+
+    try {
+      await classStudentService.remove(data.id);
+      onDeleted();
+      toast.success("Siswa berhasil dihapus dari kelas.");
+    } catch (err) {
+      const apiError = toApiError(err);
+      setError(apiError);
+      toast.error("Gagal menghapus siswa dari kelas", {
+        description: apiError.message,
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title="Hapus Siswa Kelas"
+      size="sm"
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={deleting}>
+            Batal
+          </Button>
+          <Button variant="danger" onClick={handleDelete} loading={deleting}>
+            Hapus
+          </Button>
+        </>
+      }
+    >
+      <p className="text-sm text-on-surface-variant">
+        Apakah Anda yakin ingin menghapus siswa{" "}
+        <span className="font-semibold text-on-surface">
+          {studentName ?? ""}
+        </span>{" "}
+        dari kelas{" "}
+        <span className="font-semibold text-on-surface">{className ?? ""}</span>?
+        Tindakan ini tidak dapat dibatalkan.
+      </p>
+
+      {error && (
+        <p className="mt-3 rounded-xl bg-error-container px-3 py-2 text-sm text-error">
+          {error.message}
+        </p>
+      )}
+    </Modal>
+  );
+}

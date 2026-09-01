@@ -13,7 +13,6 @@ import {
   CalendarDays,
   Library,
   School,
-  UserCheck,
   ClipboardCheck,
   Award,
   BadgePercent,
@@ -40,7 +39,6 @@ import {
   Activity,
   Shield,
   KeyRound,
-  UsersRound,
   ScrollText,
   Cog,
   Stethoscope,
@@ -72,8 +70,6 @@ export const navigation: NavigationGroup[] = [
     label: "Siswa",
     items: [
       { label: "Data Siswa", path: "/students", icon: Users },
-      { label: "Orang Tua", path: "/students/parents", icon: UsersRound },
-      { label: "Wali Siswa", path: "/students/guardians", icon: UserCheck },
       { label: "Riwayat Siswa", path: "/students/history", icon: ScrollText },
       { label: "Kehadiran", path: "/students/attendance", icon: ClipboardCheck },
       { label: "Mutasi Siswa", path: "/students/transfers", icon: ArrowLeftRight },
@@ -97,8 +93,8 @@ export const navigation: NavigationGroup[] = [
     items: [
       { label: "Pendaftaran", path: "/ppdb/registrations", icon: UserPlus },
       { label: "Verifikasi", path: "/ppdb/verification", icon: ShieldCheck },
-      { label: "Seleksi", path: "/ppdb/selection", icon: ClipboardCheck },
       { label: "Daftar Ulang", path: "/ppdb/re-registration", icon: ArrowLeftRight },
+      { label: "Export Excel", path: "/ppdb/export-dapodik", icon: FileText },
     ],
   },
   {

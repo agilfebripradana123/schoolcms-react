@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { LogOut, User, Settings } from "lucide-react";
-import { useAuth } from "@/features/auth/AuthContext";
+import { LogOut, User, Settings, Bell } from "lucide-react";
+import { useAuth } from "@/features/auth/useAuth";
 import { useNavigate } from "react-router-dom";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { toast } from "sonner";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -9,6 +11,7 @@ interface HeaderProps {
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -23,6 +26,9 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
 
   const handleLogout = useCallback(() => {
     logout();
+    toast.success("Berhasil keluar", {
+      description: "Sesi Anda telah diakhiri.",
+    });
     navigate("/login", { replace: true });
   }, [logout, navigate]);
 
@@ -36,52 +42,30 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeUserMenu]);
 
-  const userDisplayName = user?.name || "User";
+  const userDisplayName = user?.name || "Admin";
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-6">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onToggleSidebar}
-          className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 lg:hidden"
-          aria-label="Alihkan sidebar"
-        >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
-      </div>
+    <>
+      <ConfirmDialog
+        open={logoutOpen}
+        onOpenChange={setLogoutOpen}
+        title="Keluar dari akun?"
+        description="Anda akan diarahkan ke halaman login."
+        confirmText="Keluar"
+        cancelText="Batal"
+        destructive
+        onConfirm={handleLogout}
+      />
 
-      <div className="flex items-center gap-2">
-        <div className="relative" ref={menuRef}>
+      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
+        <div className="flex items-center gap-3">
           <button
-            onClick={toggleUserMenu}
-            className="flex items-center gap-2 rounded-lg p-2 text-slate-600 hover:bg-slate-100"
-            aria-label="Menu pengguna"
-            aria-expanded={userMenuOpen}
+            onClick={onToggleSidebar}
+            className="rounded-2xl border border-slate-200 bg-white p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container lg:hidden"
+            aria-label="Alihkan sidebar"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100">
-              <span className="text-sm font-medium text-indigo-700">
-                {userDisplayName.charAt(0).toUpperCase()}
-              </span>
-            </div>
-            <span className="hidden text-sm font-medium text-slate-700 md:block">
-              {userDisplayName}
-            </span>
             <svg
-              className={`hidden h-4 w-4 text-slate-400 transition-transform md:block ${
-                userMenuOpen ? "rotate-180" : ""
-              }`}
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -90,42 +74,87 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
+                d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
           </button>
-
-          {userMenuOpen && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
-              <a
-                href="#profile"
-                onClick={closeUserMenu}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-              >
-                <User className="h-4 w-4" />
-                Profil
-              </a>
-              <a
-                href="#settings"
-                onClick={closeUserMenu}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-              >
-                <Settings className="h-4 w-4" />
-                Pengaturan
-              </a>
-              <hr className="my-1 border-slate-100" />
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-              >
-                <LogOut className="h-4 w-4" />
-                Keluar
-              </button>
-            </div>
-          )}
+          <div className="hidden lg:block">
+            <p className="text-sm font-semibold text-on-surface">
+              Hallo, {userDisplayName}
+            </p>
+          </div>
         </div>
-      </div>
-    </header>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="rounded-2xl border border-slate-200 bg-white p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
+            aria-label="Notifikasi"
+          >
+            <Bell className="h-5 w-5" />
+          </button>
+
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={toggleUserMenu}
+              className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-1.5 text-slate-700 shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
+              aria-label="Menu pengguna"
+              aria-expanded={userMenuOpen}
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
+                <span className="text-sm font-bold">
+                  {userDisplayName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <span className="hidden text-sm font-semibold md:block">
+                {userDisplayName}
+              </span>
+              <svg
+                className={`hidden h-4 w-4 text-outline transition-transform md:block ${userMenuOpen ? "rotate-180" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {userMenuOpen && (
+              <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-2xl border border-slate-200 bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
+                <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">
+                  Akun
+                </div>
+                <a
+                  href="#profile"
+                  onClick={closeUserMenu}
+                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low"
+                >
+                  <User className="h-4 w-4" /> Profil
+                </a>
+                <a
+                  href="#settings"
+                  onClick={closeUserMenu}
+                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low"
+                >
+                  <Settings className="h-4 w-4" /> Pengaturan
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setLogoutOpen(true)}
+                  className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-error hover:bg-error-container/60"
+                >
+                  <LogOut className="h-4 w-4" /> Keluar
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
