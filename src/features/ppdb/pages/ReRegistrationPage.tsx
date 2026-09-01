@@ -53,8 +53,6 @@ export default function ReRegistrationPage() {
 
   const fetchList = useCallback(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
     reRegistrantService
       .list({ ...query })
       .then((res) => {
@@ -222,7 +220,11 @@ export default function ReRegistrationPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">{error.message}</p>
-            <Button variant="secondary" onClick={fetchList}>Muat Ulang</Button>
+            <Button variant="secondary" onClick={() => {
+              setLoading(true);
+              setError(null);
+              fetchList();
+            }}>Muat Ulang</Button>
           </div>
         ) : (
           <DataTable columns={columns} data={data} loading={loading} emptyMessage="Tidak ada pendaftar untuk daftar ulang." />

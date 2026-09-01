@@ -46,6 +46,25 @@ export default function AttendanceForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStudentId(initialData?.student_id ?? "");
+      setClassId(initialData?.class_id ?? "");
+      setClassAuto(Boolean(initialData));
+      setDate(initialData?.date ? initialData.date.substring(0, 10) : new Date().toISOString().substring(0, 10));
+      setStatus(initialData?.status ?? "hadir");
+      setNote(initialData?.note ?? "");
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   useEffect(() => {
     if (open) {
       if (!isEdit) {
@@ -81,26 +100,11 @@ export default function AttendanceForm({
     [classes],
   );
 
-  useEffect(() => {
-    if (open) {
-      setStudentId(initialData?.student_id ?? "");
-      setClassId(initialData?.class_id ?? "");
-      setClassAuto(Boolean(initialData));
-      setDate(initialData?.date ? initialData.date.substring(0, 10) : new Date().toISOString().substring(0, 10));
-      setStatus(initialData?.status ?? "hadir");
-      setNote(initialData?.note ?? "");
-      setError(null);
-      setFieldErrors({});
-    }
-  }, [open, initialData]);
-
   // Isi kelas otomatis dari class_students (sumber kelas resmi per tahun ajaran)
   useEffect(() => {
     if (!open || isEdit || !studentId) return;
 
     let active = true;
-    setClassId("");
-    setClassAuto(false);
 
     (async () => {
       let yearId: number | undefined;
@@ -203,7 +207,11 @@ export default function AttendanceForm({
           <FormField label="Pilih Siswa" required error={fieldErrors.student_id?.[0]}>
             <Select
               value={studentId}
-              onChange={(e) => setStudentId(e.target.value ? Number(e.target.value) : "")}
+              onChange={(e) => {
+                setClassId("");
+                setClassAuto(false);
+                setStudentId(e.target.value ? Number(e.target.value) : "");
+              }}
               options={studentOptions}
               placeholder="Pilih siswa"
               disabled={submitting}

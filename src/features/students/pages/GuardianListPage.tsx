@@ -38,8 +38,6 @@ export default function GuardianListPage() {
 
   const fetchList = useCallback(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     guardianService
       .list()
@@ -104,6 +102,8 @@ export default function GuardianListPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     fetchList();
   }, [fetchList]);
 
@@ -114,6 +114,8 @@ export default function GuardianListPage() {
       toast.warning(`Data wali ${toDelete.name || ""} berhasil dihapus.`);
       setDeleteOpen(false);
       setToDelete(null);
+      setLoading(true);
+      setError(null);
       fetchList();
     } catch (err) {
       toast.error("Gagal menghapus data wali siswa", {
@@ -229,7 +231,11 @@ export default function GuardianListPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">{error.message}</p>
-            <Button variant="secondary" onClick={fetchList}>
+            <Button variant="secondary" onClick={() => {
+              setLoading(true);
+              setError(null);
+              fetchList();
+            }}>
               Muat Ulang
             </Button>
           </div>

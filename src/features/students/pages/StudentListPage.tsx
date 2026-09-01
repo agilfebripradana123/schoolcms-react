@@ -41,8 +41,6 @@ export default function StudentListPage() {
 
   const fetchList = useCallback(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     studentService
       .list()
@@ -112,6 +110,8 @@ export default function StudentListPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     fetchList();
   }, [fetchList]);
 
@@ -122,6 +122,8 @@ export default function StudentListPage() {
       toast.warning(`Data siswa ${toDelete.name} berhasil dihapus.`);
       setDeleteOpen(false);
       setToDelete(null);
+      setLoading(true);
+      setError(null);
       fetchList();
     } catch (err) {
       toast.error("Gagal menghapus data siswa", {
@@ -231,7 +233,7 @@ export default function StudentListPage() {
         ),
       },
     ];
-  }, [openEdit, openDelete]);
+  }, [openDetail, openEdit, openDelete]);
 
   const from = filtered.length === 0 ? 0 : (safePage - 1) * PER_PAGE + 1;
   const to = Math.min(safePage * PER_PAGE, filtered.length);
@@ -265,7 +267,11 @@ export default function StudentListPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">{error.message}</p>
-            <Button variant="secondary" onClick={fetchList}>
+            <Button variant="secondary" onClick={() => {
+              setLoading(true);
+              setError(null);
+              fetchList();
+            }}>
               Muat Ulang
             </Button>
           </div>

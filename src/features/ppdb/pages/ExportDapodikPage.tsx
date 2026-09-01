@@ -29,8 +29,6 @@ export default function ExportDapodikPage() {
 
   const fetchList = useCallback(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
     reRegistrantService
       .exportList({ ...query })
       .then((res) => {
@@ -221,7 +219,11 @@ const columns = useMemo(() => {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">{error.message}</p>
-            <Button variant="secondary" onClick={fetchList}>
+            <Button variant="secondary" onClick={() => {
+              setLoading(true);
+              setError(null);
+              fetchList();
+            }}>
               Muat Ulang
             </Button>
           </div>
