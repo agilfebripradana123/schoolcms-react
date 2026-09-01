@@ -4,6 +4,7 @@ import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateExamParticipantPayload,
   ExaminationListParams,
+  ExaminationPaginatedResponse,
   ExamParticipant,
   UpdateExamParticipantPayload,
 } from "./types";
@@ -11,8 +12,8 @@ import type {
 export const examParticipantService = {
   async list(
     params?: ExaminationListParams,
-  ): Promise<ApiEnvelope<ExamParticipant[]>> {
-    return api.get<ApiEnvelope<ExamParticipant[]>>(
+  ): Promise<ExaminationPaginatedResponse<ExamParticipant[]>> {
+    return api.get<ExaminationPaginatedResponse<ExamParticipant[]>>(
       EXAMINATION.EXAM_PARTICIPANTS,
       params,
     );

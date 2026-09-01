@@ -11,6 +11,7 @@ import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPa
 import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
 import { RegistrationsPage, VerificationPage, ReRegistrationPage, ExportDapodikPage } from "@/features/ppdb";
 import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
+import { QuestionsPage, ExamsPage, ExamSchedulesPage, ExamSessionsPage, ExamParticipantsPage, ExamResultsPage } from "@/features/examinations";
 
 const developmentModules = [
   { path: "counseling", title: "Bimbingan & Konseling" },
@@ -37,15 +38,6 @@ const communicationModules = [
   { path: "announcements", title: "Pengumuman" },
   { path: "notifications", title: "Notifikasi" },
   { path: "calendar", title: "Kalender" },
-];
-
-const examModules = [
-  { path: "questions", title: "Bank Soal" },
-  { path: "exams", title: "Ujian" },
-  { path: "schedules", title: "Jadwal Ujian" },
-  { path: "sessions", title: "Sesi Ujian" },
-  { path: "participants", title: "Peserta Ujian" },
-  { path: "results", title: "Hasil Ujian" },
 ];
 
 const reportModules = [
@@ -123,6 +115,12 @@ const router = createBrowserRouter([
           { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
           { path: "teachers/leave", element: <TeacherLeaveListPage /> },
           { path: "teachers/documents", element: <TeacherDocumentListPage /> },
+          { path: "examinations/questions", element: <QuestionsPage /> },
+          { path: "examinations/exams", element: <ExamsPage /> },
+          { path: "examinations/schedules", element: <ExamSchedulesPage /> },
+          { path: "examinations/sessions", element: <ExamSessionsPage /> },
+          { path: "examinations/participants", element: <ExamParticipantsPage /> },
+          { path: "examinations/results", element: <ExamResultsPage /> },
           {
             element: <RoleRoute allow={["admin", "administrator"]} />,
             children: [
@@ -136,7 +134,6 @@ const router = createBrowserRouter([
           ...createModuleRoutes("/facilities", "Facilities", facilityModules),
           ...createModuleRoutes("/administration", "Administration", adminModules),
           ...createModuleRoutes("/communication", "Communication", communicationModules),
-          ...createModuleRoutes("/examinations", "Question & Examination", examModules),
           ...createModuleRoutes("/reports", "Reports", reportModules),
           ...createModuleRoutes("/system", "System", systemModules),
         ],

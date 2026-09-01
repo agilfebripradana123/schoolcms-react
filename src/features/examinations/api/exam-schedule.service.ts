@@ -5,12 +5,18 @@ import type {
   CreateExamSchedulePayload,
   ExamSchedule,
   ExaminationListParams,
+  ExaminationPaginatedResponse,
   UpdateExamSchedulePayload,
 } from "./types";
 
 export const examScheduleService = {
-  async list(params?: ExaminationListParams): Promise<ApiEnvelope<ExamSchedule[]>> {
-    return api.get<ApiEnvelope<ExamSchedule[]>>(EXAMINATION.EXAM_SCHEDULES, params);
+  async list(
+    params?: ExaminationListParams,
+  ): Promise<ExaminationPaginatedResponse<ExamSchedule[]>> {
+    return api.get<ExaminationPaginatedResponse<ExamSchedule[]>>(
+      EXAMINATION.EXAM_SCHEDULES,
+      params,
+    );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<ExamSchedule>> {

@@ -5,12 +5,18 @@ import type {
   CreateExamSessionPayload,
   ExamSession,
   ExaminationListParams,
+  ExaminationPaginatedResponse,
   UpdateExamSessionPayload,
 } from "./types";
 
 export const examSessionService = {
-  async list(params?: ExaminationListParams): Promise<ApiEnvelope<ExamSession[]>> {
-    return api.get<ApiEnvelope<ExamSession[]>>(EXAMINATION.EXAM_SESSIONS, params);
+  async list(
+    params?: ExaminationListParams,
+  ): Promise<ExaminationPaginatedResponse<ExamSession[]>> {
+    return api.get<ExaminationPaginatedResponse<ExamSession[]>>(
+      EXAMINATION.EXAM_SESSIONS,
+      params,
+    );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<ExamSession>> {
