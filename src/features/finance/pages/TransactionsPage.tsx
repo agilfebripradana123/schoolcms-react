@@ -95,8 +95,6 @@ export default function TransactionsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     paymentTransactionService
       .list({
@@ -129,6 +127,8 @@ export default function TransactionsPage() {
 
   const handleTypeChange = useCallback((value: TypeFilter) => {
     setTypeFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       type: value === "all" ? undefined : value,
@@ -138,6 +138,8 @@ export default function TransactionsPage() {
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
     setStatusFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       status: value === "all" ? undefined : value,
@@ -146,18 +148,24 @@ export default function TransactionsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -370,7 +378,11 @@ export default function TransactionsPage() {
             <p className="text-sm text-error">Gagal memuat data transaksi.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

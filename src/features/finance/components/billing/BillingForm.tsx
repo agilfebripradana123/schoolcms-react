@@ -64,8 +64,6 @@ export default function BillingForm({
   const isEdit = Boolean(initialData);
 
   const loadStudents = useCallback(() => {
-    setStudentsLoading(true);
-    setStudentsError(false);
     studentService
       .list({ per_page: 200 })
       .then((res) => {
@@ -81,8 +79,6 @@ export default function BillingForm({
   }, []);
 
   const loadFeeTypes = useCallback(() => {
-    setFeeTypesLoading(true);
-    setFeeTypesError(false);
     feeTypeService
       .list({ per_page: 100 })
       .then((res) => {
@@ -98,8 +94,6 @@ export default function BillingForm({
   }, []);
 
   const loadYears = useCallback(() => {
-    setYearsLoading(true);
-    setYearsError(false);
     academicYearService
       .list({ per_page: 100 })
       .then((res) => {
@@ -115,8 +109,6 @@ export default function BillingForm({
   }, []);
 
   const loadSemesters = useCallback(() => {
-    setSemestersLoading(true);
-    setSemestersError(false);
     semesterService
       .list({ per_page: 100 })
       .then((res) => {
@@ -131,14 +123,24 @@ export default function BillingForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadStudents();
-      loadFeeTypes();
-      loadYears();
-      loadSemesters();
+      setStudentsLoading(true);
+      setStudentsError(false);
+      setFeeTypesLoading(true);
+      setFeeTypesError(false);
+      setYearsLoading(true);
+      setYearsError(false);
+      setSemestersLoading(true);
+      setSemestersError(false);
 
       if (initialData) {
         setStudentId(String(initialData.student_id));
@@ -158,7 +160,16 @@ export default function BillingForm({
         setNotes("");
       }
     }
-  }, [open, initialData, loadStudents, loadFeeTypes, loadYears, loadSemesters]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadStudents();
+      loadFeeTypes();
+      loadYears();
+      loadSemesters();
+    }
+  }, [open, loadStudents, loadFeeTypes, loadYears, loadSemesters]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -256,7 +267,11 @@ export default function BillingForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadStudents}
+                  onClick={() => {
+                    setStudentsLoading(true);
+                    setStudentsError(false);
+                    loadStudents();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -290,7 +305,11 @@ export default function BillingForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadFeeTypes}
+                  onClick={() => {
+                    setFeeTypesLoading(true);
+                    setFeeTypesError(false);
+                    loadFeeTypes();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -324,7 +343,11 @@ export default function BillingForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadYears}
+                  onClick={() => {
+                    setYearsLoading(true);
+                    setYearsError(false);
+                    loadYears();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -358,7 +381,11 @@ export default function BillingForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadSemesters}
+                  onClick={() => {
+                    setSemestersLoading(true);
+                    setSemestersError(false);
+                    loadSemesters();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang

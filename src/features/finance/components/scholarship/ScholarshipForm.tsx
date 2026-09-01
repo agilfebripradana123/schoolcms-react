@@ -53,8 +53,6 @@ export default function ScholarshipForm({
   const isEdit = Boolean(initialData);
 
   const loadStudents = useCallback(() => {
-    setStudentsLoading(true);
-    setStudentsError(false);
     studentService
       .list({ per_page: 200 })
       .then((res) => {
@@ -69,11 +67,18 @@ export default function ScholarshipForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadStudents();
+      setStudentsLoading(true);
+      setStudentsError(false);
 
       if (initialData) {
         setStudentId(String(initialData.student_id));
@@ -93,7 +98,13 @@ export default function ScholarshipForm({
         setStatus("aktif");
       }
     }
-  }, [open, initialData, loadStudents]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadStudents();
+    }
+  }, [open, loadStudents]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +194,11 @@ export default function ScholarshipForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadStudents}
+                  onClick={() => {
+                    setStudentsLoading(true);
+                    setStudentsError(false);
+                    loadStudents();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
