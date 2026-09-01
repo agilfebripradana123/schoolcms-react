@@ -92,8 +92,6 @@ export default function ReportCardsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     reportCardService
       .list({
@@ -127,6 +125,8 @@ export default function ReportCardsPage() {
   }, [query]);
 
   const handleStudentChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setStudentFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -136,6 +136,8 @@ export default function ReportCardsPage() {
   }, []);
 
   const handleClassChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setClassFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -145,6 +147,8 @@ export default function ReportCardsPage() {
   }, []);
 
   const handleSemesterChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setSemesterFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -154,6 +158,8 @@ export default function ReportCardsPage() {
   }, []);
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
+    setLoading(true);
+    setError(null);
     setStatusFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -163,16 +169,22 @@ export default function ReportCardsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     setQuery((prev) => ({ ...prev }));
@@ -394,7 +406,11 @@ export default function ReportCardsPage() {
             <p className="text-sm text-error">Gagal memuat data rapor.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

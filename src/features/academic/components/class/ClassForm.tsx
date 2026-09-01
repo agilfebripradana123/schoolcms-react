@@ -43,8 +43,6 @@ export default function ClassForm({
   const isEdit = Boolean(initialData);
 
   const loadTeachers = useCallback(() => {
-    setTeachersLoading(true);
-    setTeachersError(false);
     teacherService
       .list({ per_page: 100 })
       .then((res) => {
@@ -59,11 +57,18 @@ export default function ClassForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadTeachers();
+      setTeachersLoading(true);
+      setTeachersError(false);
 
       if (initialData) {
         setName(initialData.name);
@@ -77,7 +82,13 @@ export default function ClassForm({
         setTeacherId("");
       }
     }
-  }, [open, initialData, loadTeachers]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadTeachers();
+    }
+  }, [open, loadTeachers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +211,11 @@ export default function ClassForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadTeachers}
+                onClick={() => {
+                  setTeachersLoading(true);
+                  setTeachersError(false);
+                  loadTeachers();
+                }}
                 className="self-start"
               >
                 Muat Ulang

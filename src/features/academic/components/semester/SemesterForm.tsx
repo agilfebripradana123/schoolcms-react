@@ -48,8 +48,6 @@ export default function SemesterForm({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const loadYears = useCallback(() => {
-    setYearsLoading(true);
-    setYearsError(false);
     academicYearService
       .list({ per_page: 100 })
       .then((res) => {
@@ -64,11 +62,18 @@ export default function SemesterForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadYears();
+      setYearsLoading(true);
+      setYearsError(false);
 
       if (initialData) {
         setAcademicYearId(String(initialData.academic_year_id));
@@ -80,7 +85,13 @@ export default function SemesterForm({
         setIsActive(false);
       }
     }
-  }, [open, initialData, loadYears]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadYears();
+    }
+  }, [open, loadYears]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,7 +179,11 @@ export default function SemesterForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadYears}
+                onClick={() => {
+                  setYearsLoading(true);
+                  setYearsError(false);
+                  loadYears();
+                }}
                 className="self-start"
               >
                 Muat Ulang

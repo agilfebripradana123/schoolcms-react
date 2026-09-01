@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input } from "@/components/ui/Form";
@@ -30,7 +30,13 @@ export default function PeriodForm({
 
   const isEdit = Boolean(initialData);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
@@ -45,7 +51,7 @@ export default function PeriodForm({
         setEndTime("");
       }
     }
-  }, [open, initialData]);
+  }
 
   const validate = (): string | null => {
     if (!name.trim()) return "Nama jam pelajaran wajib diisi.";

@@ -86,8 +86,6 @@ export default function SchedulesPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     scheduleService
       .list({
@@ -120,6 +118,8 @@ export default function SchedulesPage() {
   }, [query]);
 
   const handleClassChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setClassFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -129,6 +129,8 @@ export default function SchedulesPage() {
   }, []);
 
   const handleDayChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setDayFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -138,6 +140,8 @@ export default function SchedulesPage() {
   }, []);
 
   const handleTeacherChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setTeacherFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -147,16 +151,22 @@ export default function SchedulesPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     setQuery((prev) => ({ ...prev }));
@@ -353,7 +363,11 @@ export default function SchedulesPage() {
             <p className="text-sm text-error">Gagal memuat data jadwal.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

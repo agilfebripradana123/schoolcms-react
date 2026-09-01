@@ -39,8 +39,6 @@ export default function PeriodsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     periodService
       .list({ q: query.q || undefined, page: query.page, per_page: PER_PAGE })
@@ -70,21 +68,29 @@ export default function PeriodsPage() {
     setSearch(value);
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
     searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       setQuery((prev) => ({ ...prev, q: value, page: 1 }));
     }, 400);
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     setQuery((prev) => ({ ...prev }));
@@ -191,7 +197,11 @@ export default function PeriodsPage() {
             <p className="text-sm text-error">Gagal memuat data jam pelajaran.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

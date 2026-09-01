@@ -87,8 +87,6 @@ export default function AssignmentsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     assignmentService
       .list({
@@ -124,11 +122,15 @@ export default function AssignmentsPage() {
     setSearch(value);
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
     searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       setQuery((prev) => ({ ...prev, q: value, page: 1 }));
     }, 400);
   }, []);
 
   const handleClassChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setClassFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -138,6 +140,8 @@ export default function AssignmentsPage() {
   }, []);
 
   const handleSubjectChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setSubjectFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -147,16 +151,22 @@ export default function AssignmentsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     setQuery((prev) => ({ ...prev }));
@@ -348,7 +358,11 @@ export default function AssignmentsPage() {
             <p className="text-sm text-error">Gagal memuat data tugas.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

@@ -62,8 +62,6 @@ export default function ClassStudentForm({
   const isEdit = Boolean(initialData);
 
   const loadClasses = useCallback(() => {
-    setClassesLoading(true);
-    setClassesError(false);
     classService
       .list()
       .then((res) => {
@@ -79,8 +77,6 @@ export default function ClassStudentForm({
   }, []);
 
   const loadStudents = useCallback(() => {
-    setStudentsLoading(true);
-    setStudentsError(false);
     studentService
       .list({ per_page: 100 })
       .then((res) => {
@@ -96,8 +92,6 @@ export default function ClassStudentForm({
   }, []);
 
   const loadYears = useCallback(() => {
-    setYearsLoading(true);
-    setYearsError(false);
     academicYearService
       .list({ per_page: 100 })
       .then((res) => {
@@ -112,13 +106,22 @@ export default function ClassStudentForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadClasses();
-      loadStudents();
-      loadYears();
+      setClassesLoading(true);
+      setClassesError(false);
+      setStudentsLoading(true);
+      setStudentsError(false);
+      setYearsLoading(true);
+      setYearsError(false);
 
       if (initialData) {
         setClassId(String(initialData.class_id));
@@ -132,7 +135,15 @@ export default function ClassStudentForm({
         setStatus("active");
       }
     }
-  }, [open, initialData, loadClasses, loadStudents, loadYears]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadClasses();
+      loadStudents();
+      loadYears();
+    }
+  }, [open, loadClasses, loadStudents, loadYears]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,7 +221,11 @@ export default function ClassStudentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadClasses}
+                onClick={() => {
+                  setClassesLoading(true);
+                  setClassesError(false);
+                  loadClasses();
+                }}
                 className="self-start"
               >
                 Muat Ulang
@@ -244,7 +259,11 @@ export default function ClassStudentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadStudents}
+                onClick={() => {
+                  setStudentsLoading(true);
+                  setStudentsError(false);
+                  loadStudents();
+                }}
                 className="self-start"
               >
                 Muat Ulang
@@ -282,7 +301,11 @@ export default function ClassStudentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadYears}
+                onClick={() => {
+                  setYearsLoading(true);
+                  setYearsError(false);
+                  loadYears();
+                }}
                 className="self-start"
               >
                 Muat Ulang

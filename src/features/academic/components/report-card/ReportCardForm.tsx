@@ -69,8 +69,6 @@ export default function ReportCardForm({
   const isEdit = Boolean(initialData);
 
   const loadStudents = useCallback(() => {
-    setStudentsLoading(true);
-    setStudentsError(false);
     studentService
       .list({ per_page: 200 })
       .then((res) => {
@@ -86,8 +84,6 @@ export default function ReportCardForm({
   }, []);
 
   const loadClasses = useCallback(() => {
-    setClassesLoading(true);
-    setClassesError(false);
     classService
       .list()
       .then((res) => {
@@ -103,8 +99,6 @@ export default function ReportCardForm({
   }, []);
 
   const loadYears = useCallback(() => {
-    setYearsLoading(true);
-    setYearsError(false);
     academicYearService
       .list({ per_page: 100 })
       .then((res) => {
@@ -120,8 +114,6 @@ export default function ReportCardForm({
   }, []);
 
   const loadSemesters = useCallback(() => {
-    setSemestersLoading(true);
-    setSemestersError(false);
     semesterService
       .list({ per_page: 100 })
       .then((res) => {
@@ -136,14 +128,24 @@ export default function ReportCardForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadStudents();
-      loadClasses();
-      loadYears();
-      loadSemesters();
+      setStudentsLoading(true);
+      setStudentsError(false);
+      setClassesLoading(true);
+      setClassesError(false);
+      setYearsLoading(true);
+      setYearsError(false);
+      setSemestersLoading(true);
+      setSemestersError(false);
 
       if (initialData) {
         setStudentId(String(initialData.student_id));
@@ -161,7 +163,16 @@ export default function ReportCardForm({
         setStatus("draft");
       }
     }
-  }, [open, initialData, loadStudents, loadClasses, loadYears, loadSemesters]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadStudents();
+      loadClasses();
+      loadYears();
+      loadSemesters();
+    }
+  }, [open, loadStudents, loadClasses, loadYears, loadSemesters]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,7 +257,11 @@ export default function ReportCardForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadStudents}
+                  onClick={() => {
+                    setStudentsLoading(true);
+                    setStudentsError(false);
+                    loadStudents();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -280,7 +295,11 @@ export default function ReportCardForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadClasses}
+                  onClick={() => {
+                    setClassesLoading(true);
+                    setClassesError(false);
+                    loadClasses();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -314,7 +333,11 @@ export default function ReportCardForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadYears}
+                  onClick={() => {
+                    setYearsLoading(true);
+                    setYearsError(false);
+                    loadYears();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -348,7 +371,11 @@ export default function ReportCardForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadSemesters}
+                  onClick={() => {
+                    setSemestersLoading(true);
+                    setSemestersError(false);
+                    loadSemesters();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang

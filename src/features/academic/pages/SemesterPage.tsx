@@ -66,8 +66,6 @@ export default function SemesterPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     semesterService
       .list({
@@ -100,6 +98,8 @@ export default function SemesterPage() {
   }, [query]);
 
   const handleAcademicYearChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setAcademicYearFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -109,15 +109,21 @@ export default function SemesterPage() {
   }, []);
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
+    setLoading(true);
+    setError(null);
     setStatus(value);
     setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     setQuery((prev) => ({
@@ -127,6 +133,8 @@ export default function SemesterPage() {
   }, [meta.last_page]);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
@@ -269,7 +277,11 @@ export default function SemesterPage() {
             <p className="text-sm text-error">Gagal memuat data semester.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

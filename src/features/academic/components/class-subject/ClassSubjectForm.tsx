@@ -54,8 +54,6 @@ export default function ClassSubjectForm({
   const isEdit = Boolean(initialData);
 
   const loadClasses = useCallback(() => {
-    setClassesLoading(true);
-    setClassesError(false);
     classService
       .list()
       .then((res) => {
@@ -71,8 +69,6 @@ export default function ClassSubjectForm({
   }, []);
 
   const loadSubjects = useCallback(() => {
-    setSubjectsLoading(true);
-    setSubjectsError(false);
     subjectService
       .list()
       .then((res) => {
@@ -88,8 +84,6 @@ export default function ClassSubjectForm({
   }, []);
 
   const loadTeachers = useCallback(() => {
-    setTeachersLoading(true);
-    setTeachersError(false);
     teacherService
       .list({ per_page: 100 })
       .then((res) => {
@@ -104,13 +98,22 @@ export default function ClassSubjectForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadClasses();
-      loadSubjects();
-      loadTeachers();
+      setClassesLoading(true);
+      setClassesError(false);
+      setSubjectsLoading(true);
+      setSubjectsError(false);
+      setTeachersLoading(true);
+      setTeachersError(false);
 
       if (initialData) {
         setClassId(String(initialData.class_id));
@@ -124,7 +127,15 @@ export default function ClassSubjectForm({
         setTeacherId("");
       }
     }
-  }, [open, initialData, loadClasses, loadSubjects, loadTeachers]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadClasses();
+      loadSubjects();
+      loadTeachers();
+    }
+  }, [open, loadClasses, loadSubjects, loadTeachers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +212,11 @@ export default function ClassSubjectForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadClasses}
+                onClick={() => {
+                  setClassesLoading(true);
+                  setClassesError(false);
+                  loadClasses();
+                }}
                 className="self-start"
               >
                 Muat Ulang
@@ -235,7 +250,11 @@ export default function ClassSubjectForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadSubjects}
+                onClick={() => {
+                  setSubjectsLoading(true);
+                  setSubjectsError(false);
+                  loadSubjects();
+                }}
                 className="self-start"
               >
                 Muat Ulang
@@ -273,7 +292,11 @@ export default function ClassSubjectForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadTeachers}
+                onClick={() => {
+                  setTeachersLoading(true);
+                  setTeachersError(false);
+                  loadTeachers();
+                }}
                 className="self-start"
               >
                 Muat Ulang

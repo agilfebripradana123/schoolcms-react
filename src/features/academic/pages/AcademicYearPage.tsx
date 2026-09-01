@@ -52,8 +52,6 @@ export default function AcademicYearPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     academicYearService
       .list({
@@ -89,20 +87,28 @@ export default function AcademicYearPage() {
     setSearch(value);
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
     searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       setQuery((prev) => ({ ...prev, q: value, page: 1 }));
     }, 400);
   }, []);
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
+    setLoading(true);
+    setError(null);
     setStatus(value);
     setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     // toast sukses dipicu oleh form, agar tidak duplikat
@@ -110,6 +116,8 @@ export default function AcademicYearPage() {
   }, []);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     // toast sukses dipicu oleh delete dialog, agar tidak duplikat
@@ -232,7 +240,11 @@ export default function AcademicYearPage() {
             <p className="text-sm text-error">{error.message}</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>
