@@ -2,16 +2,24 @@ import { api } from "@/lib/api";
 import { FACILITIES } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
+  AdjustmentPayload,
   CreateInventoryPayload,
   FacilitiesListParams,
+  FacilitiesPaginatedResponse,
   Inventory,
+  StockInOutPayload,
   StockMovement,
   UpdateInventoryPayload,
 } from "./types";
 
 export const inventoryService = {
-  async list(params?: FacilitiesListParams): Promise<ApiEnvelope<Inventory[]>> {
-    return api.get<ApiEnvelope<Inventory[]>>(FACILITIES.INVENTORY, params);
+  async list(
+    params?: FacilitiesListParams,
+  ): Promise<FacilitiesPaginatedResponse<Inventory[]>> {
+    return api.get<FacilitiesPaginatedResponse<Inventory[]>>(
+      FACILITIES.INVENTORY,
+      params,
+    );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Inventory>> {
@@ -39,22 +47,22 @@ export const inventoryService = {
     );
   },
 
-  async stockIn(id: number | string, quantity: number): Promise<ApiEnvelope<Inventory>> {
-    return api.post<ApiEnvelope<Inventory>>(
+  async stockIn(id: number | string, payload: StockInOutPayload): Promise<ApiEnvelope<StockMovement>> {
+    return api.post<ApiEnvelope<StockMovement>>(
       FACILITIES.INVENTORY_STOCK_IN.replace("{id}", String(id)),
-      { quantity },
+      payload,
     );
   },
 
-  async stockOut(id: number | string, quantity: number): Promise<ApiEnvelope<Inventory>> {
-    return api.post<ApiEnvelope<Inventory>>(
+  async stockOut(id: number | string, payload: StockInOutPayload): Promise<ApiEnvelope<StockMovement>> {
+    return api.post<ApiEnvelope<StockMovement>>(
       FACILITIES.INVENTORY_STOCK_OUT.replace("{id}", String(id)),
-      { quantity },
+      payload,
     );
   },
 
-  async adjustment(id: number | string, payload: unknown): Promise<ApiEnvelope<Inventory>> {
-    return api.post<ApiEnvelope<Inventory>>(
+  async adjustment(id: number | string, payload: AdjustmentPayload): Promise<ApiEnvelope<StockMovement>> {
+    return api.post<ApiEnvelope<StockMovement>>(
       FACILITIES.INVENTORY_ADJUSTMENT.replace("{id}", String(id)),
       payload,
     );

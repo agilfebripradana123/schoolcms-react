@@ -4,13 +4,19 @@ import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateMaintenancePayload,
   FacilitiesListParams,
+  FacilitiesPaginatedResponse,
   Maintenance,
   UpdateMaintenancePayload,
 } from "./types";
 
 export const maintenanceService = {
-  async list(params?: FacilitiesListParams): Promise<ApiEnvelope<Maintenance[]>> {
-    return api.get<ApiEnvelope<Maintenance[]>>(FACILITIES.MAINTENANCE, params);
+  async list(
+    params?: FacilitiesListParams,
+  ): Promise<FacilitiesPaginatedResponse<Maintenance[]>> {
+    return api.get<FacilitiesPaginatedResponse<Maintenance[]>>(
+      FACILITIES.MAINTENANCE,
+      params,
+    );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Maintenance>> {

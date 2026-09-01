@@ -5,12 +5,15 @@ import type {
   Asset,
   CreateAssetPayload,
   FacilitiesListParams,
+  FacilitiesPaginatedResponse,
   UpdateAssetPayload,
 } from "./types";
 
 export const assetService = {
-  async list(params?: FacilitiesListParams): Promise<ApiEnvelope<Asset[]>> {
-    return api.get<ApiEnvelope<Asset[]>>(FACILITIES.ASSETS, params);
+  async list(
+    params?: FacilitiesListParams,
+  ): Promise<FacilitiesPaginatedResponse<Asset[]>> {
+    return api.get<FacilitiesPaginatedResponse<Asset[]>>(FACILITIES.ASSETS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Asset>> {

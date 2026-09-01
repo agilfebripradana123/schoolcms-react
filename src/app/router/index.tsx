@@ -12,19 +12,13 @@ import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeave
 import { RegistrationsPage, VerificationPage, ReRegistrationPage, ExportDapodikPage } from "@/features/ppdb";
 import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
 import { QuestionsPage, ExamsPage, ExamSchedulesPage, ExamSessionsPage, ExamParticipantsPage, ExamResultsPage } from "@/features/examinations";
+import { RoomsPage, AssetsPage, MaintenancesPage, InventoryPage } from "@/features/facilities";
 
 const developmentModules = [
   { path: "counseling", title: "Bimbingan & Konseling" },
   { path: "extracurricular", title: "Ekstrakurikuler" },
   { path: "achievements", title: "Prestasi" },
   { path: "violations", title: "Pelanggaran" },
-];
-
-const facilityModules = [
-  { path: "rooms", title: "Ruangan" },
-  { path: "assets", title: "Aset" },
-  { path: "maintenance", title: "Pemeliharaan" },
-  { path: "inventory", title: "Inventaris" },
 ];
 
 const adminModules = [
@@ -121,6 +115,10 @@ const router = createBrowserRouter([
           { path: "examinations/sessions", element: <ExamSessionsPage /> },
           { path: "examinations/participants", element: <ExamParticipantsPage /> },
           { path: "examinations/results", element: <ExamResultsPage /> },
+          { path: "facilities/rooms", element: <RoomsPage /> },
+          { path: "facilities/assets", element: <AssetsPage /> },
+          { path: "facilities/maintenance", element: <MaintenancesPage /> },
+          { path: "facilities/inventory", element: <InventoryPage /> },
           {
             element: <RoleRoute allow={["admin", "administrator"]} />,
             children: [
@@ -131,7 +129,6 @@ const router = createBrowserRouter([
             ],
           },
           ...createModuleRoutes("/development", "Student Development", developmentModules),
-          ...createModuleRoutes("/facilities", "Facilities", facilityModules),
           ...createModuleRoutes("/administration", "Administration", adminModules),
           ...createModuleRoutes("/communication", "Communication", communicationModules),
           ...createModuleRoutes("/reports", "Reports", reportModules),
