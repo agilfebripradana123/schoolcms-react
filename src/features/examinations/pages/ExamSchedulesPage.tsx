@@ -58,8 +58,6 @@ export default function ExamSchedulesPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     examScheduleService
       .list({
@@ -91,6 +89,8 @@ export default function ExamSchedulesPage() {
 
   const handleDateChange = useCallback((value: string) => {
     setDateFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       exam_date: value || undefined,
@@ -100,22 +100,30 @@ export default function ExamSchedulesPage() {
 
   const handleClearDate = useCallback(() => {
     setDateFilter("");
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, exam_date: undefined, page: 1 }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -242,7 +250,11 @@ export default function ExamSchedulesPage() {
             <p className="text-sm text-error">Gagal memuat data jadwal ujian.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>
