@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Select, Textarea } from "@/components/ui/Form";
@@ -115,47 +115,52 @@ export default function RegistrantForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
-      const d = initialData;
-      setFullName(d?.full_name ?? "");
-      setEmail(d?.email ?? "");
-      setGender(d?.gender ?? "L");
-      setNik(d?.nik ?? "");
-      setNisn(d?.nisn ?? "");
-      setPhone(d?.phone ?? "");
-      setBirthPlace(d?.birth_place ?? "");
-      setBirthDate(d?.birth_date ? d.birth_date.substring(0, 10) : "");
-      setReligion(d?.religion ?? "islam");
-      setAddress(d?.address ?? "");
-      setRt(d?.rt ?? "");
-      setRw(d?.rw ?? "");
-      setVillage(d?.village ?? "");
-      setDistrict(d?.district ?? "");
-      setCity(d?.city ?? "");
-      setProvince(d?.province ?? "");
-      setPostalCode(d?.postal_code ?? "");
-      setPreviousSchool(d?.previous_school ?? "");
-      setPreviousSchoolNpsn(d?.previous_school_npsn ?? "");
-      setGraduationYear(d?.graduation_year ? String(d.graduation_year) : "");
-      setRegistrationPath(d?.registration_path ?? "reguler");
-      setProgramChoice(d?.program_choice ?? "ipa");
-      setFatherName(d?.father_name ?? "");
-      setFatherEducation(d?.father_education ?? "sma");
-      setFatherOccupation(d?.father_occupation ?? "");
-      setFatherPhone(d?.father_phone ?? "");
-      setMotherName(d?.mother_name ?? "");
-      setMotherEducation(d?.mother_education ?? "sma");
-      setMotherOccupation(d?.mother_occupation ?? "");
-      setMotherPhone(d?.mother_phone ?? "");
-      setGuardianName(d?.guardian_name ?? "");
-      setGuardianEducation(d?.guardian_education ?? "sma");
-      setGuardianOccupation(d?.guardian_occupation ?? "");
-      setGuardianPhone(d?.guardian_phone ?? "");
+      setFullName(initialData?.full_name ?? "");
+      setEmail(initialData?.email ?? "");
+      setGender(initialData?.gender ?? "L");
+      setNik(initialData?.nik ?? "");
+      setNisn(initialData?.nisn ?? "");
+      setPhone(initialData?.phone ?? "");
+      setBirthPlace(initialData?.birth_place ?? "");
+      setBirthDate(initialData?.birth_date ? initialData.birth_date.substring(0, 10) : "");
+      setReligion(initialData?.religion ?? "islam");
+      setAddress(initialData?.address ?? "");
+      setRt(initialData?.rt ?? "");
+      setRw(initialData?.rw ?? "");
+      setVillage(initialData?.village ?? "");
+      setDistrict(initialData?.district ?? "");
+      setCity(initialData?.city ?? "");
+      setProvince(initialData?.province ?? "");
+      setPostalCode(initialData?.postal_code ?? "");
+      setPreviousSchool(initialData?.previous_school ?? "");
+      setPreviousSchoolNpsn(initialData?.previous_school_npsn ?? "");
+      setGraduationYear(initialData?.graduation_year ? String(initialData.graduation_year) : "");
+      setRegistrationPath(initialData?.registration_path ?? "reguler");
+      setProgramChoice(initialData?.program_choice ?? "ipa");
+      setFatherName(initialData?.father_name ?? "");
+      setFatherEducation(initialData?.father_education ?? "sma");
+      setFatherOccupation(initialData?.father_occupation ?? "");
+      setFatherPhone(initialData?.father_phone ?? "");
+      setMotherName(initialData?.mother_name ?? "");
+      setMotherEducation(initialData?.mother_education ?? "sma");
+      setMotherOccupation(initialData?.mother_occupation ?? "");
+      setMotherPhone(initialData?.mother_phone ?? "");
+      setGuardianName(initialData?.guardian_name ?? "");
+      setGuardianEducation(initialData?.guardian_education ?? "sma");
+      setGuardianOccupation(initialData?.guardian_occupation ?? "");
+      setGuardianPhone(initialData?.guardian_phone ?? "");
       setError(null);
       setFieldErrors({});
     }
-  }, [open, initialData]);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

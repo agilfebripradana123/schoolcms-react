@@ -43,6 +43,28 @@ export default function StudentIdCardForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStudentId(initialData?.student_id ?? "");
+      setCardNumber(initialData?.card_number ?? "");
+      setIssuedDate(
+        initialData?.issued_date
+          ? initialData.issued_date.substring(0, 10)
+          : new Date().toISOString().substring(0, 10),
+      );
+      setValidUntil(initialData?.valid_until ? initialData.valid_until.substring(0, 10) : "");
+      setStatus(initialData?.status ?? "aktif");
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   useEffect(() => {
     if (open && !isEdit) {
       studentService
@@ -62,22 +84,6 @@ export default function StudentIdCardForm({
         })),
     [students],
   );
-
-  useEffect(() => {
-    if (open) {
-      setStudentId(initialData?.student_id ?? "");
-      setCardNumber(initialData?.card_number ?? "");
-      setIssuedDate(
-        initialData?.issued_date
-          ? initialData.issued_date.substring(0, 10)
-          : new Date().toISOString().substring(0, 10),
-      );
-      setValidUntil(initialData?.valid_until ? initialData.valid_until.substring(0, 10) : "");
-      setStatus(initialData?.status ?? "aktif");
-      setError(null);
-      setFieldErrors({});
-    }
-  }, [open, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

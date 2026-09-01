@@ -38,6 +38,24 @@ export default function HistoryForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStudentId(initialData?.student_id ?? "");
+      setClassId(initialData?.class_id ?? "");
+      setAcademicYearId(initialData?.academic_year_id ?? "");
+      setStatus(initialData?.status ?? "naik");
+      setNotes(initialData?.notes ?? "");
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   useEffect(() => {
     if (open) {
       if (!isEdit) {
@@ -83,18 +101,6 @@ export default function HistoryForm({
       })),
     [academicYears],
   );
-
-  useEffect(() => {
-    if (open) {
-      setStudentId(initialData?.student_id ?? "");
-      setClassId(initialData?.class_id ?? "");
-      setAcademicYearId(initialData?.academic_year_id ?? "");
-      setStatus(initialData?.status ?? "naik");
-      setNotes(initialData?.notes ?? "");
-      setError(null);
-      setFieldErrors({});
-    }
-  }, [open, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

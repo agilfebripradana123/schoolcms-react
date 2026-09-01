@@ -65,7 +65,13 @@ export default function StudentForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       if (initialData) {
         setNisn(initialData.nisn ?? "");
@@ -77,30 +83,8 @@ export default function StudentForm({
         setAddress(initialData.address ?? "");
         setPhone(initialData.phone ?? "");
 
-        // Muat data orang tua + wali milik siswa ini
         setParentId(null);
         setGuardianId(null);
-        Promise.all([parentService.list(), guardianService.list()])
-          .then(([parentsRes, guardiansRes]) => {
-            const parent = parentsRes.data.find((p) => p.student_id === initialData.id);
-            const guardian = guardiansRes.data.find((g) => g.student_id === initialData.id);
-
-            setParentId(parent?.id ?? null);
-            setFatherName(parent?.father_name ?? "");
-            setMotherName(parent?.mother_name ?? "");
-            setFatherOccupation(parent?.father_occupation ?? "");
-            setMotherOccupation(parent?.mother_occupation ?? "");
-            setParentPhone(parent?.phone ?? "");
-            setParentAddress(parent?.address ?? "");
-
-            setGuardianId(guardian?.id ?? null);
-            setGuardianName(guardian?.name ?? "");
-            setGuardianRelation(guardian?.relation ?? "ayah");
-            setGuardianOccupation(guardian?.occupation ?? "");
-            setGuardianPhone(guardian?.phone ?? "");
-            setGuardianAddress(guardian?.address ?? "");
-          })
-          .catch(() => setError({ message: "Gagal memuat data orang tua/wali." }));
       } else {
         setNisn("");
         setNis("");
@@ -126,6 +110,38 @@ export default function StudentForm({
       }
       setError(null);
       setFieldErrors({});
+    }
+  }
+
+  useEffect(() => {
+    if (open && initialData) {
+      let active = true;
+      Promise.all([parentService.list(), guardianService.list()])
+        .then(([parentsRes, guardiansRes]) => {
+          if (!active) return;
+          const parent = parentsRes.data.find((p) => p.student_id === initialData.id);
+          const guardian = guardiansRes.data.find((g) => g.student_id === initialData.id);
+
+          setParentId(parent?.id ?? null);
+          setFatherName(parent?.father_name ?? "");
+          setMotherName(parent?.mother_name ?? "");
+          setFatherOccupation(parent?.father_occupation ?? "");
+          setMotherOccupation(parent?.mother_occupation ?? "");
+          setParentPhone(parent?.phone ?? "");
+          setParentAddress(parent?.address ?? "");
+
+          setGuardianId(guardian?.id ?? null);
+          setGuardianName(guardian?.name ?? "");
+          setGuardianRelation(guardian?.relation ?? "ayah");
+          setGuardianOccupation(guardian?.occupation ?? "");
+          setGuardianPhone(guardian?.phone ?? "");
+          setGuardianAddress(guardian?.address ?? "");
+        })
+        .catch(() => setError({ message: "Gagal memuat data orang tua/wali." }));
+
+      return () => {
+        active = false;
+      };
     }
   }, [open, initialData]);
 
