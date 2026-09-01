@@ -13,13 +13,7 @@ import { RegistrationsPage, VerificationPage, ReRegistrationPage, ExportDapodikP
 import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
 import { QuestionsPage, ExamsPage, ExamSchedulesPage, ExamSessionsPage, ExamParticipantsPage, ExamResultsPage } from "@/features/examinations";
 import { RoomsPage, AssetsPage, MaintenancesPage, InventoryPage } from "@/features/facilities";
-
-const developmentModules = [
-  { path: "counseling", title: "Bimbingan & Konseling" },
-  { path: "extracurricular", title: "Ekstrakurikuler" },
-  { path: "achievements", title: "Prestasi" },
-  { path: "violations", title: "Pelanggaran" },
-];
+import { CounselingsPage, ExtracurricularsPage, AchievementsPage, ViolationsPage } from "@/features/studentship";
 
 const adminModules = [
   { path: "incoming", title: "Surat Masuk" },
@@ -128,7 +122,10 @@ const router = createBrowserRouter([
               { path: "ppdb/export-dapodik", element: <ExportDapodikPage /> },
             ],
           },
-          ...createModuleRoutes("/development", "Student Development", developmentModules),
+          { path: "development/counseling", element: <CounselingsPage /> },
+          { path: "development/extracurricular", element: <ExtracurricularsPage /> },
+          { path: "development/achievements", element: <AchievementsPage /> },
+          { path: "development/violations", element: <ViolationsPage /> },
           ...createModuleRoutes("/administration", "Administration", adminModules),
           ...createModuleRoutes("/communication", "Communication", communicationModules),
           ...createModuleRoutes("/reports", "Reports", reportModules),
