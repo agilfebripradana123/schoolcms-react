@@ -8,7 +8,7 @@ import type {
 } from "./types";
 
 export const violationService = {
-  async list(params?: Record<string, unknown>): Promise<ApiEnvelope<Violation[]>> {
+  async list(params?: Record<string, string | number | boolean | null | undefined>): Promise<ApiEnvelope<Violation[]>> {
     return api.get<ApiEnvelope<Violation[]>>(DEVELOPMENT.VIOLATIONS, params);
   },
 

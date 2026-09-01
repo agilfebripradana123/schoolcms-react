@@ -50,3 +50,8 @@ export const RoomsPage = lazy(() => import("@/features/facilities/pages/RoomsPag
 export const AssetsPage = lazy(() => import("@/features/facilities/pages/AssetsPage"));
 export const MaintenancesPage = lazy(() => import("@/features/facilities/pages/MaintenancesPage"));
 export const InventoryPage = lazy(() => import("@/features/facilities/pages/InventoryPage"));
+
+export const CounselingsPage = lazy(() => import("@/features/studentship/pages/CounselingsPage"));
+export const ExtracurricularsPage = lazy(() => import("@/features/studentship/pages/ExtracurricularsPage"));
+export const AchievementsPage = lazy(() => import("@/features/studentship/pages/AchievementsPage"));
+export const ViolationsPage = lazy(() => import("@/features/studentship/pages/ViolationsPage"));

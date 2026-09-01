@@ -8,9 +8,9 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { extracurricularService } from "@/features/development/api/extracurricular.service";
-import type { Extracurricular } from "@/features/studentship/api/types";
-import { formatSupervisor } from "@/features/studentship/api/types";
+import { extracurricularService } from "../api/extracurricular.service";
+import type { Extracurricular } from "../api/types";
+import { formatSupervisor } from "../api/types";
 import ExtracurricularForm from "../components/extracurricular/ExtracurricularForm";
 import ExtracurricularDeleteDialog from "../components/extracurricular/ExtracurricularDeleteDialog";
 

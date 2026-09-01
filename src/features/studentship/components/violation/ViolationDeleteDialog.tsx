@@ -62,7 +62,7 @@ export default function ViolationDeleteDialog({
     >
       <p className="text-sm text-on-surface-variant">
         Apakah Anda yakin ingin menghapus pelanggaran{" "}
-        <span className="font-semibold text-on-surface">{data?.title ?? `#${data?.id}`}</span>?
+        <span className="font-semibold text-on-surface">{data?.category ?? `#${data?.id}`}</span>?
         Tindakan ini tidak dapat dibatalkan.
       </p>
 

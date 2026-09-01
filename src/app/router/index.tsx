@@ -51,14 +51,11 @@ import {
   AssetsPage,
   MaintenancesPage,
   InventoryPage,
+  CounselingsPage,
+  ExtracurricularsPage,
+  AchievementsPage,
+  ViolationsPage,
 } from "./lazy-pages";
-
-const developmentModules = [
-  { path: "counseling", title: "Bimbingan & Konseling" },
-  { path: "extracurricular", title: "Ekstrakurikuler" },
-  { path: "achievements", title: "Prestasi" },
-  { path: "violations", title: "Pelanggaran" },
-];
 
 const adminModules = [
   { path: "incoming", title: "Surat Masuk" },

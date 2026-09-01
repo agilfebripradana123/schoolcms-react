@@ -36,11 +36,11 @@ export interface Violation {
 }
 
 export interface CreateViolationPayload {
-  student_id: number;
-  category: string;
+  student_id?: number;
+  category?: string;
   description?: string | null;
-  points: number;
-  violated_at: string;
+  points?: number;
+  violated_at?: string;
   handled_by?: number | string | null;
 }
 
