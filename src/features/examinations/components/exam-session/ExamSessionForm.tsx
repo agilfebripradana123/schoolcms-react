@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -33,19 +33,26 @@ export default function ExamSessionForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    setError(null);
-    if (initialData) {
-      setName(initialData.name);
-      setStartTime(toTimeInput(initialData.start_time));
-      setEndTime(toTimeInput(initialData.end_time));
-    } else {
-      setName("");
-      setStartTime("");
-      setEndTime("");
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setError(null);
+      if (initialData) {
+        setName(initialData.name);
+        setStartTime(toTimeInput(initialData.start_time));
+        setEndTime(toTimeInput(initialData.end_time));
+      } else {
+        setName("");
+        setStartTime("");
+        setEndTime("");
+      }
     }
-  }, [open, initialData]);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

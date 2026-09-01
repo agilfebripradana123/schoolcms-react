@@ -78,8 +78,6 @@ export default function ExamParticipantsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     examParticipantService
       .list({
@@ -111,11 +109,15 @@ export default function ExamParticipantsPage() {
   }, [query]);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleStatusChange = useCallback((value: string) => {
     setStatusFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       status: value === "all" ? undefined : value,
@@ -125,6 +127,8 @@ export default function ExamParticipantsPage() {
 
   const handleExamChange = useCallback((value: string) => {
     setExamFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       exam_id: value === "all" ? undefined : Number(value),
@@ -135,12 +139,16 @@ export default function ExamParticipantsPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -283,7 +291,11 @@ export default function ExamParticipantsPage() {
             <p className="text-sm text-error">Gagal memuat data peserta ujian.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

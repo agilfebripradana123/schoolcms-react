@@ -94,8 +94,6 @@ export default function ExamsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     examService
       .list({
@@ -131,12 +129,16 @@ export default function ExamsPage() {
     setSearch(value);
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
     searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       setQuery((prev) => ({ ...prev, search: value, page: 1 }));
     }, 400);
   }, []);
 
   const handleSubjectChange = useCallback((value: string) => {
     setSubjectFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       subject_id: value === "all" ? undefined : Number(value),
@@ -146,6 +148,8 @@ export default function ExamsPage() {
 
   const handleStatusChange = useCallback((value: string) => {
     setStatusFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       status: value === "all" ? undefined : (value as ExamStatus),
@@ -154,18 +158,24 @@ export default function ExamsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -361,7 +371,14 @@ export default function ExamsPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">Gagal memuat data ujian.</p>
-            <Button variant="secondary" onClick={() => setQuery((prev) => ({ ...prev }))}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
+            >
               Muat Ulang
             </Button>
           </div>
