@@ -8,9 +8,23 @@ import type {
   UpdatePeriodPayload,
 } from "./types";
 
+export interface PeriodListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface PeriodListResponse {
+  success: boolean;
+  message: string;
+  data: Period[];
+  meta: PeriodListMeta;
+}
+
 export const periodService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<Period[]>> {
-    return api.get<ApiEnvelope<Period[]>>(ACADEMIC.PERIODS, params);
+  async list(params?: AcademicListParams): Promise<PeriodListResponse> {
+    return api.get<PeriodListResponse>(ACADEMIC.PERIODS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Period>> {

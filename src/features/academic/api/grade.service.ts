@@ -8,9 +8,23 @@ import type {
   UpdateGradePayload,
 } from "./types";
 
+export interface GradeListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface GradeListResponse {
+  success: boolean;
+  message: string;
+  data: Grade[];
+  meta: GradeListMeta;
+}
+
 export const gradeService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<Grade[]>> {
-    return api.get<ApiEnvelope<Grade[]>>(ACADEMIC.GRADES, params);
+  async list(params?: AcademicListParams): Promise<GradeListResponse> {
+    return api.get<GradeListResponse>(ACADEMIC.GRADES, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Grade>> {

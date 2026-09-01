@@ -8,9 +8,23 @@ import type {
   UpdateAssignmentPayload,
 } from "./types";
 
+export interface AssignmentListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface AssignmentListResponse {
+  success: boolean;
+  message: string;
+  data: Assignment[];
+  meta: AssignmentListMeta;
+}
+
 export const assignmentService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<Assignment[]>> {
-    return api.get<ApiEnvelope<Assignment[]>>(ACADEMIC.ASSIGNMENTS, params);
+  async list(params?: AcademicListParams): Promise<AssignmentListResponse> {
+    return api.get<AssignmentListResponse>(ACADEMIC.ASSIGNMENTS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Assignment>> {

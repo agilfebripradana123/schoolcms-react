@@ -11,10 +11,10 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { academicYearService } from "../api/academic-year.service";
-import type { AcademicYear } from "../api/types";
-import AcademicYearForm from "../components/academic-year/AcademicYearForm";
-import AcademicYearDeleteDialog from "../components/academic-year/AcademicYearDeleteDialog";
+import { curriculumService } from "../api/curriculum.service";
+import type { Curriculum } from "../api/types";
+import CurriculumForm from "../components/curriculum/CurriculumForm";
+import CurriculumDeleteDialog from "../components/curriculum/CurriculumDeleteDialog";
 
 const PER_PAGE = 10;
 
@@ -31,8 +31,8 @@ function statusToFilter(status: StatusFilter): boolean | undefined {
   return status === "active";
 }
 
-export default function AcademicYearPage() {
-  const [data, setData] = useState<AcademicYear[]>([]);
+export default function CurriculumPage() {
+  const [data, setData] = useState<Curriculum[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
@@ -44,16 +44,16 @@ export default function AcademicYearPage() {
   const [query, setQuery] = useState<QueryState>({ q: "", is_active: undefined, page: 1 });
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<AcademicYear | null>(null);
+  const [editing, setEditing] = useState<Curriculum | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState<AcademicYear | null>(null);
+  const [toDelete, setToDelete] = useState<Curriculum | null>(null);
 
   const searchTimeout = useRef<number | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    academicYearService
+    curriculumService
       .list({
         q: query.q || undefined,
         is_active: query.is_active,
@@ -70,7 +70,7 @@ export default function AcademicYearPage() {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
-        toast.error("Gagal memuat data", {
+        toast.error("Gagal memuat data kurikulum", {
           description: toApiError(err).message,
         });
       })
@@ -111,7 +111,6 @@ export default function AcademicYearPage() {
     setError(null);
     setFormOpen(false);
     setEditing(null);
-    // toast sukses dipicu oleh form, agar tidak duplikat
     setQuery((prev) => ({ ...prev, page: 1 }));
   }, []);
 
@@ -120,33 +119,43 @@ export default function AcademicYearPage() {
     setError(null);
     setDeleteOpen(false);
     setToDelete(null);
-    // toast sukses dipicu oleh delete dialog, agar tidak duplikat
-    setQuery((prev) => ({ ...prev }));
-  }, []);
+    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
+    setQuery((prev) => ({
+      ...prev,
+      page: isLastPage ? page - 1 : page,
+    }));
+  }, [page, meta.total, meta.per_page]);
 
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
   }, []);
 
-  const openEdit = useCallback((row: AcademicYear) => {
+  const openEdit = useCallback((row: Curriculum) => {
     setEditing(row);
     setFormOpen(true);
   }, []);
 
-  const openDelete = useCallback((row: AcademicYear) => {
+  const openDelete = useCallback((row: Curriculum) => {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
 
   const columns = useMemo(() => {
-    type Row = AcademicYear;
+    type Row = Curriculum;
     return [
       {
-        header: "Nama Tahun Ajaran",
+        header: "Nama",
         accessor: "name" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
           <span className="font-medium text-on-surface">{row.name}</span>
+        ),
+      },
+      {
+        header: "Deskripsi",
+        accessor: "description" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">{row.description || "-"}</span>
         ),
       },
       {
@@ -169,14 +178,14 @@ export default function AcademicYearPage() {
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-center text-sm text-slate-700",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={() => openEdit(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
               aria-label={`Edit ${row.name}`}
             >
-              <Pencil className="h-4 w-4" strokeWidth={2} />
+              <Pencil className="h-4 w-4" strokeWidth={1.75} />
             </button>
             <button
               type="button"
@@ -184,7 +193,7 @@ export default function AcademicYearPage() {
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
               aria-label={`Hapus ${row.name}`}
             >
-              <Trash2 className="h-4 w-4" strokeWidth={2} />
+              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
             </button>
           </div>
         ),
@@ -192,11 +201,13 @@ export default function AcademicYearPage() {
     ];
   }, [openEdit, openDelete]);
 
+  const isFirstPage = meta.current_page <= 1;
+  const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
   const statusFilterOptions = [
-    { value: "all", label: "Semua" },
+    { value: "all", label: "Semua Status" },
     { value: "active", label: "Aktif" },
     { value: "inactive", label: "Tidak Aktif" },
   ];
@@ -204,8 +215,8 @@ export default function AcademicYearPage() {
   return (
     <PageContainer className="py-6">
       <PageHeader
-        title="Tahun Ajaran"
-        description="Kelola daftar tahun ajaran di sekolah Anda."
+        title="Kurikulum"
+        description="Kelola data kurikulum yang digunakan dalam sistem akademik."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -219,7 +230,7 @@ export default function AcademicYearPage() {
             <Search
               value={search}
               onChange={handleSearchChange}
-              placeholder="Cari nama tahun ajaran..."
+              placeholder="Cari nama kurikulum..."
             />
           </div>
           <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
@@ -237,7 +248,7 @@ export default function AcademicYearPage() {
 
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error.message}</p>
+            <p className="text-sm text-error">Gagal memuat data kurikulum.</p>
             <Button
               variant="secondary"
               onClick={() => {
@@ -259,7 +270,7 @@ export default function AcademicYearPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Tidak ada tahun ajaran.
+                  Tidak ada kurikulum.
                 </div>
               ) : (
                 data.map((row) => (
@@ -270,6 +281,11 @@ export default function AcademicYearPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-on-surface">{row.name}</p>
+                        {row.description && (
+                          <p className="mt-0.5 text-xs text-on-surface-variant">
+                            {row.description}
+                          </p>
+                        )}
                       </div>
                       <Badge
                         variant={row.is_active ? "success" : "secondary"}
@@ -304,7 +320,7 @@ export default function AcademicYearPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Tidak ada tahun ajaran."
+                emptyMessage="Tidak ada kurikulum."
               />
             </div>
           </>
@@ -319,19 +335,19 @@ export default function AcademicYearPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                disabled={page <= 1}
-                onClick={() => goToPage(page - 1)}
+                disabled={isFirstPage}
+                onClick={() => goToPage(meta.current_page - 1)}
               >
                 Sebelumnya
               </Button>
               <span className="text-sm text-on-surface-variant">
-                Halaman {page} dari {meta.last_page}
+                Halaman {meta.current_page} dari {meta.last_page}
               </span>
               <Button
                 variant="secondary"
                 size="sm"
-                disabled={page >= meta.last_page}
-                onClick={() => goToPage(page + 1)}
+                disabled={isLastPage}
+                onClick={() => goToPage(meta.current_page + 1)}
               >
                 Berikutnya
               </Button>
@@ -340,7 +356,7 @@ export default function AcademicYearPage() {
         )}
       </Card>
 
-      <AcademicYearForm
+      <CurriculumForm
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -350,7 +366,7 @@ export default function AcademicYearPage() {
         initialData={editing}
       />
 
-      <AcademicYearDeleteDialog
+      <CurriculumDeleteDialog
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false);

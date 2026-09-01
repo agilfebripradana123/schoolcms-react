@@ -4,22 +4,22 @@ import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { academicYearService } from "../../api/academic-year.service";
-import type { AcademicYear } from "../../api/types";
+import { subjectService } from "../../api/subject.service";
+import type { Subject } from "../../api/types";
 
-interface AcademicYearDeleteDialogProps {
+interface SubjectDeleteDialogProps {
   open: boolean;
   onClose: () => void;
   onDeleted: () => void;
-  data: AcademicYear | null;
+  data: Subject | null;
 }
 
-export default function AcademicYearDeleteDialog({
+export default function SubjectDeleteDialog({
   open,
   onClose,
   onDeleted,
   data,
-}: AcademicYearDeleteDialogProps) {
+}: SubjectDeleteDialogProps) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
 
@@ -29,13 +29,13 @@ export default function AcademicYearDeleteDialog({
     setError(null);
 
     try {
-      await academicYearService.remove(data.id);
+      await subjectService.remove(data.id);
       onDeleted();
-      toast.success("Tahun ajaran berhasil dihapus.");
+      toast.success("Mata pelajaran berhasil dihapus.");
     } catch (err) {
       const apiError = toApiError(err);
       setError(apiError);
-      toast.error("Gagal menghapus", {
+      toast.error("Gagal menghapus mata pelajaran", {
         description: apiError.message,
       });
     } finally {
@@ -47,25 +47,21 @@ export default function AcademicYearDeleteDialog({
     <Modal
       open={open}
       onClose={onClose}
-      title="Hapus Tahun Ajaran"
+      title="Hapus Mata Pelajaran"
       size="sm"
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={deleting}>
             Batal
           </Button>
-          <Button
-            variant="danger"
-            onClick={handleDelete}
-            loading={deleting}
-          >
+          <Button variant="danger" onClick={handleDelete} loading={deleting}>
             Hapus
           </Button>
         </>
       }
     >
       <p className="text-sm text-on-surface-variant">
-        Apakah Anda yakin ingin menghapus tahun ajaran{" "}
+        Apakah Anda yakin ingin menghapus mata pelajaran{" "}
         <span className="font-semibold text-on-surface">{data?.name}</span>?
         Tindakan ini tidak dapat dibatalkan.
       </p>

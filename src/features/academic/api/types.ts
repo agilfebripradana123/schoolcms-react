@@ -21,9 +21,8 @@ export interface Semester {
   id: number;
   academic_year_id: number;
   name: string;
-  start_date?: string;
-  end_date?: string;
   is_active?: boolean;
+  academic_year?: AcademicYear;
   created_at?: string;
   updated_at?: string;
 }
@@ -31,8 +30,6 @@ export interface Semester {
 export interface CreateSemesterPayload {
   academic_year_id: number;
   name: string;
-  start_date?: string;
-  end_date?: string;
   is_active?: boolean;
 }
 
@@ -82,78 +79,130 @@ export interface UpdateSubjectPayload extends Partial<CreateSubjectPayload> {}
 export interface SchoolClass {
   id: number;
   name: string;
-  code?: string;
-  grade?: string;
-  academic_year_id?: number;
-  teacher_id?: number;
-  created_at?: string;
-  updated_at?: string;
+  teacher_id?: number | null;
+  level?: string;
+  academic_year?: string;
 }
 
 export interface CreateSchoolClassPayload {
   name: string;
-  code?: string;
-  grade?: string;
-  academic_year_id?: number;
-  teacher_id?: number;
+  teacher_id?: number | null;
+  level?: string;
+  academic_year?: string;
 }
 
 export interface UpdateSchoolClassPayload extends Partial<CreateSchoolClassPayload> {}
 
 // ---- Class Subject ----
+export interface Teacher {
+  id: number;
+  full_name?: string;
+}
+
 export interface ClassSubject {
   id: number;
   class_id: number;
   subject_id: number;
-  teacher_id?: number;
+  teacher_id?: number | null;
   created_at?: string;
   updated_at?: string;
+  class?: SchoolClass;
+  subject?: Subject;
+  teacher?: Teacher;
 }
 
 export interface CreateClassSubjectPayload {
   class_id: number;
   subject_id: number;
-  teacher_id?: number;
+  teacher_id?: number | null;
 }
 
 export interface UpdateClassSubjectPayload extends Partial<CreateClassSubjectPayload> {}
 
 // ---- Class Student ----
+export type ClassStudentStatus = "active" | "moved" | "graduated";
+
+export interface Student {
+  id: number;
+  name: string;
+}
+
 export interface ClassStudent {
   id: number;
   class_id: number;
   student_id: number;
-  academic_year_id?: number;
+  academic_year_id: number;
+  status: ClassStudentStatus;
   created_at?: string;
   updated_at?: string;
+  class?: SchoolClass;
+  student?: Student;
+  academic_year?: AcademicYear;
 }
 
 export interface CreateClassStudentPayload {
   class_id: number;
   student_id: number;
-  academic_year_id?: number;
+  academic_year_id: number;
+  status: ClassStudentStatus;
 }
 
 export interface UpdateClassStudentPayload extends Partial<CreateClassStudentPayload> {}
 
+// ---- Teacher Assignment ----
+export interface TeacherAssignment {
+  id: number;
+  teacher_id: number;
+  class_id: number;
+  subject_id: number;
+  academic_year_id: number;
+  created_at?: string;
+  updated_at?: string;
+  teacher?: Teacher;
+  class?: SchoolClass;
+  subject?: Subject;
+  academic_year?: AcademicYear;
+}
+
+export interface CreateTeacherAssignmentPayload {
+  teacher_id: number;
+  class_id: number;
+  subject_id: number;
+  academic_year_id: number;
+}
+
+export interface UpdateTeacherAssignmentPayload extends Partial<CreateTeacherAssignmentPayload> {}
+
 // ---- Schedule ----
+export type ScheduleDay = "senin" | "selasa" | "rabu" | "kamis" | "jumat" | "sabtu";
+
 export interface Schedule {
   id: number;
-  class_id?: number;
-  subject_id?: number;
-  day?: string;
-  start_time?: string;
-  end_time?: string;
+  class_id: number;
+  subject_id: number;
+  teacher_id?: number | null;
+  day: ScheduleDay;
+  period_id: number;
+  academic_year_id: number;
+  semester_id?: number | null;
+  class?: SchoolClass;
+  subject?: Subject;
+  teacher?: Teacher;
+  period?: Period;
+  academic_year?: AcademicYear;
+  semester?: Semester;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CreateSchedulePayload {
-  class_id?: number;
-  subject_id?: number;
-  day?: string;
-  start_time?: string;
-  end_time?: string;
+  class_id: number;
+  subject_id: number;
+  teacher_id?: number | null;
+  day: ScheduleDay;
+  period_id: number;
+  academic_year_id: number;
+  semester_id?: number | null;
 }
 
 export interface UpdateSchedulePayload extends Partial<CreateSchedulePayload> {}
@@ -181,9 +230,15 @@ export interface Assignment {
   id: number;
   title: string;
   description?: string | null;
-  class_id?: number;
-  subject_id?: number;
+  subject_id: number;
+  class_id: number;
+  teacher_id?: number | null;
   due_date?: string;
+  academic_year_id: number;
+  subject?: Subject;
+  class?: SchoolClass;
+  teacher?: Teacher;
+  academic_year?: AcademicYear;
   created_at?: string;
   updated_at?: string;
 }
@@ -191,45 +246,74 @@ export interface Assignment {
 export interface CreateAssignmentPayload {
   title: string;
   description?: string;
-  class_id?: number;
-  subject_id?: number;
+  subject_id: number;
+  class_id: number;
+  teacher_id?: number | null;
   due_date?: string;
+  academic_year_id: number;
 }
 
 export interface UpdateAssignmentPayload extends Partial<CreateAssignmentPayload> {}
 
 // ---- Grade ----
+export type GradeType = "tugas" | "uts" | "uas";
+
 export interface Grade {
   id: number;
-  student_id?: number;
-  subject_id?: number;
-  score?: number;
-  grade?: string;
+  student_id: number;
+  subject_id: number;
+  class_id: number;
+  type: GradeType;
+  score: number;
+  semester: string;
+  academic_year: string;
+  student?: Student;
+  subject?: Subject;
+  class?: SchoolClass;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CreateGradePayload {
-  student_id?: number;
-  subject_id?: number;
-  score?: number;
-  grade?: string;
+  student_id: number;
+  subject_id: number;
+  class_id: number;
+  type: GradeType;
+  score: number;
+  semester: string;
+  academic_year: string;
 }
 
 export interface UpdateGradePayload extends Partial<CreateGradePayload> {}
 
 // ---- Report Card ----
+export type ReportCardStatus = "draft" | "published";
+
 export interface ReportCard {
   id: number;
-  student_id?: number;
-  semester_id?: number;
+  student_id: number;
+  class_id: number;
+  academic_year_id: number;
+  semester_id: number;
+  teacher_notes?: string | null;
+  status: ReportCardStatus;
+  published_at?: string | null;
+  student?: Student;
+  class?: SchoolClass;
+  academic_year?: AcademicYear;
+  semester?: Semester;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CreateReportCardPayload {
-  student_id?: number;
-  semester_id?: number;
+  student_id: number;
+  class_id: number;
+  academic_year_id: number;
+  semester_id: number;
+  teacher_notes?: string;
+  status: ReportCardStatus;
+  published_at?: string;
 }
 
 export interface UpdateReportCardPayload extends Partial<CreateReportCardPayload> {}

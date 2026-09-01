@@ -2,14 +2,17 @@ import { api } from "@/lib/api";
 import { ACADEMIC } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
-  AcademicListParams,
   CreateSubjectPayload,
   Subject,
   UpdateSubjectPayload,
 } from "./types";
 
+export interface SubjectListParams {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
 export const subjectService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<Subject[]>> {
+  async list(params?: SubjectListParams): Promise<ApiEnvelope<Subject[]>> {
     return api.get<ApiEnvelope<Subject[]>>(ACADEMIC.SUBJECTS, params);
   },
 

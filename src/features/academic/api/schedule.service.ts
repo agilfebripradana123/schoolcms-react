@@ -8,9 +8,23 @@ import type {
   UpdateSchedulePayload,
 } from "./types";
 
+export interface ScheduleListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
+export interface ScheduleListResponse {
+  success: boolean;
+  message: string;
+  data: Schedule[];
+  meta: ScheduleListMeta;
+}
+
 export const scheduleService = {
-  async list(params?: AcademicListParams): Promise<ApiEnvelope<Schedule[]>> {
-    return api.get<ApiEnvelope<Schedule[]>>(ACADEMIC.SCHEDULES, params);
+  async list(params?: AcademicListParams): Promise<ScheduleListResponse> {
+    return api.get<ScheduleListResponse>(ACADEMIC.SCHEDULES, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Schedule>> {

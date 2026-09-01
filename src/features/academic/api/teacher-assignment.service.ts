@@ -1,31 +1,41 @@
 import { api } from "@/lib/api";
 import { ACADEMIC } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
-import type { AcademicListParams } from "./types";
+import type {
+  CreateTeacherAssignmentPayload,
+  TeacherAssignment,
+  UpdateTeacherAssignmentPayload,
+} from "./types";
 
-export interface TeacherAssignment {
-  id: number;
+export interface TeacherAssignmentListParams {
   teacher_id?: number;
   class_id?: number;
   subject_id?: number;
-  created_at?: string;
-  updated_at?: string;
+  academic_year_id?: number;
+  page?: number;
+  per_page?: number;
+  [key: string]: string | number | boolean | null | undefined;
 }
 
-export interface CreateTeacherAssignmentPayload {
-  teacher_id?: number;
-  class_id?: number;
-  subject_id?: number;
+export interface TeacherAssignmentListMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
 }
 
-export interface UpdateTeacherAssignmentPayload
-  extends Partial<CreateTeacherAssignmentPayload> {}
+export interface TeacherAssignmentListResponse {
+  success: boolean;
+  message: string;
+  data: TeacherAssignment[];
+  meta: TeacherAssignmentListMeta;
+}
 
 export const teacherAssignmentService = {
   async list(
-    params?: AcademicListParams,
-  ): Promise<ApiEnvelope<TeacherAssignment[]>> {
-    return api.get<ApiEnvelope<TeacherAssignment[]>>(
+    params?: TeacherAssignmentListParams,
+  ): Promise<TeacherAssignmentListResponse> {
+    return api.get<TeacherAssignmentListResponse>(
       ACADEMIC.TEACHER_ASSIGNMENTS,
       params,
     );

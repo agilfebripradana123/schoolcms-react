@@ -1,27 +1,27 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
-import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import { academicYearService } from "../api/academic-year.service";
-import type { AcademicYear } from "../api/types";
-import AcademicYearForm from "../components/academic-year/AcademicYearForm";
-import AcademicYearDeleteDialog from "../components/academic-year/AcademicYearDeleteDialog";
+import { semesterService } from "../api/semester.service";
+import type { AcademicYear, Semester } from "../api/types";
+import SemesterForm from "../components/semester/SemesterForm";
+import SemesterDeleteDialog from "../components/semester/SemesterDeleteDialog";
 
 const PER_PAGE = 10;
 
 type StatusFilter = "all" | "active" | "inactive";
 
 interface QueryState {
-  q: string;
+  academic_year_id: number | undefined;
   is_active: boolean | undefined;
   page: number;
 }
@@ -31,31 +31,45 @@ function statusToFilter(status: StatusFilter): boolean | undefined {
   return status === "active";
 }
 
-export default function AcademicYearPage() {
-  const [data, setData] = useState<AcademicYear[]>([]);
+export default function SemesterPage() {
+  const [data, setData] = useState<Semester[]>([]);
   const [meta, setMeta] = useState({ current_page: 1, per_page: PER_PAGE, total: 0, last_page: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
 
-  const [search, setSearch] = useState("");
+  const [years, setYears] = useState<AcademicYear[]>([]);
+  const [academicYearFilter, setAcademicYearFilter] = useState<string>("all");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [page, setPage] = useState(1);
 
-  const [query, setQuery] = useState<QueryState>({ q: "", is_active: undefined, page: 1 });
+  const [query, setQuery] = useState<QueryState>({
+    academic_year_id: undefined,
+    is_active: undefined,
+    page: 1,
+  });
 
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<AcademicYear | null>(null);
+  const [editing, setEditing] = useState<Semester | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState<AcademicYear | null>(null);
+  const [toDelete, setToDelete] = useState<Semester | null>(null);
 
-  const searchTimeout = useRef<number | null>(null);
+  useEffect(() => {
+    academicYearService
+      .list({ per_page: 100 })
+      .then((res) => setYears(res.data))
+      .catch(() => {
+        toast.error("Gagal memuat tahun ajaran", {
+          description: "Filter tahun ajaran tidak tersedia.",
+        });
+      });
+  }, []);
 
   useEffect(() => {
     let active = true;
 
-    academicYearService
+    semesterService
       .list({
-        q: query.q || undefined,
+        academic_year_id: query.academic_year_id,
         is_active: query.is_active,
         page: query.page,
         per_page: PER_PAGE,
@@ -70,7 +84,7 @@ export default function AcademicYearPage() {
         if (!active) return;
         setError(toApiError(err));
         setData([]);
-        toast.error("Gagal memuat data", {
+        toast.error("Gagal memuat data semester", {
           description: toApiError(err).message,
         });
       })
@@ -83,14 +97,15 @@ export default function AcademicYearPage() {
     };
   }, [query]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
-    searchTimeout.current = window.setTimeout(() => {
-      setLoading(true);
-      setError(null);
-      setQuery((prev) => ({ ...prev, q: value, page: 1 }));
-    }, 400);
+  const handleAcademicYearChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
+    setAcademicYearFilter(value);
+    setQuery((prev) => ({
+      ...prev,
+      academic_year_id: value === "all" ? undefined : Number(value),
+      page: 1,
+    }));
   }, []);
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
@@ -111,42 +126,54 @@ export default function AcademicYearPage() {
     setError(null);
     setFormOpen(false);
     setEditing(null);
-    // toast sukses dipicu oleh form, agar tidak duplikat
-    setQuery((prev) => ({ ...prev, page: 1 }));
-  }, []);
+    setQuery((prev) => ({
+      ...prev,
+      page: Math.max(1, Math.min(prev.page, meta.last_page)),
+    }));
+  }, [meta.last_page]);
 
   const handleDeleted = useCallback(() => {
     setLoading(true);
     setError(null);
     setDeleteOpen(false);
     setToDelete(null);
-    // toast sukses dipicu oleh delete dialog, agar tidak duplikat
-    setQuery((prev) => ({ ...prev }));
-  }, []);
+    const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
+    setQuery((prev) => ({
+      ...prev,
+      page: isLastPage ? page - 1 : page,
+    }));
+  }, [page, meta.total, meta.per_page]);
 
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
   }, []);
 
-  const openEdit = useCallback((row: AcademicYear) => {
+  const openEdit = useCallback((row: Semester) => {
     setEditing(row);
     setFormOpen(true);
   }, []);
 
-  const openDelete = useCallback((row: AcademicYear) => {
+  const openDelete = useCallback((row: Semester) => {
     setToDelete(row);
     setDeleteOpen(true);
   }, []);
 
   const columns = useMemo(() => {
-    type Row = AcademicYear;
+    type Row = Semester;
     return [
       {
-        header: "Nama Tahun Ajaran",
+        header: "Semester",
         accessor: "name" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="font-medium text-on-surface">{row.name}</span>
+          <span className="font-medium text-on-surface">Semester {row.name}</span>
+        ),
+      },
+      {
+        header: "Tahun Ajaran",
+        accessor: "academic_year" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700"> {row.academic_year?.name ?? "-"}</span>
         ),
       },
       {
@@ -169,22 +196,22 @@ export default function AcademicYearPage() {
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
         className: "px-6 py-4 text-center text-sm text-slate-700",
         render: (_value: Row[keyof Row], row: Row) => (
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={() => openEdit(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
-              aria-label={`Edit ${row.name}`}
+              aria-label={`Edit Semester ${row.name}`}
             >
-              <Pencil className="h-4 w-4" strokeWidth={2} />
+              <Pencil className="h-4 w-4" strokeWidth={1.75} />
             </button>
             <button
               type="button"
               onClick={() => openDelete(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
-              aria-label={`Hapus ${row.name}`}
+              aria-label={`Hapus Semester ${row.name}`}
             >
-              <Trash2 className="h-4 w-4" strokeWidth={2} />
+              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
             </button>
           </div>
         ),
@@ -192,11 +219,20 @@ export default function AcademicYearPage() {
     ];
   }, [openEdit, openDelete]);
 
+  const isFirstPage = meta.current_page <= 1;
+  const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
+  const yearFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Tahun Ajaran" },
+      ...years.map((y) => ({ value: String(y.id), label: y.name })),
+    ],
+    [years],
+  );
   const statusFilterOptions = [
-    { value: "all", label: "Semua" },
+    { value: "all", label: "Semua Status" },
     { value: "active", label: "Aktif" },
     { value: "inactive", label: "Tidak Aktif" },
   ];
@@ -204,8 +240,8 @@ export default function AcademicYearPage() {
   return (
     <PageContainer className="py-6">
       <PageHeader
-        title="Tahun Ajaran"
-        description="Kelola daftar tahun ajaran di sekolah Anda."
+        title="Semester"
+        description="Kelola semester berdasarkan tahun ajaran."
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Tambah
@@ -214,15 +250,17 @@ export default function AcademicYearPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:items-end *:sm:gap-3">
-          <div className="w-full sm:max-w-xs">
-            <Search
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Cari nama tahun ajaran..."
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:flex-wrap *:md:gap-3">
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Tahun Ajaran</span>
+            <AppSelect
+              options={yearFilterOptions}
+              value={academicYearFilter}
+              onChange={(v) => handleAcademicYearChange(v ?? "all")}
+              placeholder="Pilih Tahun Ajaran"
             />
-          </div>
-          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Status</span>
             <AppSelect
               options={statusFilterOptions}
@@ -230,14 +268,13 @@ export default function AcademicYearPage() {
               onChange={(v) => handleStatusChange((v ?? "all") as StatusFilter)}
               placeholder="Pilih Status"
               isSearchable={false}
-              className="min-w-[180px]"
             />
           </label>
         </div>
 
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error.message}</p>
+            <p className="text-sm text-error">Gagal memuat data semester.</p>
             <Button
               variant="secondary"
               onClick={() => {
@@ -259,7 +296,7 @@ export default function AcademicYearPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Tidak ada tahun ajaran.
+                  Tidak ada semester.
                 </div>
               ) : (
                 data.map((row) => (
@@ -269,7 +306,12 @@ export default function AcademicYearPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-on-surface">{row.name}</p>
+                        <p className="font-semibold text-on-surface">
+                          Semester {row.name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-on-surface-variant">
+                          {row.academic_year?.name ?? "-"}
+                        </p>
                       </div>
                       <Badge
                         variant={row.is_active ? "success" : "secondary"}
@@ -304,7 +346,7 @@ export default function AcademicYearPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Tidak ada tahun ajaran."
+                emptyMessage="Tidak ada semester."
               />
             </div>
           </>
@@ -319,19 +361,19 @@ export default function AcademicYearPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                disabled={page <= 1}
-                onClick={() => goToPage(page - 1)}
+                disabled={isFirstPage}
+                onClick={() => goToPage(meta.current_page - 1)}
               >
                 Sebelumnya
               </Button>
               <span className="text-sm text-on-surface-variant">
-                Halaman {page} dari {meta.last_page}
+                Halaman {meta.current_page} dari {meta.last_page}
               </span>
               <Button
                 variant="secondary"
                 size="sm"
-                disabled={page >= meta.last_page}
-                onClick={() => goToPage(page + 1)}
+                disabled={isLastPage}
+                onClick={() => goToPage(meta.current_page + 1)}
               >
                 Berikutnya
               </Button>
@@ -340,7 +382,7 @@ export default function AcademicYearPage() {
         )}
       </Card>
 
-      <AcademicYearForm
+      <SemesterForm
         open={formOpen}
         onClose={() => {
           setFormOpen(false);
@@ -350,7 +392,7 @@ export default function AcademicYearPage() {
         initialData={editing}
       />
 
-      <AcademicYearDeleteDialog
+      <SemesterDeleteDialog
         open={deleteOpen}
         onClose={() => {
           setDeleteOpen(false);

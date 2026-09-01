@@ -4,24 +4,28 @@ import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { academicYearService } from "../../api/academic-year.service";
-import type { AcademicYear } from "../../api/types";
+import { teacherAssignmentService } from "../../api/teacher-assignment.service";
+import type { TeacherAssignment } from "../../api/types";
 
-interface AcademicYearDeleteDialogProps {
+interface TeacherAssignmentDeleteDialogProps {
   open: boolean;
   onClose: () => void;
   onDeleted: () => void;
-  data: AcademicYear | null;
+  data: TeacherAssignment | null;
 }
 
-export default function AcademicYearDeleteDialog({
+export default function TeacherAssignmentDeleteDialog({
   open,
   onClose,
   onDeleted,
   data,
-}: AcademicYearDeleteDialogProps) {
+}: TeacherAssignmentDeleteDialogProps) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
+
+  const teacherName = data?.teacher?.full_name ?? (data ? `#${data.teacher_id}` : undefined);
+  const subjectName = data?.subject?.name;
+  const className = data?.class?.name;
 
   const handleDelete = async () => {
     if (!data) return;
@@ -29,13 +33,13 @@ export default function AcademicYearDeleteDialog({
     setError(null);
 
     try {
-      await academicYearService.remove(data.id);
+      await teacherAssignmentService.remove(data.id);
       onDeleted();
-      toast.success("Tahun ajaran berhasil dihapus.");
+      toast.success("Penugasan guru berhasil dihapus.");
     } catch (err) {
       const apiError = toApiError(err);
       setError(apiError);
-      toast.error("Gagal menghapus", {
+      toast.error("Gagal menghapus penugasan guru", {
         description: apiError.message,
       });
     } finally {
@@ -47,26 +51,30 @@ export default function AcademicYearDeleteDialog({
     <Modal
       open={open}
       onClose={onClose}
-      title="Hapus Tahun Ajaran"
+      title="Hapus Penugasan Guru"
       size="sm"
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={deleting}>
             Batal
           </Button>
-          <Button
-            variant="danger"
-            onClick={handleDelete}
-            loading={deleting}
-          >
+          <Button variant="danger" onClick={handleDelete} loading={deleting}>
             Hapus
           </Button>
         </>
       }
     >
       <p className="text-sm text-on-surface-variant">
-        Apakah Anda yakin ingin menghapus tahun ajaran{" "}
-        <span className="font-semibold text-on-surface">{data?.name}</span>?
+        Apakah Anda yakin ingin menghapus penugasan{" "}
+        <span className="font-semibold text-on-surface">
+          {subjectName ?? ""}
+        </span>{" "}
+        untuk guru{" "}
+        <span className="font-semibold text-on-surface">
+          {teacherName ?? ""}
+        </span>{" "}
+        di kelas{" "}
+        <span className="font-semibold text-on-surface">{className ?? ""}</span>?
         Tindakan ini tidak dapat dibatalkan.
       </p>
 

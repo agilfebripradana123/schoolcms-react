@@ -4,22 +4,33 @@ import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { academicYearService } from "../../api/academic-year.service";
-import type { AcademicYear } from "../../api/types";
+import { scheduleService } from "../../api/schedule.service";
+import type { Schedule } from "../../api/types";
 
-interface AcademicYearDeleteDialogProps {
+interface ScheduleDeleteDialogProps {
   open: boolean;
   onClose: () => void;
   onDeleted: () => void;
-  data: AcademicYear | null;
+  data: Schedule | null;
 }
 
-export default function AcademicYearDeleteDialog({
+function scheduleLabel(data: Schedule | null): string {
+  if (!data) return "";
+  const dayLabel =
+    { senin: "Senin", selasa: "Selasa", rabu: "Rabu", kamis: "Kamis", jumat: "Jumat", sabtu: "Sabtu" }[
+      data.day
+    ] ?? data.day;
+  const subjectName = data.subject?.name ?? `#${data.subject_id}`;
+  const className = data.class?.name ?? `#${data.class_id}`;
+  return `${dayLabel} - ${subjectName} (${className})`;
+}
+
+export default function ScheduleDeleteDialog({
   open,
   onClose,
   onDeleted,
   data,
-}: AcademicYearDeleteDialogProps) {
+}: ScheduleDeleteDialogProps) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
 
@@ -29,13 +40,13 @@ export default function AcademicYearDeleteDialog({
     setError(null);
 
     try {
-      await academicYearService.remove(data.id);
+      await scheduleService.remove(data.id);
       onDeleted();
-      toast.success("Tahun ajaran berhasil dihapus.");
+      toast.success("Jadwal berhasil dihapus.");
     } catch (err) {
       const apiError = toApiError(err);
       setError(apiError);
-      toast.error("Gagal menghapus", {
+      toast.error("Gagal menghapus jadwal", {
         description: apiError.message,
       });
     } finally {
@@ -47,27 +58,25 @@ export default function AcademicYearDeleteDialog({
     <Modal
       open={open}
       onClose={onClose}
-      title="Hapus Tahun Ajaran"
+      title="Hapus Jadwal"
       size="sm"
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={deleting}>
             Batal
           </Button>
-          <Button
-            variant="danger"
-            onClick={handleDelete}
-            loading={deleting}
-          >
+          <Button variant="danger" onClick={handleDelete} loading={deleting}>
             Hapus
           </Button>
         </>
       }
     >
       <p className="text-sm text-on-surface-variant">
-        Apakah Anda yakin ingin menghapus tahun ajaran{" "}
-        <span className="font-semibold text-on-surface">{data?.name}</span>?
-        Tindakan ini tidak dapat dibatalkan.
+        Apakah Anda yakin ingin menghapus jadwal{" "}
+        <span className="font-semibold text-on-surface">
+          {scheduleLabel(data)}
+        </span>
+        ? Tindakan ini tidak dapat dibatalkan.
       </p>
 
       {error && (
