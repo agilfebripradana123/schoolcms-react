@@ -76,8 +76,6 @@ export default function GradeForm({
   const isEdit = Boolean(initialData);
 
   const loadStudents = useCallback(() => {
-    setStudentsLoading(true);
-    setStudentsError(false);
     studentService
       .list({ per_page: 200 })
       .then((res) => {
@@ -93,8 +91,6 @@ export default function GradeForm({
   }, []);
 
   const loadSubjects = useCallback(() => {
-    setSubjectsLoading(true);
-    setSubjectsError(false);
     subjectService
       .list()
       .then((res) => {
@@ -110,8 +106,6 @@ export default function GradeForm({
   }, []);
 
   const loadClasses = useCallback(() => {
-    setClassesLoading(true);
-    setClassesError(false);
     classService
       .list()
       .then((res) => {
@@ -127,8 +121,6 @@ export default function GradeForm({
   }, []);
 
   const loadYears = useCallback(() => {
-    setYearsLoading(true);
-    setYearsError(false);
     academicYearService
       .list({ per_page: 100 })
       .then((res) => {
@@ -143,14 +135,24 @@ export default function GradeForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadStudents();
-      loadSubjects();
-      loadClasses();
-      loadYears();
+      setStudentsLoading(true);
+      setStudentsError(false);
+      setSubjectsLoading(true);
+      setSubjectsError(false);
+      setClassesLoading(true);
+      setClassesError(false);
+      setYearsLoading(true);
+      setYearsError(false);
 
       if (initialData) {
         setStudentId(String(initialData.student_id));
@@ -170,7 +172,16 @@ export default function GradeForm({
         setAcademicYear("");
       }
     }
-  }, [open, initialData, loadStudents, loadSubjects, loadClasses, loadYears]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadStudents();
+      loadSubjects();
+      loadClasses();
+      loadYears();
+    }
+  }, [open, loadStudents, loadSubjects, loadClasses, loadYears]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -265,7 +276,11 @@ export default function GradeForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadStudents}
+                  onClick={() => {
+                    setStudentsLoading(true);
+                    setStudentsError(false);
+                    loadStudents();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -299,7 +314,11 @@ export default function GradeForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadSubjects}
+                  onClick={() => {
+                    setSubjectsLoading(true);
+                    setSubjectsError(false);
+                    loadSubjects();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -333,7 +352,11 @@ export default function GradeForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadClasses}
+                  onClick={() => {
+                    setClassesLoading(true);
+                    setClassesError(false);
+                    loadClasses();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -407,7 +430,11 @@ export default function GradeForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadYears}
+                onClick={() => {
+                  setYearsLoading(true);
+                  setYearsError(false);
+                  loadYears();
+                }}
                 className="self-start"
               >
                 Muat Ulang

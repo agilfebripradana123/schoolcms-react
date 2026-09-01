@@ -25,9 +25,6 @@ export default function SubjectsPage() {
   const [toDelete, setToDelete] = useState<Subject | null>(null);
 
   const loadData = useCallback(() => {
-    setLoading(true);
-    setError(null);
-
     subjectService
       .list()
       .then((res) => {
@@ -50,12 +47,16 @@ export default function SubjectsPage() {
   }, [loadData]);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     loadData();
   }, [loadData]);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     loadData();
@@ -159,7 +160,11 @@ export default function SubjectsPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">Gagal memuat data mata pelajaran.</p>
-            <Button variant="secondary" onClick={loadData}>
+            <Button variant="secondary" onClick={() => {
+              setLoading(true);
+              setError(null);
+              loadData();
+            }}>
               Muat Ulang
             </Button>
           </div>

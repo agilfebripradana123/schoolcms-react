@@ -61,8 +61,6 @@ export default function TeacherAssignmentForm({
   const isEdit = Boolean(initialData);
 
   const loadTeachers = useCallback(() => {
-    setTeachersLoading(true);
-    setTeachersError(false);
     teacherService
       .list({ per_page: 100 })
       .then((res) => {
@@ -78,8 +76,6 @@ export default function TeacherAssignmentForm({
   }, []);
 
   const loadClasses = useCallback(() => {
-    setClassesLoading(true);
-    setClassesError(false);
     classService
       .list()
       .then((res) => {
@@ -95,8 +91,6 @@ export default function TeacherAssignmentForm({
   }, []);
 
   const loadSubjects = useCallback(() => {
-    setSubjectsLoading(true);
-    setSubjectsError(false);
     subjectService
       .list()
       .then((res) => {
@@ -112,8 +106,6 @@ export default function TeacherAssignmentForm({
   }, []);
 
   const loadYears = useCallback(() => {
-    setYearsLoading(true);
-    setYearsError(false);
     academicYearService
       .list({ per_page: 100 })
       .then((res) => {
@@ -128,14 +120,24 @@ export default function TeacherAssignmentForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadTeachers();
-      loadClasses();
-      loadSubjects();
-      loadYears();
+      setTeachersLoading(true);
+      setTeachersError(false);
+      setClassesLoading(true);
+      setClassesError(false);
+      setSubjectsLoading(true);
+      setSubjectsError(false);
+      setYearsLoading(true);
+      setYearsError(false);
 
       if (initialData) {
         setTeacherId(String(initialData.teacher_id));
@@ -149,7 +151,16 @@ export default function TeacherAssignmentForm({
         setAcademicYearId("");
       }
     }
-  }, [open, initialData, loadTeachers, loadClasses, loadSubjects, loadYears]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadTeachers();
+      loadClasses();
+      loadSubjects();
+      loadYears();
+    }
+  }, [open, loadTeachers, loadClasses, loadSubjects, loadYears]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,7 +240,11 @@ export default function TeacherAssignmentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadTeachers}
+                onClick={() => {
+                  setTeachersLoading(true);
+                  setTeachersError(false);
+                  loadTeachers();
+                }}
                 className="self-start"
               >
                 Muat Ulang
@@ -263,7 +278,11 @@ export default function TeacherAssignmentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadClasses}
+                onClick={() => {
+                  setClassesLoading(true);
+                  setClassesError(false);
+                  loadClasses();
+                }}
                 className="self-start"
               >
                 Muat Ulang
@@ -297,7 +316,11 @@ export default function TeacherAssignmentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadSubjects}
+                onClick={() => {
+                  setSubjectsLoading(true);
+                  setSubjectsError(false);
+                  loadSubjects();
+                }}
                 className="self-start"
               >
                 Muat Ulang
@@ -331,7 +354,11 @@ export default function TeacherAssignmentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={loadYears}
+                onClick={() => {
+                  setYearsLoading(true);
+                  setYearsError(false);
+                  loadYears();
+                }}
                 className="self-start"
               >
                 Muat Ulang

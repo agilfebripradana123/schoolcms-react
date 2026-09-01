@@ -77,8 +77,6 @@ export default function ClassSubjectsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     classSubjectService
       .list({
@@ -112,6 +110,8 @@ export default function ClassSubjectsPage() {
   }, [query]);
 
   const handleClassChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setClassFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -121,6 +121,8 @@ export default function ClassSubjectsPage() {
   }, []);
 
   const handleSubjectChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setSubjectFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -130,6 +132,8 @@ export default function ClassSubjectsPage() {
   }, []);
 
   const handleTeacherChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
     setTeacherFilter(value);
     setQuery((prev) => ({
       ...prev,
@@ -139,16 +143,22 @@ export default function ClassSubjectsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     setQuery((prev) => ({ ...prev, page: 1 }));
   }, []);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
@@ -312,7 +322,11 @@ export default function ClassSubjectsPage() {
             <p className="text-sm text-error">Gagal memuat data mata pelajaran kelas.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

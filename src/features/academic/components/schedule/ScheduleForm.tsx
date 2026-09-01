@@ -86,8 +86,6 @@ export default function ScheduleForm({
   const isEdit = Boolean(initialData);
 
   const loadClasses = useCallback(() => {
-    setClassesLoading(true);
-    setClassesError(false);
     classService
       .list()
       .then((res) => {
@@ -103,8 +101,6 @@ export default function ScheduleForm({
   }, []);
 
   const loadSubjects = useCallback(() => {
-    setSubjectsLoading(true);
-    setSubjectsError(false);
     subjectService
       .list()
       .then((res) => {
@@ -120,8 +116,6 @@ export default function ScheduleForm({
   }, []);
 
   const loadTeachers = useCallback(() => {
-    setTeachersLoading(true);
-    setTeachersError(false);
     teacherService
       .list({ per_page: 100 })
       .then((res) => {
@@ -137,8 +131,6 @@ export default function ScheduleForm({
   }, []);
 
   const loadPeriods = useCallback(() => {
-    setPeriodsLoading(true);
-    setPeriodsError(false);
     periodService
       .list({ per_page: 100 })
       .then((res) => {
@@ -154,8 +146,6 @@ export default function ScheduleForm({
   }, []);
 
   const loadYears = useCallback(() => {
-    setYearsLoading(true);
-    setYearsError(false);
     academicYearService
       .list({ per_page: 100 })
       .then((res) => {
@@ -171,8 +161,6 @@ export default function ScheduleForm({
   }, []);
 
   const loadSemesters = useCallback(() => {
-    setSemestersLoading(true);
-    setSemestersError(false);
     semesterService
       .list({ per_page: 100 })
       .then((res) => {
@@ -187,16 +175,28 @@ export default function ScheduleForm({
       });
   }, []);
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadClasses();
-      loadSubjects();
-      loadTeachers();
-      loadPeriods();
-      loadYears();
-      loadSemesters();
+      setClassesLoading(true);
+      setClassesError(false);
+      setSubjectsLoading(true);
+      setSubjectsError(false);
+      setTeachersLoading(true);
+      setTeachersError(false);
+      setPeriodsLoading(true);
+      setPeriodsError(false);
+      setYearsLoading(true);
+      setYearsError(false);
+      setSemestersLoading(true);
+      setSemestersError(false);
 
       if (initialData) {
         setClassId(String(initialData.class_id));
@@ -216,7 +216,18 @@ export default function ScheduleForm({
         setSemesterId("");
       }
     }
-  }, [open, initialData, loadClasses, loadSubjects, loadTeachers, loadPeriods, loadYears, loadSemesters]);
+  }
+
+  useEffect(() => {
+    if (open) {
+      loadClasses();
+      loadSubjects();
+      loadTeachers();
+      loadPeriods();
+      loadYears();
+      loadSemesters();
+    }
+  }, [open, loadClasses, loadSubjects, loadTeachers, loadPeriods, loadYears, loadSemesters]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -307,7 +318,11 @@ export default function ScheduleForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadClasses}
+                  onClick={() => {
+                    setClassesLoading(true);
+                    setClassesError(false);
+                    loadClasses();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -341,7 +356,11 @@ export default function ScheduleForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadSubjects}
+                  onClick={() => {
+                    setSubjectsLoading(true);
+                    setSubjectsError(false);
+                    loadSubjects();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -375,7 +394,11 @@ export default function ScheduleForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadTeachers}
+                  onClick={() => {
+                    setTeachersLoading(true);
+                    setTeachersError(false);
+                    loadTeachers();
+                  }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -420,7 +443,11 @@ export default function ScheduleForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadPeriods}
+                  onClick={() => {
+                  setPeriodsLoading(true);
+                  setPeriodsError(false);
+                  loadPeriods();
+                }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -454,7 +481,11 @@ export default function ScheduleForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadYears}
+                  onClick={() => {
+                  setYearsLoading(true);
+                  setYearsError(false);
+                  loadYears();
+                }}
                   className="self-start"
                 >
                   Muat Ulang
@@ -488,7 +519,11 @@ export default function ScheduleForm({
                   type="button"
                   variant="secondary"
                   size="sm"
-                  onClick={loadSemesters}
+                  onClick={() => {
+                  setSemestersLoading(true);
+                  setSemestersError(false);
+                  loadSemesters();
+                }}
                   className="self-start"
                 >
                   Muat Ulang

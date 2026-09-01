@@ -69,8 +69,6 @@ export default function FinancialReportsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     financialReportService
       .list({
@@ -102,6 +100,8 @@ export default function FinancialReportsPage() {
 
   const handleTypeChange = useCallback((value: TypeFilter) => {
     setTypeFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       report_type: value === "all" ? undefined : value,
@@ -110,18 +110,24 @@ export default function FinancialReportsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -284,7 +290,11 @@ export default function FinancialReportsPage() {
             <p className="text-sm text-error">Gagal memuat data laporan keuangan.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

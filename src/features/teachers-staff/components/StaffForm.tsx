@@ -35,6 +35,26 @@ export default function StaffForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStaffNumber(initialData?.staff_number ?? "");
+      setName(initialData?.name ?? "");
+      setPosition(initialData?.position ?? "");
+      setDepartment(initialData?.department ?? "");
+      setPhone(initialData?.phone ?? "");
+      setEmail(initialData?.email ?? "");
+      setIsActive(initialData?.is_active ?? true);
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   // Auto-generate no. staf (STF-001..) hanya untuk staf baru
   useEffect(() => {
     if (open && !initialData) {
@@ -55,20 +75,6 @@ export default function StaffForm({
       return () => {
         active = false;
       };
-    }
-  }, [open, initialData]);
-
-  useEffect(() => {
-    if (open) {
-      setStaffNumber(initialData?.staff_number ?? "");
-      setName(initialData?.name ?? "");
-      setPosition(initialData?.position ?? "");
-      setDepartment(initialData?.department ?? "");
-      setPhone(initialData?.phone ?? "");
-      setEmail(initialData?.email ?? "");
-      setIsActive(initialData?.is_active ?? true);
-      setError(null);
-      setFieldErrors({});
     }
   }, [open, initialData]);
 

@@ -36,6 +36,25 @@ export default function GuardianForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStudentId(initialData?.student_id ?? "");
+      setName(initialData?.name ?? "");
+      setRelation(initialData?.relation ?? "");
+      setPhone(initialData?.phone ?? "");
+      setOccupation(initialData?.occupation ?? "");
+      setAddress(initialData?.address ?? "");
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   useEffect(() => {
     if (open) {
       studentService
@@ -57,20 +76,7 @@ export default function GuardianForm({
       );
     }
     return students.filter((s) => !takenStudentIds.has(s.id));
-  }, [students, takenStudentIds, isEdit, initialData?.student_id]);
-
-  useEffect(() => {
-    if (open) {
-      setStudentId(initialData?.student_id ?? "");
-      setName(initialData?.name ?? "");
-      setRelation(initialData?.relation ?? "");
-      setPhone(initialData?.phone ?? "");
-      setOccupation(initialData?.occupation ?? "");
-      setAddress(initialData?.address ?? "");
-      setError(null);
-      setFieldErrors({});
-    }
-  }, [open, initialData]);
+  }, [students, takenStudentIds, isEdit, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

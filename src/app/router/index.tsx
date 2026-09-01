@@ -1,5 +1,4 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { StudentListPage, HistoryListPage, AttendanceListPage, TransferListPage, AlumniListPage, StudentIdCardListPage } from "@/features/students";
 import AppLayout from "@/components/layout/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -7,13 +6,59 @@ import Login from "@/pages/Login";
 import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
 import RoleRoute from "@/features/auth/RoleRoute";
-import { AcademicYearPage, SemesterPage, CurriculumPage, SubjectsPage, ClassesPage, ClassSubjectsPage, ClassStudentsPage, TeacherAssignmentsPage, SchedulesPage, PeriodsPage, AssignmentsPage, GradesPage, ReportCardsPage } from "@/features/academic";
-import { TeacherListPage, StaffListPage, TeacherAttendanceListPage, TeacherLeaveListPage, TeacherDocumentListPage } from "@/features/teachers-staff";
-import { RegistrationsPage, VerificationPage, ReRegistrationPage, ExportDapodikPage } from "@/features/ppdb";
-import { FeeTypesPage, BillingsPage, PaymentsPage, TransactionsPage, ScholarshipsPage, FinancialReportsPage } from "@/features/finance";
-import { QuestionsPage, ExamsPage, ExamSchedulesPage, ExamSessionsPage, ExamParticipantsPage, ExamResultsPage } from "@/features/examinations";
-import { RoomsPage, AssetsPage, MaintenancesPage, InventoryPage } from "@/features/facilities";
-import { CounselingsPage, ExtracurricularsPage, AchievementsPage, ViolationsPage } from "@/features/studentship";
+import {
+  AcademicYearPage,
+  SemesterPage,
+  CurriculumPage,
+  SubjectsPage,
+  ClassesPage,
+  ClassSubjectsPage,
+  ClassStudentsPage,
+  SchedulesPage,
+  PeriodsPage,
+  AssignmentsPage,
+  GradesPage,
+  ReportCardsPage,
+  StudentListPage,
+  HistoryListPage,
+  AttendanceListPage,
+  TransferListPage,
+  AlumniListPage,
+  StudentIdCardListPage,
+  TeacherListPage,
+  StaffListPage,
+  TeacherAssignmentsPage,
+  TeacherAttendanceListPage,
+  TeacherLeaveListPage,
+  TeacherDocumentListPage,
+  RegistrationsPage,
+  VerificationPage,
+  ReRegistrationPage,
+  ExportDapodikPage,
+  FeeTypesPage,
+  BillingsPage,
+  PaymentsPage,
+  TransactionsPage,
+  ScholarshipsPage,
+  FinancialReportsPage,
+  QuestionsPage,
+  ExamsPage,
+  ExamSchedulesPage,
+  ExamSessionsPage,
+  ExamParticipantsPage,
+  ExamResultsPage,
+  RoomsPage,
+  AssetsPage,
+  MaintenancesPage,
+  InventoryPage,
+} from "./lazy-pages";
+
+const developmentModules = [
+  { path: "counseling", title: "Bimbingan & Konseling" },
+  { path: "extracurricular", title: "Ekstrakurikuler" },
+  { path: "achievements", title: "Prestasi" },
+  { path: "violations", title: "Pelanggaran" },
+];
 
 const adminModules = [
   { path: "incoming", title: "Surat Masuk" },

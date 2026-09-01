@@ -95,8 +95,6 @@ export default function ExamResultsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     examResultService
       .list({
@@ -128,11 +126,15 @@ export default function ExamResultsPage() {
   }, [query]);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleStatusChange = useCallback((value: string) => {
     setStatusFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       status: value === "all" ? undefined : value,
@@ -142,6 +144,8 @@ export default function ExamResultsPage() {
 
   const handleParticipantChange = useCallback((value: string) => {
     setParticipantFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       participant_id: value === "all" ? undefined : Number(value),
@@ -152,12 +156,16 @@ export default function ExamResultsPage() {
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -328,7 +336,11 @@ export default function ExamResultsPage() {
             <p className="text-sm text-error">Gagal memuat data hasil ujian.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

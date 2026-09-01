@@ -28,9 +28,6 @@ export default function ClassesPage() {
   const [toDelete, setToDelete] = useState<SchoolClass | null>(null);
 
   const loadData = useCallback(() => {
-    setLoading(true);
-    setError(null);
-
     classService
       .list()
       .then((res) => {
@@ -67,12 +64,16 @@ export default function ClassesPage() {
   }, [teachers]);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     loadData();
   }, [loadData]);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     loadData();
@@ -173,7 +174,11 @@ export default function ClassesPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">Gagal memuat data kelas.</p>
-            <Button variant="secondary" onClick={loadData}>
+            <Button variant="secondary" onClick={() => {
+              setLoading(true);
+              setError(null);
+              loadData();
+            }}>
               Muat Ulang
             </Button>
           </div>

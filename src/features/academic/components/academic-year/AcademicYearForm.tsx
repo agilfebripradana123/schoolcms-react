@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input } from "@/components/ui/Form";
@@ -41,17 +41,34 @@ export default function AcademicYearForm({
   const startNum = parseInt(startYear, 10);
   const endYear = isNaN(startNum) ? "" : String(startNum + 1);
 
-  useEffect(() => {
-    if (open && initialData) {
-      const parts = initialData.name.split("/");
-      if (parts.length === 2 && parts[0]) {
-        setStartYear(parts[0]);
-      }
-      setIsActive(initialData.is_active ?? false);
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
       setError(null);
       setFieldErrors({});
+
+      if (initialData) {
+        const parts = initialData.name.split("/");
+        if (parts.length === 2 && parts[0]) {
+          setStartYear(parts[0]);
+        }
+        setIsActive(initialData.is_active ?? false);
+      } else {
+        setStartYear(() => {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth();
+          return String(month >= 6 ? year : year - 1);
+        });
+        setIsActive(false);
+      }
     }
-  }, [open, initialData]);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

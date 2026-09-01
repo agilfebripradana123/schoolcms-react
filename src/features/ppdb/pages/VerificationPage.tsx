@@ -44,8 +44,6 @@ export default function VerificationPage() {
 
   const fetchList = useCallback(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
     registrationService
       .list({ ...query })
       .then((res) => {
@@ -200,7 +198,11 @@ export default function VerificationPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">{error.message}</p>
-            <Button variant="secondary" onClick={fetchList}>Muat Ulang</Button>
+            <Button variant="secondary" onClick={() => {
+              setLoading(true);
+              setError(null);
+              fetchList();
+            }}>Muat Ulang</Button>
           </div>
         ) : (
           <DataTable columns={columns} data={data} loading={loading} emptyMessage="Tidak ada pendaftar untuk diverifikasi." />

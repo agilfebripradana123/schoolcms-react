@@ -70,30 +70,13 @@ export default function TeacherForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  // Auto-generate kode guru (GR-001..) hanya untuk guru baru
-  useEffect(() => {
-    if (open && !initialData) {
-      let active = true;
-      teacherService
-        .list({ per_page: 100 })
-        .then((res) => {
-          if (!active) return;
-          const max = res.data.reduce((m, t) => {
-            const n = parseInt((t.teacher_code ?? "").replace(/^GR-0*/, ""), 10);
-            return Number.isNaN(n) ? m : Math.max(m, n);
-          }, 0);
-          setTeacherCode(`GR-${String(max + 1).padStart(3, "0")}`);
-        })
-        .catch(() => {
-          // biarkan kode kosong, pengguna tetap bisa mengisi manual
-        });
-      return () => {
-        active = false;
-      };
-    }
-  }, [open, initialData]);
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
 
-  useEffect(() => {
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setTeacherCode(initialData?.teacher_code ?? "");
       setNip(initialData?.nip ?? "");
@@ -114,6 +97,29 @@ export default function TeacherForm({
       setIsActive(initialData?.is_active ?? true);
       setError(null);
       setFieldErrors({});
+    }
+  }
+
+  // Auto-generate kode guru (GR-001..) hanya untuk guru baru
+  useEffect(() => {
+    if (open && !initialData) {
+      let active = true;
+      teacherService
+        .list({ per_page: 100 })
+        .then((res) => {
+          if (!active) return;
+          const max = res.data.reduce((m, t) => {
+            const n = parseInt((t.teacher_code ?? "").replace(/^GR-0*/, ""), 10);
+            return Number.isNaN(n) ? m : Math.max(m, n);
+          }, 0);
+          setTeacherCode(`GR-${String(max + 1).padStart(3, "0")}`);
+        })
+        .catch(() => {
+          // biarkan kode kosong, pengguna tetap bisa mengisi manual
+        });
+      return () => {
+        active = false;
+      };
     }
   }, [open, initialData]);
 

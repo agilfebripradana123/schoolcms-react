@@ -49,7 +49,13 @@ export default function TeacherLeaveForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setTeacherId(initialData?.teacher_id ? String(initialData.teacher_id) : "");
       setLeaveType(initialData?.leave_type ?? "izin");
@@ -60,7 +66,7 @@ export default function TeacherLeaveForm({
       setError(null);
       setFieldErrors({});
     }
-  }, [open, initialData]);
+  }
 
   useEffect(() => {
     if (open) {

@@ -1,8 +1,17 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { Outlet } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import MobileSidebar from "./MobileSidebar";
+
+function PageLoadingFallback() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -24,7 +33,9 @@ export default function AppLayout() {
       >
         <Header onToggleSidebar={toggleSidebar} />
         <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-8">
-          <Outlet />
+          <Suspense fallback={<PageLoadingFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

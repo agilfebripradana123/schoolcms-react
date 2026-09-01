@@ -44,12 +44,23 @@ export default function StudentDetail({ open, onClose, student }: StudentDetailP
   const [parent, setParent] = useState<StudentParent | null>(null);
   const [guardian, setGuardian] = useState<Guardian | null>(null);
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousStudent, setPreviousStudent] = useState(student);
+
+  if (open !== previousOpen || student !== previousStudent) {
+    setPreviousOpen(open);
+    setPreviousStudent(student);
+
+    if (open && student) {
+      setLoading(true);
+      setParent(null);
+      setGuardian(null);
+    }
+  }
+
   useEffect(() => {
     if (!open || !student) return;
     let active = true;
-    setLoading(true);
-    setParent(null);
-    setGuardian(null);
 
     const sid = student.id;
     Promise.allSettled([parentService.list(), guardianService.list()]).then(

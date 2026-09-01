@@ -52,8 +52,6 @@ export default function CurriculumPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     curriculumService
       .list({
@@ -89,26 +87,36 @@ export default function CurriculumPage() {
     setSearch(value);
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
     searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       setQuery((prev) => ({ ...prev, q: value, page: 1 }));
     }, 400);
   }, []);
 
   const handleStatusChange = useCallback((value: StatusFilter) => {
+    setLoading(true);
+    setError(null);
     setStatus(value);
     setQuery((prev) => ({ ...prev, is_active: statusToFilter(value), page: 1 }));
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setFormOpen(false);
     setEditing(null);
     setQuery((prev) => ({ ...prev, page: 1 }));
   }, []);
 
   const handleDeleted = useCallback(() => {
+    setLoading(true);
+    setError(null);
     setDeleteOpen(false);
     setToDelete(null);
     const isLastPage = page > 1 && meta.total - 1 <= (page - 1) * meta.per_page;
@@ -243,7 +251,11 @@ export default function CurriculumPage() {
             <p className="text-sm text-error">Gagal memuat data kurikulum.</p>
             <Button
               variant="secondary"
-              onClick={() => setQuery((prev) => ({ ...prev }))}
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
             >
               Muat Ulang
             </Button>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Search as SearchIcon, X } from "lucide-react";
 
 // ponytail: search lokal saja — tambah debounced API search saat data besar
@@ -23,11 +23,10 @@ export default function Search({
 
   const currentValue = controlledValue ?? internalValue;
 
-  useEffect(() => {
-    if (controlledValue !== undefined) {
-      setInternalValue(controlledValue);
-    }
-  }, [controlledValue]);
+
+  if (controlledValue !== undefined && controlledValue !== internalValue) {
+    setInternalValue(controlledValue);
+  }
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

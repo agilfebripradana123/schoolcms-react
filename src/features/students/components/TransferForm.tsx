@@ -42,6 +42,29 @@ export default function TransferForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStudentId(initialData?.student_id ?? "");
+      setType(initialData?.type ?? "masuk");
+      setFromSchool(initialData?.from_school ?? "");
+      setToSchool(initialData?.to_school ?? "");
+      setTransferDate(
+        initialData?.transfer_date
+          ? initialData.transfer_date.substring(0, 10)
+          : new Date().toISOString().substring(0, 10),
+      );
+      setReason(initialData?.reason ?? "");
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   useEffect(() => {
     if (open && !isEdit) {
       studentService
@@ -61,23 +84,6 @@ export default function TransferForm({
         })),
     [students],
   );
-
-  useEffect(() => {
-    if (open) {
-      setStudentId(initialData?.student_id ?? "");
-      setType(initialData?.type ?? "masuk");
-      setFromSchool(initialData?.from_school ?? "");
-      setToSchool(initialData?.to_school ?? "");
-      setTransferDate(
-        initialData?.transfer_date
-          ? initialData.transfer_date.substring(0, 10)
-          : new Date().toISOString().substring(0, 10),
-      );
-      setReason(initialData?.reason ?? "");
-      setError(null);
-      setFieldErrors({});
-    }
-  }, [open, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

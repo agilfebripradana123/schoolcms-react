@@ -37,6 +37,26 @@ export default function ParentForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStudentId(initialData?.student_id ?? "");
+      setFatherName(initialData?.father_name ?? "");
+      setMotherName(initialData?.mother_name ?? "");
+      setFatherOccupation(initialData?.father_occupation ?? "");
+      setMotherOccupation(initialData?.mother_occupation ?? "");
+      setPhone(initialData?.phone ?? "");
+      setAddress(initialData?.address ?? "");
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   useEffect(() => {
     if (open) {
       // Ambil siswa + orang tua yang sudah ada sekaligus untuk filter
@@ -60,21 +80,7 @@ export default function ParentForm({
       );
     }
     return students.filter((s) => !takenStudentIds.has(s.id));
-  }, [students, takenStudentIds, isEdit, initialData?.student_id]);
-
-  useEffect(() => {
-    if (open) {
-      setStudentId(initialData?.student_id ?? "");
-      setFatherName(initialData?.father_name ?? "");
-      setMotherName(initialData?.mother_name ?? "");
-      setFatherOccupation(initialData?.father_occupation ?? "");
-      setMotherOccupation(initialData?.mother_occupation ?? "");
-      setPhone(initialData?.phone ?? "");
-      setAddress(initialData?.address ?? "");
-      setError(null);
-      setFieldErrors({});
-    }
-  }, [open, initialData]);
+  }, [students, takenStudentIds, isEdit, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

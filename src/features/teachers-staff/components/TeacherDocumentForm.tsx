@@ -44,7 +44,13 @@ export default function TeacherDocumentForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  useEffect(() => {
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
     if (open) {
       setTeacherId(initialData?.teacher_id ? String(initialData.teacher_id) : "");
       setTitle(initialData?.title ?? "");
@@ -55,7 +61,7 @@ export default function TeacherDocumentForm({
       setError(null);
       setFieldErrors({});
     }
-  }, [open, initialData]);
+  }
 
   useEffect(() => {
     if (open) {

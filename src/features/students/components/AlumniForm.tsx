@@ -35,6 +35,25 @@ export default function AlumniForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  const [previousOpen, setPreviousOpen] = useState(open);
+  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+
+  if (open !== previousOpen || initialData !== previousInitialData) {
+    setPreviousOpen(open);
+    setPreviousInitialData(initialData);
+
+    if (open) {
+      setStudentId(initialData?.student_id ?? "");
+      setName(initialData?.name ?? "");
+      setGraduationYear(initialData?.graduation_year ? String(initialData.graduation_year) : "");
+      setPhone(initialData?.phone ?? "");
+      setEmail(initialData?.email ?? "");
+      setOccupation(initialData?.occupation ?? "");
+      setError(null);
+      setFieldErrors({});
+    }
+  }
+
   useEffect(() => {
     if (open && !isEdit) {
       studentService
@@ -54,19 +73,6 @@ export default function AlumniForm({
         })),
     [students],
   );
-
-  useEffect(() => {
-    if (open) {
-      setStudentId(initialData?.student_id ?? "");
-      setName(initialData?.name ?? "");
-      setGraduationYear(initialData?.graduation_year ? String(initialData.graduation_year) : "");
-      setPhone(initialData?.phone ?? "");
-      setEmail(initialData?.email ?? "");
-      setOccupation(initialData?.occupation ?? "");
-      setError(null);
-      setFieldErrors({});
-    }
-  }, [open, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

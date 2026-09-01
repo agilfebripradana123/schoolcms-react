@@ -119,8 +119,6 @@ export default function QuestionsPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError(null);
 
     questionBankService
       .list({
@@ -157,12 +155,16 @@ export default function QuestionsPage() {
     setSearch(value);
     if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
     searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
       setQuery((prev) => ({ ...prev, search: value, page: 1 }));
     }, 400);
   }, []);
 
   const handleSubjectChange = useCallback((value: string) => {
     setSubjectFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       subject_id: value === "all" ? undefined : Number(value),
@@ -172,6 +174,8 @@ export default function QuestionsPage() {
 
   const handleTypeChange = useCallback((value: string) => {
     setTypeFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       type: value === "all" ? undefined : (value as QuestionType),
@@ -181,6 +185,8 @@ export default function QuestionsPage() {
 
   const handleDifficultyChange = useCallback((value: string) => {
     setDifficultyFilter(value);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({
       ...prev,
       difficulty: value === "all" ? undefined : (value as QuestionDifficulty),
@@ -189,18 +195,24 @@ export default function QuestionsPage() {
   }, []);
 
   const goToPage = useCallback((target: number) => {
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev, page: target }));
   }, []);
 
   const handleSaved = useCallback(() => {
     setFormOpen(false);
     setEditing(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
   const handleDeleted = useCallback(() => {
     setDeleteOpen(false);
     setToDelete(null);
+    setLoading(true);
+    setError(null);
     setQuery((prev) => ({ ...prev }));
   }, []);
 
@@ -404,7 +416,14 @@ export default function QuestionsPage() {
         {error ? (
           <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
             <p className="text-sm text-error">Gagal memuat data soal.</p>
-            <Button variant="secondary" onClick={() => setQuery((prev) => ({ ...prev }))}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                setQuery((prev) => ({ ...prev }));
+              }}
+            >
               Muat Ulang
             </Button>
           </div>
