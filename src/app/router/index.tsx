@@ -62,6 +62,12 @@ import {
   AnnouncementsPage,
   NotificationsPage,
   CalendarPage,
+  AcademicReportsPage,
+  StudentReportsPage,
+  TeacherReportsPage,
+  FinanceReportsPage,
+  AttendanceReportsPage,
+  InventoryReportsPage,
 } from "./lazy-pages";
 
 const developmentModules = [
@@ -69,15 +75,6 @@ const developmentModules = [
   { path: "extracurricular", title: "Ekstrakurikuler" },
   { path: "achievements", title: "Prestasi" },
   { path: "violations", title: "Pelanggaran" },
-];
-
-const reportModules = [
-  { path: "academic", title: "Laporan Akademik" },
-  { path: "students", title: "Laporan Siswa" },
-  { path: "teachers", title: "Laporan Guru" },
-  { path: "finance", title: "Laporan Keuangan" },
-  { path: "attendance", title: "Laporan Kehadiran" },
-  { path: "inventory", title: "Laporan Inventaris" },
 ];
 
 const systemModules = [
@@ -167,6 +164,12 @@ const router = createBrowserRouter([
           { path: "communication/announcements", element: <AnnouncementsPage /> },
           { path: "communication/notifications", element: <NotificationsPage /> },
           { path: "communication/calendar", element: <CalendarPage /> },
+          { path: "reports/academic", element: <AcademicReportsPage /> },
+          { path: "reports/students", element: <StudentReportsPage /> },
+          { path: "reports/teachers", element: <TeacherReportsPage /> },
+          { path: "reports/finance", element: <FinanceReportsPage /> },
+          { path: "reports/attendance", element: <AttendanceReportsPage /> },
+          { path: "reports/inventory", element: <InventoryReportsPage /> },
           {
             element: <RoleRoute allow={["admin", "administrator"]} />,
             children: [
@@ -177,7 +180,6 @@ const router = createBrowserRouter([
             ],
           },
           ...createModuleRoutes("/development", "Student Development", developmentModules),
-          ...createModuleRoutes("/reports", "Reports", reportModules),
           ...createModuleRoutes("/system", "System", systemModules),
         ],
       },

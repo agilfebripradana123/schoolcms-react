@@ -1,1 +1,2 @@
-export * from "./report.service";
+export * from "./types";
+export { reportService } from "./report.service";
