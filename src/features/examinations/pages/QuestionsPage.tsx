@@ -376,7 +376,7 @@ export default function QuestionsPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end *:md:gap-3">
           <div className="md:min-w-[220px] md:flex-1">
             <Search
               value={search}

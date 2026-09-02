@@ -292,7 +292,7 @@ export default function CounselingsPage() {
       />
 
       <Card>
-        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3 *:md:gap-3">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant">
             <span className="whitespace-nowrap">Siswa</span>
             <AppSelect

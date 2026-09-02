@@ -337,7 +337,7 @@ export default function InventoryReportsPage() {
       ) : (
         <>
           <Card>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:max-w-xl">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:max-w-3xl *:sm:gap-3">
               <FormField label="Dari Tanggal" className="flex flex-col gap-1">
                 <Input
                   type="date"
@@ -353,7 +353,7 @@ export default function InventoryReportsPage() {
                 />
               </FormField>
             </div>
-            <div className="mt-4">
+            <div className="mt-4 *:sm:mt-2">
               <Button variant="secondary" size="sm" onClick={handleApplyDates}>
                 Terapkan Filter
               </Button>

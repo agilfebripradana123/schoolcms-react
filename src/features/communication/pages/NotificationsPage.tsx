@@ -246,8 +246,8 @@ export default function NotificationsPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface md:min-w-[180px] md:flex-1">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center *:sm:gap-3">
+          <label className="flex w-full flex-col gap-1 text-sm text-on-surface-variant sm:w-56">
             <span className="whitespace-nowrap">Status</span>
             <AppSelect
               options={READ_FILTER_OPTIONS}

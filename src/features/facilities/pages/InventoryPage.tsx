@@ -405,7 +405,7 @@ export default function InventoryPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end *:md:gap-3">
           <div className="flex flex-1 flex-col gap-1 md:min-w-[200px] md:flex-1">
             <Search
               value={searchInput}

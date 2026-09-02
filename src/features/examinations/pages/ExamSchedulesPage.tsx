@@ -227,7 +227,7 @@ export default function ExamSchedulesPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end *:md:gap-3">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface md:max-w-[220px]">
             <span className="whitespace-nowrap">Tanggal Ujian</span>
             <div className="flex items-center gap-2">

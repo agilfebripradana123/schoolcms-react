@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
-import { FormField, Input } from "@/components/ui/Form";
+import { FormField } from "@/components/ui/Form";
 import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -13,8 +13,8 @@ import { reportService } from "../api/report.service";
 import type { AcademicGradesSummaryRow } from "../api/types";
 import { classService } from "@/features/academic/api/class.service";
 import { subjectService } from "@/features/academic/api/subject.service";
-import type { SchoolClass } from "@/features/academic/api/types";
-import type { Subject } from "@/features/academic/api/types";
+import { academicYearService } from "@/features/academic/api/academic-year.service";
+import type { AcademicYear, SchoolClass, Subject } from "@/features/academic/api/types";
 
 const PER_PAGE = 10;
 
@@ -45,11 +45,12 @@ export default function AcademicReportsPage() {
 
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
 
   const [classFilter, setClassFilter] = useState<string>("all");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [semesterFilter, setSemesterFilter] = useState<string>("all");
-  const [academicYearInput, setAcademicYearInput] = useState("");
+  const [academicYearId, setAcademicYearId] = useState("all");
 
   const [query, setQuery] = useState<QueryState>({
     class_id: undefined,
@@ -65,11 +66,13 @@ export default function AcademicReportsPage() {
     Promise.all([
       classService.list({ per_page: 100 }),
       subjectService.list({ per_page: 100 }),
+      academicYearService.list({ per_page: 100 }),
     ])
-      .then(([classesRes, subjectsRes]) => {
+      .then(([classesRes, subjectsRes, yearsRes]) => {
         if (!active) return;
         setClasses(classesRes.data);
         setSubjects(subjectsRes.data);
+        setAcademicYears(yearsRes.data);
       })
       .catch(() => {
         // Filter relasi opsional; list tetap dapat ditampilkan tanpa nama.
@@ -83,19 +86,6 @@ export default function AcademicReportsPage() {
   useEffect(() => {
     return fetchFilters();
   }, [fetchFilters]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(true);
-      setError(null);
-      setQuery((prev) => ({
-        ...prev,
-        academic_year: academicYearInput || undefined,
-        page: 1,
-      }));
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [academicYearInput]);
 
   useEffect(() => {
     let active = true;
@@ -170,6 +160,18 @@ export default function AcademicReportsPage() {
     }));
   }, []);
 
+  const handleAcademicYearChange = useCallback((value: string) => {
+    setAcademicYearId(value);
+    const selected = academicYears.find((y) => String(y.id) === value);
+    setLoading(true);
+    setError(null);
+    setQuery((prev) => ({
+      ...prev,
+      academic_year: selected?.name ?? undefined,
+      page: 1,
+    }));
+  }, [academicYears]);
+
   const classOptions = useMemo(
     () => [
       { value: "all", label: "Semua Kelas" },
@@ -184,6 +186,14 @@ export default function AcademicReportsPage() {
       ...subjects.map((s) => ({ value: String(s.id), label: s.name })),
     ],
     [subjects],
+  );
+
+  const academicYearOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Tahun Ajaran" },
+      ...academicYears.map((y) => ({ value: String(y.id), label: y.name })),
+    ],
+    [academicYears],
   );
 
   const columns = [
@@ -239,8 +249,8 @@ export default function AcademicReportsPage() {
       />
 
       <Card>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <FormField label="Kelas" className="flex flex-col gap-1">
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 *:md:gap-3">
+          <FormField label="Kelas" className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <AppSelect
               options={classOptions}
               value={classFilter}
@@ -248,7 +258,7 @@ export default function AcademicReportsPage() {
               placeholder="Pilih Kelas"
             />
           </FormField>
-          <FormField label="Mata Pelajaran" className="flex flex-col gap-1">
+          <FormField label="Mata Pelajaran" className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <AppSelect
               options={subjectOptions}
               value={subjectFilter}
@@ -256,7 +266,7 @@ export default function AcademicReportsPage() {
               placeholder="Pilih Mata Pelajaran"
             />
           </FormField>
-          <FormField label="Semester" className="flex flex-col gap-1">
+          <FormField label="Semester" className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <AppSelect
               options={SEMESTER_OPTIONS}
               value={semesterFilter}
@@ -264,16 +274,12 @@ export default function AcademicReportsPage() {
               placeholder="Pilih Semester"
             />
           </FormField>
-          <FormField
-            label="Tahun Ajaran"
-            hint="Contoh: 2025/2026"
-            className="flex flex-col gap-1"
-          >
-            <Input
-              value={academicYearInput}
-              onChange={(e) => setAcademicYearInput(e.target.value)}
-              placeholder="2025/2026"
-              maxLength={20}
+          <FormField label="Tahun Ajaran" className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <AppSelect
+              options={academicYearOptions}
+              value={academicYearId}
+              onChange={(v) => handleAcademicYearChange(v ?? "all")}
+              placeholder="Pilih Tahun Ajaran"
             />
           </FormField>
         </div>
