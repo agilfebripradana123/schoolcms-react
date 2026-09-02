@@ -3,6 +3,7 @@ import { COMMUNICATION } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CommunicationListParams,
+  CommunicationListResponse,
   CreateNotificationPayload,
   UpdateNotificationPayload,
   UserNotification,
@@ -11,27 +12,35 @@ import type {
 export const notificationService = {
   async list(
     params?: CommunicationListParams,
-  ): Promise<ApiEnvelope<UserNotification[]>> {
-    return api.get<ApiEnvelope<UserNotification[]>>(COMMUNICATION.NOTIFICATIONS, params);
+  ): Promise<CommunicationListResponse<UserNotification[]>> {
+    return api.get<CommunicationListResponse<UserNotification[]>>(
+      COMMUNICATION.NOTIFICATIONS,
+      params,
+    );
   },
 
   async myNotifications(
     params?: CommunicationListParams,
-  ): Promise<ApiEnvelope<UserNotification[]>> {
-    return api.get<ApiEnvelope<UserNotification[]>>(
+  ): Promise<CommunicationListResponse<UserNotification[]>> {
+    return api.get<CommunicationListResponse<UserNotification[]>>(
       COMMUNICATION.NOTIFICATIONS_MY,
       params,
     );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<UserNotification>> {
-    return api.get<ApiEnvelope<UserNotification>>(`${COMMUNICATION.NOTIFICATIONS}/${id}`);
+    return api.get<ApiEnvelope<UserNotification>>(
+      `${COMMUNICATION.NOTIFICATIONS}/${id}`,
+    );
   },
 
   async create(
     payload: CreateNotificationPayload,
   ): Promise<ApiEnvelope<UserNotification>> {
-    return api.post<ApiEnvelope<UserNotification>>(COMMUNICATION.NOTIFICATIONS, payload);
+    return api.post<ApiEnvelope<UserNotification>>(
+      COMMUNICATION.NOTIFICATIONS,
+      payload,
+    );
   },
 
   async update(

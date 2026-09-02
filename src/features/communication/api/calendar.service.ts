@@ -4,13 +4,19 @@ import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   Calendar,
   CommunicationListParams,
+  CommunicationListResponse,
   CreateCalendarPayload,
   UpdateCalendarPayload,
 } from "./types";
 
 export const calendarService = {
-  async list(params?: CommunicationListParams): Promise<ApiEnvelope<Calendar[]>> {
-    return api.get<ApiEnvelope<Calendar[]>>(COMMUNICATION.CALENDARS, params);
+  async list(
+    params?: CommunicationListParams,
+  ): Promise<CommunicationListResponse<Calendar[]>> {
+    return api.get<CommunicationListResponse<Calendar[]>>(
+      COMMUNICATION.CALENDARS,
+      params,
+    );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Calendar>> {
@@ -25,7 +31,10 @@ export const calendarService = {
     id: number | string,
     payload: UpdateCalendarPayload,
   ): Promise<ApiEnvelope<Calendar>> {
-    return api.put<ApiEnvelope<Calendar>>(`${COMMUNICATION.CALENDARS}/${id}`, payload);
+    return api.put<ApiEnvelope<Calendar>>(
+      `${COMMUNICATION.CALENDARS}/${id}`,
+      payload,
+    );
   },
 
   async remove(id: number | string): Promise<ApiMessage> {
