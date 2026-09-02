@@ -198,13 +198,7 @@ const router = createBrowserRouter([
               { path: "reports/finance", element: <FinanceReportsPage /> },
               { path: "reports/attendance", element: <AttendanceReportsPage /> },
               { path: "reports/inventory", element: <InventoryReportsPage /> },
-              // Development modules dipindah ke placeholder agar tidak duplikat
-              ...createModuleRoutes("development", "Student Development", [
-                { path: "counseling", title: "Bimbingan & Konseling" },
-                { path: "extracurricular", title: "Ekstrakurikuler" },
-                { path: "achievements", title: "Prestasi" },
-                { path: "violations", title: "Pelanggaran" },
-              ]),
+
               ...createModuleRoutes("system", "System", systemModules),
             ],
           },
