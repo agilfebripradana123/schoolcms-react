@@ -3,6 +3,7 @@ import { ADMINISTRATION } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   AdministrationListParams,
+  AdministrationListResponse,
   CreateIncomingLetterPayload,
   IncomingLetter,
   UpdateIncomingLetterPayload,
@@ -11,8 +12,8 @@ import type {
 export const incomingLetterService = {
   async list(
     params?: AdministrationListParams,
-  ): Promise<ApiEnvelope<IncomingLetter[]>> {
-    return api.get<ApiEnvelope<IncomingLetter[]>>(
+  ): Promise<AdministrationListResponse<IncomingLetter[]>> {
+    return api.get<AdministrationListResponse<IncomingLetter[]>>(
       ADMINISTRATION.INCOMING_LETTERS,
       params,
     );

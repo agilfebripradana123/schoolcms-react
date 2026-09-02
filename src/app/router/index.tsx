@@ -51,6 +51,10 @@ import {
   AssetsPage,
   MaintenancesPage,
   InventoryPage,
+  IncomingLettersPage,
+  OutgoingLettersPage,
+  DocumentsPage,
+  DispositionsPage,
 } from "./lazy-pages";
 
 const developmentModules = [
@@ -58,13 +62,6 @@ const developmentModules = [
   { path: "extracurricular", title: "Ekstrakurikuler" },
   { path: "achievements", title: "Prestasi" },
   { path: "violations", title: "Pelanggaran" },
-];
-
-const adminModules = [
-  { path: "incoming", title: "Surat Masuk" },
-  { path: "outgoing", title: "Surat Keluar" },
-  { path: "documents", title: "Dokumen" },
-  { path: "dispositions", title: "Disposisi" },
 ];
 
 const communicationModules = [
@@ -158,6 +155,10 @@ const router = createBrowserRouter([
           { path: "facilities/assets", element: <AssetsPage /> },
           { path: "facilities/maintenance", element: <MaintenancesPage /> },
           { path: "facilities/inventory", element: <InventoryPage /> },
+          { path: "administration/incoming", element: <IncomingLettersPage /> },
+          { path: "administration/outgoing", element: <OutgoingLettersPage /> },
+          { path: "administration/documents", element: <DocumentsPage /> },
+          { path: "administration/dispositions", element: <DispositionsPage /> },
           {
             element: <RoleRoute allow={["admin", "administrator"]} />,
             children: [
@@ -168,7 +169,6 @@ const router = createBrowserRouter([
             ],
           },
           ...createModuleRoutes("/development", "Student Development", developmentModules),
-          ...createModuleRoutes("/administration", "Administration", adminModules),
           ...createModuleRoutes("/communication", "Communication", communicationModules),
           ...createModuleRoutes("/reports", "Reports", reportModules),
           ...createModuleRoutes("/system", "System", systemModules),

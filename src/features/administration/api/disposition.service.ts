@@ -3,14 +3,20 @@ import { ADMINISTRATION } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   AdministrationListParams,
+  AdministrationListResponse,
   CreateDispositionPayload,
   Disposition,
   UpdateDispositionPayload,
 } from "./types";
 
 export const dispositionService = {
-  async list(params?: AdministrationListParams): Promise<ApiEnvelope<Disposition[]>> {
-    return api.get<ApiEnvelope<Disposition[]>>(ADMINISTRATION.DISPOSITIONS, params);
+  async list(
+    params?: AdministrationListParams,
+  ): Promise<AdministrationListResponse<Disposition[]>> {
+    return api.get<AdministrationListResponse<Disposition[]>>(
+      ADMINISTRATION.DISPOSITIONS,
+      params,
+    );
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Disposition>> {
