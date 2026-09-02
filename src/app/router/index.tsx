@@ -92,13 +92,6 @@ import {
   InventoryReportsPage,
 } from "./lazy-pages";
 
-const developmentModules = [
-  { path: "counseling", title: "Bimbingan & Konseling" },
-  { path: "extracurricular", title: "Ekstrakurikuler" },
-  { path: "achievements", title: "Prestasi" },
-  { path: "violations", title: "Pelanggaran" },
-];
-
 const systemModules = [
   { path: "roles", title: "Peran" },
   { path: "permissions", title: "Hak Akses" },
@@ -119,22 +112,14 @@ function createModuleRoutes(
 }
 
 const router = createBrowserRouter([
+  { path: "/login", element: <Login /> },
+  { path: "/login/guru", element: <GuruLogin /> },
+  { path: "/login/admin", element: <AdminLogin /> },
+
+  // =========================
+  // ADMIN PORTAL (/admin) — Superadmin & Administrator
+  // =========================
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/login/guru",
-    element: <GuruLogin />,
-  },
-  {
-    path: "/login/admin",
-    element: <AdminLogin />,
-  },
-  {
-    // =========================
-    // ADMIN PORTAL (/admin) — Superadmin & Administrator
-    // =========================
     path: "/admin",
     element: <ProtectedRoute />,
     children: [
@@ -207,19 +192,31 @@ const router = createBrowserRouter([
                   { path: "ppdb/export-dapodik", element: <ExportDapodikPage /> },
                 ],
               },
-...createModuleRoutes("development", "Student Development", developmentModules),
-          ...createModuleRoutes("reports", "Reports", reportModules),
-          ...createModuleRoutes("system", "System", systemModules),
+              { path: "reports/academic", element: <AcademicReportsPage /> },
+              { path: "reports/students", element: <StudentReportsPage /> },
+              { path: "reports/teachers", element: <TeacherReportsPage /> },
+              { path: "reports/finance", element: <FinanceReportsPage /> },
+              { path: "reports/attendance", element: <AttendanceReportsPage /> },
+              { path: "reports/inventory", element: <InventoryReportsPage /> },
+              // Development modules dipindah ke placeholder agar tidak duplikat
+              ...createModuleRoutes("development", "Student Development", [
+                { path: "counseling", title: "Bimbingan & Konseling" },
+                { path: "extracurricular", title: "Ekstrakurikuler" },
+                { path: "achievements", title: "Prestasi" },
+                { path: "violations", title: "Pelanggaran" },
+              ]),
+              ...createModuleRoutes("system", "System", systemModules),
             ],
           },
         ],
       },
     ],
   },
+
+  // =========================
+  // GURU PORTAL (/guru) — Guru, layout + guard saja
+  // =========================
   {
-    // =========================
-    // GURU PORTAL (/guru) — Guru, layout + guard saja
-    // =========================
     path: "/guru",
     element: <ProtectedRoute />,
     children: [
@@ -246,76 +243,17 @@ const router = createBrowserRouter([
       },
     ],
   },
+
+  // =========================
+  // SISWA PORTAL (/siswa) — Siswa, default home
+  // =========================
   {
-    // =========================
-    // SISWA PORTAL (/siswa) — Siswa, default home setelah login
-    // =========================
     path: "/siswa",
     element: <ProtectedRoute />,
     children: [
       {
         element: <StudentRoute />,
         children: [
-          { index: true, element: <Navigate to="/dashboard" replace /> },
-          { path: "dashboard", element: <Dashboard /> },
-          { path: "academic/years", element: <AcademicYearPage /> },
-          { path: "academic/semesters", element: <SemesterPage /> },
-          { path: "academic/curriculum", element: <CurriculumPage /> },
-          { path: "academic/subjects", element: <SubjectsPage /> },
-          { path: "academic/classes", element: <ClassesPage /> },
-          { path: "academic/class-subjects", element: <ClassSubjectsPage /> },
-          { path: "academic/class-students", element: <ClassStudentsPage /> },
-          { path: "academic/teacher-assignments", element: <TeacherAssignmentsPage /> },
-          { path: "academic/schedules", element: <SchedulesPage /> },
-          { path: "academic/periods", element: <PeriodsPage /> },
-          { path: "academic/assignments", element: <AssignmentsPage /> },
-          { path: "academic/grades", element: <GradesPage /> },
-          { path: "academic/report-cards", element: <ReportCardsPage /> },
-          { path: "students", element: <StudentListPage /> },
-          { path: "students/history", element: <HistoryListPage /> },
-          { path: "students/attendance", element: <AttendanceListPage /> },
-          { path: "students/transfers", element: <TransferListPage /> },
-          { path: "students/alumni", element: <AlumniListPage /> },
-          { path: "students/id-card", element: <StudentIdCardListPage /> },
-          { path: "finance/fee-types", element: <FeeTypesPage /> },
-          { path: "finance/billing", element: <BillingsPage /> },
-          { path: "finance/payments", element: <PaymentsPage /> },
-          { path: "finance/transactions", element: <TransactionsPage /> },
-          { path: "finance/scholarships", element: <ScholarshipsPage /> },
-          { path: "finance/reports", element: <FinancialReportsPage /> },
-          { path: "teachers", element: <TeacherListPage /> },
-          { path: "teachers/staff", element: <StaffListPage /> },
-          { path: "teachers/assignments", element: <TeacherAssignmentsPage /> },
-          { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
-          { path: "teachers/leave", element: <TeacherLeaveListPage /> },
-          { path: "teachers/documents", element: <TeacherDocumentListPage /> },
-          { path: "examinations/questions", element: <QuestionsPage /> },
-          { path: "examinations/exams", element: <ExamsPage /> },
-          { path: "examinations/schedules", element: <ExamSchedulesPage /> },
-          { path: "examinations/sessions", element: <ExamSessionsPage /> },
-          { path: "examinations/participants", element: <ExamParticipantsPage /> },
-          { path: "examinations/results", element: <ExamResultsPage /> },
-          { path: "facilities/rooms", element: <RoomsPage /> },
-          { path: "facilities/assets", element: <AssetsPage /> },
-          { path: "facilities/maintenance", element: <MaintenancesPage /> },
-          { path: "facilities/inventory", element: <InventoryPage /> },
-          { path: "administration/incoming", element: <IncomingLettersPage /> },
-          { path: "administration/outgoing", element: <OutgoingLettersPage /> },
-          { path: "administration/documents", element: <DocumentsPage /> },
-          { path: "administration/dispositions", element: <DispositionsPage /> },
-          { path: "development/counseling", element: <CounselingsPage /> },
-          { path: "development/extracurricular", element: <ExtracurricularsPage /> },
-          { path: "development/achievements", element: <AchievementsPage /> },
-          { path: "development/violations", element: <ViolationsPage /> },
-          { path: "communication/announcements", element: <AnnouncementsPage /> },
-          { path: "communication/notifications", element: <NotificationsPage /> },
-          { path: "communication/calendar", element: <CalendarPage /> },
-          { path: "reports/academic", element: <AcademicReportsPage /> },
-          { path: "reports/students", element: <StudentReportsPage /> },
-          { path: "reports/teachers", element: <TeacherReportsPage /> },
-          { path: "reports/finance", element: <FinanceReportsPage /> },
-          { path: "reports/attendance", element: <AttendanceReportsPage /> },
-          { path: "reports/inventory", element: <InventoryReportsPage /> },
           {
             element: <StudentLayout />,
             children: [
@@ -338,16 +276,12 @@ const router = createBrowserRouter([
               { path: "notifications", element: <StudentNotificationsPage /> },
             ],
           },
-          ...createModuleRoutes("/development", "Student Development", developmentModules),
-          ...createModuleRoutes("/system", "System", systemModules),
         ],
       },
     ],
   },
-  {
-    path: "*",
-    element: <NotFound />,
-  },
+
+  { path: "*", element: <NotFound /> },
 ]);
 
 export default router;
