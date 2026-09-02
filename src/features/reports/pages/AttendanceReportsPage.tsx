@@ -320,7 +320,7 @@ export default function AttendanceReportsPage() {
       {section === "daily" ? (
         <>
           <Card>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:max-w-xl">
+            <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 *:md:gap-3">
               <FormField label="Tanggal" className="flex flex-col gap-1">
                 <Input
                   type="date"
@@ -337,7 +337,7 @@ export default function AttendanceReportsPage() {
                 />
               </FormField>
             </div>
-            <div className="mt-4">
+            <div className="mt-4 *:sm:mt-2">
               <Button variant="secondary" size="sm" onClick={handleApplyDaily}>
                 Tampilkan
               </Button>
@@ -360,26 +360,26 @@ export default function AttendanceReportsPage() {
               <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
             ) : (
               <>
-                <div className="flex flex-wrap gap-3">
-                  <div className="rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                  <div className="flex h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Hadir</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.hadir}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Sakit</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.sakit}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Izin</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.izin}
                     </p>
                   </div>
-                  <div className="rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Alfa</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.alfa}
@@ -404,7 +404,7 @@ export default function AttendanceReportsPage() {
       ) : (
         <>
           <Card>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:max-w-3xl">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:max-w-3xl *:sm:gap-3">
               <FormField label="Dari Tanggal" className="flex flex-col gap-1">
                 <Input
                   type="date"
@@ -428,7 +428,7 @@ export default function AttendanceReportsPage() {
                 />
               </FormField>
             </div>
-            <div className="mt-4">
+            <div className="mt-4 *:sm:mt-2">
               <Button variant="secondary" size="sm" onClick={handleApplyStudent}>
                 Terapkan Filter
               </Button>

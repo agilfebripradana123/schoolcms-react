@@ -182,7 +182,7 @@ export default function VerificationPage() {
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center *:sm:gap-3">
-          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+          <label className="flex w-full flex-col gap-1 text-sm text-on-surface-variant sm:w-56">
             <span className="whitespace-nowrap">Status Verifikasi</span>
             <AppSelect
               options={STATUS_FILTER_OPTIONS}
