@@ -68,13 +68,6 @@ const developmentModules = [
   { path: "violations", title: "Pelanggaran" },
 ];
 
-const adminModules = [
-  { path: "incoming", title: "Surat Masuk" },
-  { path: "outgoing", title: "Surat Keluar" },
-  { path: "documents", title: "Dokumen" },
-  { path: "dispositions", title: "Disposisi" },
-];
-
 const communicationModules = [
   { path: "announcements", title: "Pengumuman" },
   { path: "notifications", title: "Notifikasi" },
@@ -184,7 +177,6 @@ const router = createBrowserRouter([
             ],
           },
           ...createModuleRoutes("/development", "Student Development", developmentModules),
-          ...createModuleRoutes("/administration", "Administration", adminModules),
           ...createModuleRoutes("/communication", "Communication", communicationModules),
           ...createModuleRoutes("/reports", "Reports", reportModules),
           ...createModuleRoutes("/system", "System", systemModules),

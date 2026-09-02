@@ -147,8 +147,14 @@ export default function DocumentsPage() {
     setToDelete(null);
     setLoading(true);
     setError(null);
-    setQuery((prev) => ({ ...prev }));
-  }, []);
+    setQuery((prev) => {
+      // Jika item terakhir pada halaman dihapus, mundur satu halaman.
+      if (data.length === 1 && prev.page > 1) {
+        return { ...prev, page: prev.page - 1 };
+      }
+      return { ...prev };
+    });
+  }, [data.length]);
 
   const openCreate = useCallback(() => {
     setEditing(null);
@@ -208,6 +214,36 @@ export default function DocumentsPage() {
         ),
       },
       {
+        header: "File / URL",
+        accessor: "file_path" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => {
+          const path = row.file_path;
+          if (!path) {
+            return <span className="text-sm text-slate-400">-</span>;
+          }
+          const isHttp = /^https?:\/\//i.test(path);
+          return (
+            <span
+              title={path}
+              className="block max-w-[200px] overflow-hidden text-ellipsis whitespace-nowrap text-sm text-slate-700"
+            >
+              {isHttp ? (
+                <a
+                  href={path}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="hover:text-primary-container hover:underline"
+                >
+                  {path}
+                </a>
+              ) : (
+                path
+              )}
+            </span>
+          );
+        },
+      },
+      {
         header: "Tanggal",
         accessor: "document_date" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
@@ -250,6 +286,11 @@ export default function DocumentsPage() {
   const isLastPage = meta.current_page >= meta.last_page;
   const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
   const to = Math.min(meta.current_page * meta.per_page, meta.total);
+
+  const emptyMessage =
+    query.q || query.category
+      ? "Tidak ada dokumen yang sesuai dengan pencarian atau filter."
+      : "Belum ada dokumen.";
 
   return (
     <PageContainer className="py-6">
@@ -307,7 +348,7 @@ export default function DocumentsPage() {
                 </div>
               ) : data.length === 0 ? (
                 <div className="py-10 text-center text-sm text-slate-500">
-                  Belum ada dokumen.
+                  {emptyMessage}
                 </div>
               ) : (
                 data.map((row) => (
@@ -321,6 +362,11 @@ export default function DocumentsPage() {
                         <p className="mt-0.5 text-xs text-on-surface-variant">
                           {row.document_number ?? "-"}
                         </p>
+                        {row.file_path && (
+                          <p className="mt-0.5 truncate text-xs text-on-surface-variant">
+                            File: {row.file_path}
+                          </p>
+                        )}
                         <p className="mt-0.5 text-xs text-on-surface-variant">
                           {row.document_date ? formatDate(row.document_date) : "-"}
                         </p>
@@ -355,7 +401,7 @@ export default function DocumentsPage() {
                 columns={columns}
                 data={data}
                 loading={loading}
-                emptyMessage="Belum ada dokumen."
+                emptyMessage={emptyMessage}
               />
             </div>
           </>
