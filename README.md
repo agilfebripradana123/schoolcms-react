@@ -91,6 +91,15 @@ Each feature module contains:
 - hooks/       # Hook khusus fitur
 - types/       # Tipe data fitur
 
+## Backend API
+Proyek ini menggunakan Backend API Laravel yang berada di repository terpisah:
+
+- **Repository**: [schoolcms-laravel](https://github.com/agilfebripradana123/schoolcms-laravel)
+- **Framework**: Laravel (PHP)
+- **API**: RESTful API dengan Laravel Sanctum untuk autentikasi
+- **Database**: MySQL
+- **Penggunaan API**: Frontend React terhubung ke API backend melalui Axios dengan endpoint yang telah ditentukan di file konfigurasi lingkungan `.env`
+
 ## Kontribusi
 
 1. **Fork** repositori
