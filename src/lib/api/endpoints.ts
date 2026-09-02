@@ -73,6 +73,7 @@ export const FACILITIES = {
 export const ADMINISTRATION = {
   INCOMING_LETTERS: "/incoming-letters",
   OUTGOING_LETTERS: "/outgoing-letters",
+  DOCUMENTS: "/documents",
   DISPOSITIONS: "/dispositions",
 } as const;
 

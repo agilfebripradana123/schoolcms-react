@@ -51,11 +51,22 @@ import {
   AssetsPage,
   MaintenancesPage,
   InventoryPage,
+  IncomingLettersPage,
+  OutgoingLettersPage,
+  DocumentsPage,
+  DispositionsPage,
   CounselingsPage,
   ExtracurricularsPage,
   AchievementsPage,
   ViolationsPage,
 } from "./lazy-pages";
+
+const developmentModules = [
+  { path: "counseling", title: "Bimbingan & Konseling" },
+  { path: "extracurricular", title: "Ekstrakurikuler" },
+  { path: "achievements", title: "Prestasi" },
+  { path: "violations", title: "Pelanggaran" },
+];
 
 const adminModules = [
   { path: "incoming", title: "Surat Masuk" },
@@ -155,6 +166,14 @@ const router = createBrowserRouter([
           { path: "facilities/assets", element: <AssetsPage /> },
           { path: "facilities/maintenance", element: <MaintenancesPage /> },
           { path: "facilities/inventory", element: <InventoryPage /> },
+          { path: "administration/incoming", element: <IncomingLettersPage /> },
+          { path: "administration/outgoing", element: <OutgoingLettersPage /> },
+          { path: "administration/documents", element: <DocumentsPage /> },
+          { path: "administration/dispositions", element: <DispositionsPage /> },
+          { path: "development/counseling", element: <CounselingsPage /> },
+          { path: "development/extracurricular", element: <ExtracurricularsPage /> },
+          { path: "development/achievements", element: <AchievementsPage /> },
+          { path: "development/violations", element: <ViolationsPage /> },
           {
             element: <RoleRoute allow={["admin", "administrator"]} />,
             children: [
@@ -164,10 +183,7 @@ const router = createBrowserRouter([
               { path: "ppdb/export-dapodik", element: <ExportDapodikPage /> },
             ],
           },
-          { path: "development/counseling", element: <CounselingsPage /> },
-          { path: "development/extracurricular", element: <ExtracurricularsPage /> },
-          { path: "development/achievements", element: <AchievementsPage /> },
-          { path: "development/violations", element: <ViolationsPage /> },
+          ...createModuleRoutes("/development", "Student Development", developmentModules),
           ...createModuleRoutes("/administration", "Administration", adminModules),
           ...createModuleRoutes("/communication", "Communication", communicationModules),
           ...createModuleRoutes("/reports", "Reports", reportModules),
