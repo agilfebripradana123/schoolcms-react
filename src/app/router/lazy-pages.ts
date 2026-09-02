@@ -65,6 +65,22 @@ export const AnnouncementsPage = lazy(() => import("@/features/communication/pag
 export const NotificationsPage = lazy(() => import("@/features/communication/pages/NotificationsPage"));
 export const CalendarPage = lazy(() => import("@/features/communication/pages/CalendarPage"));
 
+export const StudentPortalPage = lazy(() => import("@/features/students/pages/StudentPortalPage"));
+export const StudentProfilePage = lazy(() => import("@/features/students/pages/StudentProfilePage"));
+export const StudentGradesPage = lazy(() => import("@/features/students/pages/StudentGradesPage"));
+export const StudentSchedulePage = lazy(() => import("@/features/students/pages/StudentSchedulePage"));
+export const StudentAttendancePage = lazy(() => import("@/features/students/pages/StudentAttendancePage"));
+export const StudentFinanceSummaryPage = lazy(() => import("@/features/students/pages/StudentFinanceSummaryPage"));
+export const StudentBillingsPage = lazy(() => import("@/features/students/pages/StudentBillingsPage"));
+export const StudentPaymentsPage = lazy(() => import("@/features/students/pages/StudentPaymentsPage"));
+export const StudentTransactionsPage = lazy(() => import("@/features/students/pages/StudentTransactionsPage"));
+export const StudentScholarshipsPage = lazy(() => import("@/features/students/pages/StudentScholarshipsPage"));
+export const StudentAssignmentsPage = lazy(() => import("@/features/students/pages/StudentAssignmentsPage"));
+export const StudentExamsPage = lazy(() => import("@/features/students/pages/StudentExamsPage"));
+export const StudentAchievementsPage = lazy(() => import("@/features/students/pages/StudentAchievementsPage"));
+export const StudentViolationsPage = lazy(() => import("@/features/students/pages/StudentViolationsPage"));
+export const StudentExtracurricularPage = lazy(() => import("@/features/students/pages/StudentExtracurricularPage"));
+export const StudentNotificationsPage = lazy(() => import("@/features/students/pages/StudentNotificationsPage"));
 export const AcademicReportsPage = lazy(() => import("@/features/reports/pages/AcademicReportsPage"));
 export const StudentReportsPage = lazy(() => import("@/features/reports/pages/StudentReportsPage"));
 export const TeacherReportsPage = lazy(() => import("@/features/reports/pages/TeacherReportsPage"));
