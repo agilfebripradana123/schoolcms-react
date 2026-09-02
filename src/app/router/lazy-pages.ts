@@ -55,3 +55,8 @@ export const IncomingLettersPage = lazy(() => import("@/features/administration/
 export const OutgoingLettersPage = lazy(() => import("@/features/administration/pages/OutgoingLettersPage"));
 export const DocumentsPage = lazy(() => import("@/features/administration/pages/DocumentsPage"));
 export const DispositionsPage = lazy(() => import("@/features/administration/pages/DispositionsPage"));
+
+export const CounselingsPage = lazy(() => import("@/features/studentship/pages/CounselingsPage"));
+export const ExtracurricularsPage = lazy(() => import("@/features/studentship/pages/ExtracurricularsPage"));
+export const AchievementsPage = lazy(() => import("@/features/studentship/pages/AchievementsPage"));
+export const ViolationsPage = lazy(() => import("@/features/studentship/pages/ViolationsPage"));

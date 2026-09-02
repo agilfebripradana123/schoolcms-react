@@ -1,0 +1,1 @@
+export { extracurricularService } from "@/features/development/api/extracurricular.service";
