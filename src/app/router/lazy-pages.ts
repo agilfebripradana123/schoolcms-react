@@ -64,3 +64,10 @@ export const ViolationsPage = lazy(() => import("@/features/studentship/pages/Vi
 export const AnnouncementsPage = lazy(() => import("@/features/communication/pages/AnnouncementsPage"));
 export const NotificationsPage = lazy(() => import("@/features/communication/pages/NotificationsPage"));
 export const CalendarPage = lazy(() => import("@/features/communication/pages/CalendarPage"));
+
+export const AcademicReportsPage = lazy(() => import("@/features/reports/pages/AcademicReportsPage"));
+export const StudentReportsPage = lazy(() => import("@/features/reports/pages/StudentReportsPage"));
+export const TeacherReportsPage = lazy(() => import("@/features/reports/pages/TeacherReportsPage"));
+export const FinanceReportsPage = lazy(() => import("@/features/reports/pages/FinanceReportsPage"));
+export const AttendanceReportsPage = lazy(() => import("@/features/reports/pages/AttendanceReportsPage"));
+export const InventoryReportsPage = lazy(() => import("@/features/reports/pages/InventoryReportsPage"));
