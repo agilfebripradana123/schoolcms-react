@@ -3,14 +3,17 @@ import { SYSTEM } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateUserPayload,
-  SystemListParams,
+  SystemPaginatedResponse,
   UpdateUserPayload,
+  UserListParams,
   UserManagement,
 } from "./types";
 
 export const userManagementService = {
-  async list(params?: SystemListParams): Promise<ApiEnvelope<UserManagement[]>> {
-    return api.get<ApiEnvelope<UserManagement[]>>(SYSTEM.USERS, params);
+  async list(
+    params?: UserListParams,
+  ): Promise<SystemPaginatedResponse<UserManagement>> {
+    return api.get<SystemPaginatedResponse<UserManagement>>(SYSTEM.USERS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<UserManagement>> {

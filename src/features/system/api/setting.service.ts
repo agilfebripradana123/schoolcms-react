@@ -4,13 +4,16 @@ import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateSettingPayload,
   Setting,
-  SystemListParams,
+  SettingListParams,
+  SystemPaginatedResponse,
   UpdateSettingPayload,
 } from "./types";
 
 export const settingService = {
-  async list(params?: SystemListParams): Promise<ApiEnvelope<Setting[]>> {
-    return api.get<ApiEnvelope<Setting[]>>(SYSTEM.SETTINGS, params);
+  async list(
+    params?: SettingListParams,
+  ): Promise<SystemPaginatedResponse<Setting>> {
+    return api.get<SystemPaginatedResponse<Setting>>(SYSTEM.SETTINGS, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Setting>> {

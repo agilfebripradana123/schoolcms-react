@@ -84,6 +84,11 @@ import {
   StudentViolationsPage,
   StudentExtracurricularPage,
   StudentNotificationsPage,
+  UsersPage,
+  RolesPage,
+  PermissionsPage,
+  AuditLogsPage,
+  SettingsPage,
   AcademicReportsPage,
   StudentReportsPage,
   TeacherReportsPage,
@@ -91,25 +96,6 @@ import {
   AttendanceReportsPage,
   InventoryReportsPage,
 } from "./lazy-pages";
-
-const systemModules = [
-  { path: "roles", title: "Peran" },
-  { path: "permissions", title: "Hak Akses" },
-  { path: "users", title: "Pengguna" },
-  { path: "audit-logs", title: "Log Aktivitas" },
-  { path: "settings", title: "Pengaturan" },
-];
-
-function createModuleRoutes(
-  basePath: string,
-  domain: string,
-  modules: Array<{ path: string; title: string }>,
-) {
-  return modules.map((mod) => ({
-    path: mod.path ? `${basePath}/${mod.path}` : basePath,
-    element: <ModulePlaceholder title={mod.title} domain={domain} />,
-  }));
-}
 
 const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
@@ -199,7 +185,11 @@ const router = createBrowserRouter([
               { path: "reports/attendance", element: <AttendanceReportsPage /> },
               { path: "reports/inventory", element: <InventoryReportsPage /> },
 
-              ...createModuleRoutes("system", "System", systemModules),
+              { path: "system/roles", element: <RolesPage /> },
+              { path: "system/permissions", element: <PermissionsPage /> },
+              { path: "system/users", element: <UsersPage /> },
+              { path: "system/audit-logs", element: <AuditLogsPage /> },
+              { path: "system/settings", element: <SettingsPage /> },
             ],
           },
         ],

@@ -4,13 +4,15 @@ import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateRolePayload,
   Role,
-  SystemListParams,
+  RoleListParams,
+  SyncRolePermissionsPayload,
+  SystemPaginatedResponse,
   UpdateRolePayload,
 } from "./types";
 
 export const roleService = {
-  async list(params?: SystemListParams): Promise<ApiEnvelope<Role[]>> {
-    return api.get<ApiEnvelope<Role[]>>(SYSTEM.ROLES, params);
+  async list(params?: RoleListParams): Promise<SystemPaginatedResponse<Role>> {
+    return api.get<SystemPaginatedResponse<Role>>(SYSTEM.ROLES, params);
   },
 
   async get(id: number | string): Promise<ApiEnvelope<Role>> {
@@ -34,11 +36,11 @@ export const roleService = {
 
   async syncPermissions(
     id: number | string,
-    permissionIds: number[],
+    payload: SyncRolePermissionsPayload,
   ): Promise<ApiEnvelope<Role>> {
     return api.post<ApiEnvelope<Role>>(
       SYSTEM.ROLES_PERMISSIONS.replace("{id}", String(id)),
-      { permission_ids: permissionIds },
+      payload,
     );
   },
 };
