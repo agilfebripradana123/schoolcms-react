@@ -264,8 +264,8 @@ export default function DocumentsPage() {
       />
 
       <Card>
-        <div className="mb-4 flex flex-col gap-3 md:flex-row md:flex-wrap md:items-end">
-          <div className="flex flex-1 flex-col gap-1 md:min-w-[200px] md:flex-1">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between md:items-end *:sm:gap-3">
+          <div className="w-full sm:max-w-xs">
             <Search
               value={searchInput}
               onChange={setSearchInput}
@@ -273,7 +273,7 @@ export default function DocumentsPage() {
             />
           </div>
 
-          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface md:min-w-[200px] md:flex-1">
+          <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
             <span className="whitespace-nowrap">Kategori</span>
             <AppSelect
               options={CATEGORY_FILTER_OPTIONS}
