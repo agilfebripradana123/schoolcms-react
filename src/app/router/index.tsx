@@ -59,6 +59,9 @@ import {
   ExtracurricularsPage,
   AchievementsPage,
   ViolationsPage,
+  AnnouncementsPage,
+  NotificationsPage,
+  CalendarPage,
 } from "./lazy-pages";
 
 const developmentModules = [
@@ -66,12 +69,6 @@ const developmentModules = [
   { path: "extracurricular", title: "Ekstrakurikuler" },
   { path: "achievements", title: "Prestasi" },
   { path: "violations", title: "Pelanggaran" },
-];
-
-const communicationModules = [
-  { path: "announcements", title: "Pengumuman" },
-  { path: "notifications", title: "Notifikasi" },
-  { path: "calendar", title: "Kalender" },
 ];
 
 const reportModules = [
@@ -167,6 +164,9 @@ const router = createBrowserRouter([
           { path: "development/extracurricular", element: <ExtracurricularsPage /> },
           { path: "development/achievements", element: <AchievementsPage /> },
           { path: "development/violations", element: <ViolationsPage /> },
+          { path: "communication/announcements", element: <AnnouncementsPage /> },
+          { path: "communication/notifications", element: <NotificationsPage /> },
+          { path: "communication/calendar", element: <CalendarPage /> },
           {
             element: <RoleRoute allow={["admin", "administrator"]} />,
             children: [
@@ -177,7 +177,6 @@ const router = createBrowserRouter([
             ],
           },
           ...createModuleRoutes("/development", "Student Development", developmentModules),
-          ...createModuleRoutes("/communication", "Communication", communicationModules),
           ...createModuleRoutes("/reports", "Reports", reportModules),
           ...createModuleRoutes("/system", "System", systemModules),
         ],

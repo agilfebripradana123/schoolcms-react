@@ -60,3 +60,7 @@ export const CounselingsPage = lazy(() => import("@/features/studentship/pages/C
 export const ExtracurricularsPage = lazy(() => import("@/features/studentship/pages/ExtracurricularsPage"));
 export const AchievementsPage = lazy(() => import("@/features/studentship/pages/AchievementsPage"));
 export const ViolationsPage = lazy(() => import("@/features/studentship/pages/ViolationsPage"));
+
+export const AnnouncementsPage = lazy(() => import("@/features/communication/pages/AnnouncementsPage"));
+export const NotificationsPage = lazy(() => import("@/features/communication/pages/NotificationsPage"));
+export const CalendarPage = lazy(() => import("@/features/communication/pages/CalendarPage"));
