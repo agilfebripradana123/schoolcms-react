@@ -37,6 +37,17 @@ export const STUDENTS = {
   GRADES: "/student/grades",
   SCHEDULES: "/student/schedules",
   ATTENDANCE: "/student/attendance",
+  ASSIGNMENTS: "/student/assignments",
+  EXAMS: "/student/exams",
+  EXAM_SESSIONS: "/student/exam-sessions",
+  EXAM_SCHEDULES: "/student/exam-schedules",
+  EXAM_INSTRUCTIONS: "/student/exam-instructions",
+  EXAM_PARTICIPANTS: "/student/exam-participants",
+  EXAM_RESULTS: "/student/exam-results",
+  EXAM_ANSWERS: "/student/exam-answers",
+  ACHIEVEMENTS: "/student/achievements",
+  VIOLATIONS: "/student/violations",
+  EXTRACURRICULARS: "/student/extracurriculars",
 } as const;
 
 export const STAFF = {
