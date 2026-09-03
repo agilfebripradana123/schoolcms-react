@@ -14,8 +14,7 @@ import StudentLayout from "@/features/students/components/StudentLayout";
 import GuruLayout from "@/features/students/components/GuruLayout";
 import {
   AcademicYearPage,
-  SemesterPage,
-  CurriculumPage,
+  SemesterPage,  CurriculumPage,
   SubjectsPage,
   ClassesPage,
   ClassSubjectsPage,
@@ -103,6 +102,8 @@ import {
   FinanceReportsPage,
   AttendanceReportsPage,
   InventoryReportsPage,
+  ProfilePage,
+  AppNotificationsPage,
 } from "./lazy-pages";
 
 const router = createBrowserRouter([
@@ -206,6 +207,48 @@ const router = createBrowserRouter([
               { path: "system/settings/security", element: <SettingsSecurityPage /> },
               { path: "system/settings/backup", element: <SettingsBackupPage /> },
               { path: "system/settings/appearance", element: <SettingsAppearancePage /> },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  // =========================
+  // PROFILE (/profile) — authenticated, admin layout
+  // =========================
+  {
+    path: "/profile",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <AdminRoute />,
+        children: [
+          {
+            element: <AppLayout />,
+            children: [
+              { index: true, element: <ProfilePage /> },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  // =========================
+  // NOTIFICATIONS (/notifications) — authenticated, admin layout
+  // =========================
+  {
+    path: "/notifications",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        element: <AdminRoute />,
+        children: [
+          {
+            element: <AppLayout />,
+            children: [
+              { index: true, element: <AppNotificationsPage /> },
             ],
           },
         ],

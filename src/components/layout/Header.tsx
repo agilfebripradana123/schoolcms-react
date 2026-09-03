@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { LogOut, User, Settings, Bell } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { useAuth } from "@/features/auth/useAuth";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
+import NotificationBell from "@/features/notifications/NotificationBell";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -86,13 +87,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="rounded-2xl border border-slate-200 bg-white p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
-            aria-label="Notifikasi"
-          >
-            <Bell className="h-5 w-5" />
-          </button>
+          <NotificationBell />
 
           <div className="relative" ref={menuRef}>
             <button
@@ -129,20 +124,16 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                 <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">
                   Akun
                 </div>
-                <a
-                  href="#profile"
-                  onClick={closeUserMenu}
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low"
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeUserMenu();
+                    navigate("/profile");
+                  }}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low"
                 >
                   <User className="h-4 w-4" /> Profil
-                </a>
-                <a
-                  href="#settings"
-                  onClick={closeUserMenu}
-                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-on-surface-variant hover:bg-surface-container-low"
-                >
-                  <Settings className="h-4 w-4" /> Pengaturan
-                </a>
+                </button>
                 <button
                   type="button"
                   onClick={() => setLogoutOpen(true)}

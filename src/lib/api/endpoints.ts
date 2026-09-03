@@ -4,6 +4,11 @@ export const AUTH = {
   LOGOUT: "/logout",
 } as const;
 
+export const PROFILE = {
+  PROFILE: "/profile",
+  PASSWORD: "/profile/password",
+} as const;
+
 export const ACADEMIC = {
   ACADEMIC_YEARS: "/academic-years",
   SEMESTERS: "/semesters",
@@ -82,6 +87,13 @@ export const COMMUNICATION = {
   NOTIFICATIONS: "/notifications",
   NOTIFICATIONS_MY: "/notifications/my",
   CALENDARS: "/calendars",
+} as const;
+
+export const NOTIFICATION = {
+  MY: "/notifications/my",
+  UNREAD_COUNT: "/notifications/unread-count",
+  READ: "/notifications/{id}/read",
+  READ_ALL: "/notifications/read-all",
 } as const;
 
 export const EXAMINATION = {
