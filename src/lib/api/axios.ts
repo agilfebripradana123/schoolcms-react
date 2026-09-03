@@ -19,6 +19,11 @@ apiClient.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    // ponytail: FormData needs browser boundary, not application/json
+    if (config.data instanceof FormData && config.headers) {
+      delete (config.headers as Record<string, unknown>)["Content-Type"];
+      delete (config.headers as Record<string, unknown>)["content-type"];
+    }
     return config;
   },
   (error: AxiosError) => Promise.reject(error),
