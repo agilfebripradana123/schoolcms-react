@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Loader2, Calendar, Bell, AlertTriangle, CheckCircle } from "lucide-react";
+import { Loader2, Calendar, Bell, CheckCircle, AlertTriangle } from "lucide-react";
 import { api } from "@/lib/api";
 import { toApiError } from "@/lib/api/error";
+import Card, { CardBody, CardHeader } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 
 interface StudentProfile {
   id: number;
@@ -60,96 +62,92 @@ export default function StudentPortalPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-        <AlertTriangle className="mx-auto h-8 w-8 text-red-500" />
-        <p className="mt-2 text-sm text-red-700">Gagal memuat data: {error}</p>
-      </div>
+      <Card className="border-red-200 bg-red-50">
+        <CardBody>
+          <AlertTriangle className="mx-auto h-8 w-8 text-red-500" />
+          <p className="mt-2 text-sm text-red-700">Gagal memuat data: {error}</p>
+        </CardBody>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
-          <span className="text-xl font-bold">
-            {profile?.name?.charAt(0).toUpperCase() || "S"}
-          </span>
+      <Card>
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white">
+            <span className="text-xl font-bold">
+              {profile?.name?.charAt(0).toUpperCase() || "S"}
+            </span>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">
+              Selamat datang, {profile?.name || "Siswa"} 👋
+            </h1>
+            <p className="text-sm text-slate-500">
+              {profile?.nisn ? `NISN: ${profile.nisn}` : ""}
+              {profile?.nis && profile.nisn ? " · " : ""}
+              {profile?.nis ? `NIS: ${profile.nis}` : ""}
+              {profile?.class_name ? ` · Kelas ${profile.class_name}` : ""}
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Selamat datang, {profile?.name || "Siswa"} 👋
-          </h1>
-          <p className="text-sm text-slate-500">
-            {profile?.nisn ? `NISN: ${profile.nisn}` : ""}
-            {profile?.nis && profile.nisn ? " · " : ""}
-            {profile?.nis ? `NIS: ${profile.nis}` : ""}
-            {profile?.class_name ? ` · Kelas ${profile.class_name}` : ""}
-          </p>
-        </div>
-      </div>
+      </Card>
 
-      {/* Summary cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Profil
-          </p>
-          <p className="mt-1 text-sm font-semibold text-slate-900">
-            {profile ? "Tersedia" : "-"}
-          </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Tagihan
-          </p>
-          <p className="mt-1 text-lg font-bold text-slate-900">
-            {formatRupiah(totals?.total_billed)}
-          </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Dibayar
-          </p>
-          <p className="mt-1 text-lg font-bold text-emerald-600">
-            {formatRupiah(totals?.total_paid)}
-          </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Sisa
-          </p>
-          <p className="mt-1 text-lg font-bold text-rose-600">
-            {formatRupiah(totals?.total_outstanding)}
-          </p>
-        </div>
+        <Card>
+          <CardHeader title="Tagihan" />
+          <CardBody>
+            <p className="text-lg font-bold text-slate-900">
+              {formatRupiah(totals?.total_billed)}
+            </p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader title="Dibayar" />
+          <CardBody>
+            <p className="text-lg font-bold text-emerald-600">
+              {formatRupiah(totals?.total_paid)}
+            </p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader title="Sisa" />
+          <CardBody>
+            <p className="text-lg font-bold text-rose-600">
+              {formatRupiah(totals?.total_outstanding)}
+            </p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardHeader title="Profil" />
+          <CardBody>
+            <Badge variant="primary">Tersedia</Badge>
+          </CardBody>
+        </Card>
       </div>
 
-      {/* Quick links */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <Calendar className="h-6 w-6 text-primary" />
-          <p className="mt-2 text-sm font-semibold text-slate-900">Akademik</p>
-          <p className="text-xs text-slate-500">Nilai, jadwal, kehadiran</p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <Bell className="h-6 w-6 text-primary" />
-          <p className="mt-2 text-sm font-semibold text-slate-900">Notifikasi</p>
-          <p className="text-xs text-slate-500">Pemberitahuan sekolah</p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <CheckCircle className="h-6 w-6 text-primary" />
-          <p className="mt-2 text-sm font-semibold text-slate-900">Keuangan</p>
-          <p className="text-xs text-slate-500">Tagihan & pembayaran</p>
-        </div>
+        <Card>
+          <Calendar className="h-6 w-6 text-indigo-500" />
+          <CardHeader title="Akademik" description="Nilai, jadwal, kehadiran" />
+        </Card>
+        <Card>
+          <Bell className="h-6 w-6 text-indigo-500" />
+          <CardHeader title="Notifikasi" description="Pemberitahuan sekolah" />
+        </Card>
+        <Card>
+          <CheckCircle className="h-6 w-6 text-indigo-500" />
+          <CardHeader title="Keuangan" description="Tagihan & pembayaran" />
+        </Card>
       </div>
     </div>
   );
