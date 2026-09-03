@@ -1,5 +1,8 @@
 import { lazy } from "react";
 
+export const ProfilePage = lazy(() => import("@/features/profile/pages/ProfilePage"));
+export const AppNotificationsPage = lazy(() => import("@/features/notifications/pages/NotificationsPage"));
+
 export const AcademicYearPage = lazy(() => import("@/features/academic/pages/AcademicYearPage"));
 export const SemesterPage = lazy(() => import("@/features/academic/pages/SemesterPage"));
 export const CurriculumPage = lazy(() => import("@/features/academic/pages/CurriculumPage"));
