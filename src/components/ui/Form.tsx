@@ -34,7 +34,7 @@ export function FormField({
   return (
     <div className={className}>
       {label && (
-        <label className="mb-1.5 block text-sm font-semibold text-on-surface">
+        <label className="mb-1.5 block text-sm text-on-surface">
           {label}
           {required && <span className="ml-0.5 text-error">*</span>}
         </label>

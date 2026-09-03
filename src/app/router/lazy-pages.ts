@@ -1,5 +1,8 @@
 import { lazy } from "react";
 
+export const ProfilePage = lazy(() => import("@/features/profile/pages/ProfilePage"));
+export const AppNotificationsPage = lazy(() => import("@/features/notifications/pages/NotificationsPage"));
+
 export const AcademicYearPage = lazy(() => import("@/features/academic/pages/AcademicYearPage"));
 export const SemesterPage = lazy(() => import("@/features/academic/pages/SemesterPage"));
 export const CurriculumPage = lazy(() => import("@/features/academic/pages/CurriculumPage"));
@@ -64,3 +67,41 @@ export const ViolationsPage = lazy(() => import("@/features/studentship/pages/Vi
 export const AnnouncementsPage = lazy(() => import("@/features/communication/pages/AnnouncementsPage"));
 export const NotificationsPage = lazy(() => import("@/features/communication/pages/NotificationsPage"));
 export const CalendarPage = lazy(() => import("@/features/communication/pages/CalendarPage"));
+
+export const StudentPortalPage = lazy(() => import("@/features/students/pages/StudentPortalPage"));
+export const StudentProfilePage = lazy(() => import("@/features/students/pages/StudentProfilePage"));
+export const StudentGradesPage = lazy(() => import("@/features/students/pages/StudentGradesPage"));
+export const StudentSchedulePage = lazy(() => import("@/features/students/pages/StudentSchedulePage"));
+export const StudentAttendancePage = lazy(() => import("@/features/students/pages/StudentAttendancePage"));
+export const StudentFinanceSummaryPage = lazy(() => import("@/features/students/pages/StudentFinanceSummaryPage"));
+export const StudentBillingsPage = lazy(() => import("@/features/students/pages/StudentBillingsPage"));
+export const StudentPaymentsPage = lazy(() => import("@/features/students/pages/StudentPaymentsPage"));
+export const StudentTransactionsPage = lazy(() => import("@/features/students/pages/StudentTransactionsPage"));
+export const StudentScholarshipsPage = lazy(() => import("@/features/students/pages/StudentScholarshipsPage"));
+export const StudentAssignmentsPage = lazy(() => import("@/features/students/pages/StudentAssignmentsPage"));
+export const StudentExamsPage = lazy(() => import("@/features/students/pages/StudentExamsPage"));
+export const StudentAchievementsPage = lazy(() => import("@/features/students/pages/StudentAchievementsPage"));
+export const StudentViolationsPage = lazy(() => import("@/features/students/pages/StudentViolationsPage"));
+export const StudentExtracurricularPage = lazy(() => import("@/features/students/pages/StudentExtracurricularPage"));
+export const StudentNotificationsPage = lazy(() => import("@/features/students/pages/StudentNotificationsPage"));
+export const UsersPage = lazy(() => import("@/features/system/pages/UsersPage"));
+export const RolesPage = lazy(() => import("@/features/system/pages/RolesPage"));
+export const PermissionsPage = lazy(() => import("@/features/system/pages/PermissionsPage"));
+export const AuditLogsPage = lazy(() => import("@/features/system/pages/AuditLogsPage"));
+export const SettingsPage = lazy(() => import("@/features/system/pages/SettingsPage"));
+
+export const SettingsGeneralPage = lazy(() => import("@/features/system/pages/settings/SettingsGeneralPage"));
+export const SettingsNotificationsPage = lazy(() => import("@/features/system/pages/settings/SettingsNotificationsPage"));
+export const SettingsEmailPage = lazy(() => import("@/features/system/pages/settings/SettingsEmailPage"));
+export const SettingsWhatsAppPage = lazy(() => import("@/features/system/pages/settings/SettingsWhatsAppPage"));
+export const SettingsPaymentPage = lazy(() => import("@/features/system/pages/settings/SettingsPaymentPage"));
+export const SettingsSecurityPage = lazy(() => import("@/features/system/pages/settings/SettingsSecurityPage"));
+export const SettingsBackupPage = lazy(() => import("@/features/system/pages/settings/SettingsBackupPage"));
+export const SettingsAppearancePage = lazy(() => import("@/features/system/pages/settings/SettingsAppearancePage"));
+
+export const AcademicReportsPage = lazy(() => import("@/features/reports/pages/AcademicReportsPage"));
+export const StudentReportsPage = lazy(() => import("@/features/reports/pages/StudentReportsPage"));
+export const TeacherReportsPage = lazy(() => import("@/features/reports/pages/TeacherReportsPage"));
+export const FinanceReportsPage = lazy(() => import("@/features/reports/pages/FinanceReportsPage"));
+export const AttendanceReportsPage = lazy(() => import("@/features/reports/pages/AttendanceReportsPage"));
+export const InventoryReportsPage = lazy(() => import("@/features/reports/pages/InventoryReportsPage"));

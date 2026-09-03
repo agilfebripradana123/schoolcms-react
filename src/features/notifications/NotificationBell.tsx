@@ -143,7 +143,9 @@ export default function NotificationBell() {
               type="button"
               onClick={() => {
                 setOpen(false);
+
                 navigate("/admin/communication/notifications");
+
               }}
               className="text-xs font-medium text-primary-container hover:underline"
             >
