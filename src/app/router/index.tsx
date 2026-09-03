@@ -24,6 +24,8 @@ import TeacherMyAssignmentsPage from "@/portal/teacher/pages/TeacherAssignmentsP
 import TeacherExamsPage from "@/portal/teacher/pages/TeacherExamsPage";
 import TeacherExamSchedulesPage from "@/portal/teacher/pages/TeacherExamSchedulesPage";
 import TeacherExamResultsPage from "@/portal/teacher/pages/TeacherExamResultsPage";
+import TeacherExamMonitoringPage from "@/portal/teacher/pages/TeacherExamMonitoringPage";
+import TeacherExamMonitoringDetailPage from "@/portal/teacher/pages/TeacherExamMonitoringDetailPage";
 import { NotificationsPage } from "@/features/notifications";
 import {
   AcademicYearPage,
@@ -319,6 +321,13 @@ const router = createBrowserRouter([
                 element: <PermissionRoute permission="view-exam-results" />,
                 children: [
                   { path: "examinations/results", element: <TeacherExamResultsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-exam-monitoring" />,
+                children: [
+                  { path: "exams/monitoring", element: <TeacherExamMonitoringPage /> },
+                  { path: "exams/monitoring/:attemptId", element: <TeacherExamMonitoringDetailPage /> },
                 ],
               },
               {
