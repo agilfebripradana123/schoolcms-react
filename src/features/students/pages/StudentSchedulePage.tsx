@@ -1,21 +1,24 @@
-﻿import { useEffect, useMemo, useState } from "react";
-import { Loader2, Calendar } from "lucide-react";
+﻿import { useCallback, useEffect, useState } from "react";
+import { Clock, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { STUDENTS } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import Card, { CardBody } from "@/components/ui/Card";
+import DataTable from "@/components/ui/DataTable";
+import Badge from "@/components/ui/Badge";
 
 interface Schedule {
   id: number;
   day: string;
-  start_time: string;
-  end_time: string;
+  start_time: string | null;
+  end_time: string | null;
   subject_name: string;
   teacher_name: string | null;
   room_name: string | null;
 }
-
-const DAYS_ID = ["senin", "selasa", "rabu", "kamis", "jumat", "sabtu"];
 
 const DAY_LABELS: Record<string, string> = {
   senin: "Senin",
@@ -28,22 +31,19 @@ const DAY_LABELS: Record<string, string> = {
 
 export default function StudentSchedulePage() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [selectedDay, setSelectedDay] = useState<string>("semua");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDay, setSelectedDay] = useState<string>("semua");
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
-      const params: { day?: string } = {};
-      if (selectedDay !== "semua") {
-        params.day = selectedDay;
-      }
-
+      const params: { day?: string; semester_id?: number } = {};
+      if (selectedDay !== "semua") params.day = selectedDay;
       const res = await api.get<{ success: boolean; data: Schedule[] }>(
         STUDENTS.SCHEDULES,
         params,
       );
-      setSchedules(res.data);
+      setSchedules(res.data ?? []);
     } catch (err) {
       const msg = toApiError(err).message;
       setError(msg);
@@ -51,130 +51,69 @@ export default function StudentSchedulePage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [selectedDay]);
 
   useEffect(() => {
     setLoading(true);
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDay]);
+  }, [load]);
 
-  const groupedSchedules = useMemo(() => {
-    const groups: Record<string, Schedule[]> = {};
-    schedules.forEach((s) => {
-      const day = s.day;
-      if (!groups[day]) groups[day] = [];
-      groups[day].push(s);
-    });
-    // Sort each group by start_time
-    Object.keys(groups).forEach((day) => {
-      groups[day].sort((a, b) => {
-        const aTime = a.start_time || "00:00";
-        const bTime = b.start_time || "00:00";
-        return aTime.localeCompare(bTime);
-      });
-    });
-    return groups;
-  }, [schedules]);
+  const dayOptions = ["senin", "selasa", "rabu", "kamis", "jumat", "sabtu"];
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-      </div>
-    );
-  }
+  const tableData = schedules.map((s) => ({
+    id: s.id,
+    day: DAY_LABELS[s.day] ?? s.day,
+    jam:
+      (s.start_time ?? "-") +
+      (s.end_time ? ` - ${s.end_time}` : ""),
+    subject_name: s.subject_name,
+    teacher_name: s.teacher_name ?? "-",
+    room_name: s.room_name ?? "-",
+  }));
 
-  if (error) {
-    return (
-      <div className="rounded-xl border border-red-300 bg-red-50 p-6 text-red-600">
-        <p className="text-sm">{error}</p>
-      </div>
-    );
-  }
-
-  if (schedules.length === 0) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Jadwal Pelajaran</h1>
-          <p className="mt-1 text-sm text-slate-500">Jadwal pelajaran Anda</p>
-        </div>
-        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
-          <Calendar className="mx-auto h-10 w-10 text-slate-300" />
-          <p className="mt-3 text-sm text-slate-400">Belum ada jadwal.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Get sorted days to display
-  const displayDay = selectedDay === "semua" ? DAYS_ID : [selectedDay];
+  const columns = [
+    { header: "Hari", accessor: "day" as const, render: (v: unknown) => <Badge variant="secondary">{String(v)}</Badge> },
+    { header: "Jam", accessor: "jam" as const, render: (v: unknown) => <span className="flex items-center gap-1 text-slate-600"><Clock className="h-3 w-3" />{String(v)}</span> },
+    { header: "Mata Pelajaran", accessor: "subject_name" as const, render: (v: unknown) => <span className="font-medium text-slate-900">{String(v)}</span> },
+    { header: "Guru", accessor: "teacher_name" as const },
+    { header: "Ruangan", accessor: "room_name" as const },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Jadwal Pelajaran</h1>
-        <p className="mt-1 text-sm text-slate-500">Jadwal pelajaran Anda</p>
-      </div>
+    <PageContainer>
+      <PageHeader title="Jadwal" description="Jadwal pelajaran berdasarkan kelas Anda" />
 
-      {/* Filter */}
-      <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-slate-700">Hari:</label>
-        <select
-          value={selectedDay}
-          onChange={(e) => setSelectedDay(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-        >
-          <option value="semua">Semua Hari</option>
-          {DAYS_ID.map((d) => (
-            <option key={d} value={d}>
-              {DAY_LABELS[d]}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Card className="mb-6">
+        <CardBody className="flex flex-wrap items-center gap-3">
+          <Calendar className="h-4 w-4 text-slate-500" />
+          <label className="text-sm font-medium text-slate-700">Hari:</label>
+          <select
+            value={selectedDay}
+            onChange={(e) => setSelectedDay(e.target.value)}
+            className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          >
+            <option value="semua">Semua Hari</option>
+            {dayOptions.map((d) => (
+              <option key={d} value={d}>
+                {DAY_LABELS[d]}
+              </option>
+            ))}
+          </select>
+        </CardBody>
+      </Card>
 
-      {/* Schedule */}
-      <div className="space-y-4">
-        {displayDay
-          .filter((day) => (selectedDay === "semua" || day === selectedDay))
-          .map((day) => {
-            const daySchedules = groupedSchedules[day] || [];
-            if (daySchedules.length === 0) return null;
-
-            return (
-              <div key={day} className="rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 px-6 py-4">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                    {DAY_LABELS[day]}
-                  </h3>
-                </div>
-                <ul className="divide-y divide-slate-100">
-                  {daySchedules.map((item) => (
-                    <li key={item.id} className="flex items-center justify-between px-6 py-3">
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-slate-900">{item.subject_name}</p>
-                        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                          <span>
-                            <span className="font-medium">Jam:</span>{" "}
-                            {item.start_time ?? "-"} - {item.end_time ?? "-"}
-                          </span>
-                          {item.teacher_name && (
-                            <span>{item.teacher_name}</span>
-                          )}
-                          {item.room_name && (
-                            <span>Rm: {item.room_name}</span>
-                          )}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-      </div>
-    </div>
+      {error ? (
+        <Card>
+          <CardBody className="text-sm text-red-600">{error}</CardBody>
+        </Card>
+      ) : (
+        <DataTable
+          columns={columns}
+          data={tableData}
+          loading={loading}
+          emptyMessage="Belum ada jadwal untuk filter yang dipilih."
+        />
+      )}
+    </PageContainer>
   );
 }

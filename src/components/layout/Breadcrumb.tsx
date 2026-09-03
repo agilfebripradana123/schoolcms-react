@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { navigation } from "@/config/navigation";
+import { navigation, studentNavigation, studentDashboardItem } from "@/config/navigation";
 
 interface BreadcrumbSegment {
   label: string;
@@ -12,30 +12,35 @@ export default function Breadcrumb() {
   const location = useLocation();
 
   const segments = useMemo((): BreadcrumbSegment[] => {
-    if (location.pathname === "/dashboard" || location.pathname === "/") {
-      return [{ label: "Dasbor", path: "/dashboard", isLast: true }];
+    const p = location.pathname;
+    const isSiswa = p.startsWith("/siswa");
+    const basePath = isSiswa ? "/siswa" : "/dashboard";
+    const baseLabel = "Dasbor";
+
+    if (p === basePath || p === "/" || p === "/siswa") {
+      return [{ label: baseLabel, path: basePath, isLast: true }];
     }
 
-    const result: BreadcrumbSegment[] = [
-      { label: "Dasbor", path: "/dashboard", isLast: false },
-    ];
+    const result: BreadcrumbSegment[] = [{ label: baseLabel, path: basePath, isLast: false }];
 
-    for (const group of navigation) {
-      for (const item of group.items) {
-        if (
-          location.pathname === item.path ||
-          location.pathname.startsWith(item.path + "/")
-        ) {
-          result.push({
-            label: group.label,
-            path: "#",
-            isLast: false,
-          });
-          result.push({
-            label: item.label,
-            path: item.path,
-            isLast: true,
-          });
+    // dashboard item itself
+    if (p === studentDashboardItem.path) {
+      return [{ label: baseLabel, path: basePath, isLast: true }];
+    }
+
+    const nav = isSiswa ? studentNavigation : navigation;
+    for (const entry of nav) {
+      if ("items" in entry && entry.items) {
+        for (const item of entry.items) {
+          if (p === item.path || p.startsWith(item.path + "/")) {
+            result.push({ label: entry.label, path: "#", isLast: false });
+            result.push({ label: item.label, path: item.path, isLast: true });
+            return result;
+          }
+        }
+      } else if ("path" in entry) {
+        if (p === entry.path || p.startsWith(entry.path + "/")) {
+          result.push({ label: entry.label, path: entry.path, isLast: true });
           return result;
         }
       }

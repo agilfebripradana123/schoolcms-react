@@ -1,10 +1,15 @@
 ﻿import { useCallback, useEffect, useState } from "react";
-import { Loader2, BookOpen, Calendar, FileText, Users, BarChart3 } from "lucide-react";
+import { BookOpen, Calendar, FileText, Users, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { STUDENTS } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
 import { formatDate } from "@/lib/format";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import Card, { CardBody } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import DataTable from "@/components/ui/DataTable";
 
 interface ExamRow {
   id: number;
@@ -88,154 +93,147 @@ export default function StudentExamsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-      </div>
+      <PageContainer>
+        <PageHeader title="Ujian" description="Jadwal dan hasil ujian" />
+        <Card><CardBody><p className="text-sm text-slate-500">Memuat...</p></CardBody></Card>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-300 bg-red-50 p-6 text-red-600">
-        <p className="text-sm">{error}</p>
-      </div>
+      <PageContainer>
+        <PageHeader title="Ujian" description="Jadwal dan hasil ujian" />
+        <Card><CardBody className="text-sm text-red-600">{error}</CardBody></Card>
+      </PageContainer>
     );
   }
 
   if (exams.length === 0) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Ujian</h1>
-          <p className="mt-1 text-sm text-slate-500">Jadwal dan hasil ujian</p>
-        </div>
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
-          <BookOpen className="mx-auto h-10 w-10 text-slate-300" />
-          <p className="mt-3 text-sm text-slate-400">Belum ada ujian.</p>
-        </div>
-      </div>
+      <PageContainer>
+        <PageHeader title="Ujian" description="Jadwal dan hasil ujian" />
+        <Card>
+          <CardBody className="p-12 text-center">
+            <BookOpen className="mx-auto h-10 w-10 text-slate-300" />
+            <p className="mt-3 text-sm text-slate-400">Belum ada ujian.</p>
+          </CardBody>
+        </Card>
+      </PageContainer>
     );
   }
 
+  const scheduleData = schedules.map((s) => ({
+    id: s.id,
+    exam: s.exam?.title ?? `Ujian #${s.exam_id}`,
+    date: formatDate(s.exam_date),
+    time: `${s.start_time ?? "-"} - ${s.end_time ?? "-"}`,
+  }));
+
+  const scheduleColumns = [
+    { header: "Ujian", accessor: "exam" as const, render: (v: unknown) => <span className="font-medium text-slate-700">{String(v)}</span> },
+    { header: "Tanggal", accessor: "date" as const },
+    { header: "Waktu", accessor: "time" as const },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Ujian</h1>
-        <p className="mt-1 text-sm text-slate-500">Jadwal dan hasil ujian</p>
-      </div>
+    <PageContainer>
+      <PageHeader title="Ujian" description="Jadwal dan hasil ujian" />
 
-      {/* Exams */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <BookOpen className="h-5 w-5 text-indigo-500" />
-          <h2 className="text-sm font-semibold text-slate-700">Daftar Ujian</h2>
-        </div>
-        <div className="space-y-3">
-          {exams.map((e) => (
-            <div key={e.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <h3 className="font-semibold text-slate-900">{e.title}</h3>
-              <p className="mt-1 text-sm text-slate-600 line-clamp-2">{e.description ?? "-"}</p>
-              <div className="mt-2 flex flex-wrap gap-3 text-xs text-slate-500">
-                {e.subject?.name && <span>{e.subject.name}</span>}
-                {e.exam_date && <span>{formatDate(e.exam_date)}</span>}
-                {e.status && <span className="inline-flex rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">{e.status}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Card className="mb-6">
+        <CardBody>
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="h-5 w-5 text-indigo-500" />
+            <h2 className="text-sm font-semibold text-slate-700">Daftar Ujian</h2>
+          </div>
+          <div className="space-y-3">
+            {exams.map((e) => (
+              <Card key={e.id} className="bg-slate-50">
+                <CardBody>
+                  <h3 className="font-semibold text-slate-900">{e.title}</h3>
+                  <p className="mt-1 text-sm text-slate-600 line-clamp-2">{e.description ?? "-"}</p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
+                    {e.subject?.name && <Badge variant="secondary">{e.subject.name}</Badge>}
+                    {e.exam_date && <span>{formatDate(e.exam_date)}</span>}
+                    {e.status && <Badge variant="primary">{e.status}</Badge>}
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        </CardBody>
+      </Card>
 
-      {/* Schedules */}
       {schedules.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <Calendar className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Jadwal Ujian</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-slate-500">Ujian</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-slate-500">Tanggal</th>
-                  <th className="px-4 py-2 text-left text-xs font-semibold text-slate-500">Waktu</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {schedules.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 text-slate-700">{s.exam?.title ?? `Ujian #${s.exam_id}`}</td>
-                    <td className="px-4 py-3 text-slate-600">{formatDate(s.exam_date)}</td>
-                    <td className="px-4 py-3 text-slate-600">{s.start_time ?? "-"} - {s.end_time ?? "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <Card className="mb-6">
+          <CardBody>
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="h-5 w-5 text-indigo-500" />
+              <h2 className="text-sm font-semibold text-slate-700">Jadwal Ujian</h2>
+            </div>
+            <DataTable columns={scheduleColumns} data={scheduleData} />
+          </CardBody>
+        </Card>
       )}
 
-      {/* Instructions */}
       {instructions.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <FileText className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Instruksi Ujian</h2>
-          </div>
-          <div className="space-y-2">
-            {instructions.map((i) => (
-              <div key={i.id} className="rounded-lg border border-amber-100 bg-amber-50 p-3">
-                <p className="text-sm text-slate-700">{i.instruction}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card className="mb-6">
+          <CardBody>
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="h-5 w-5 text-indigo-500" />
+              <h2 className="text-sm font-semibold text-slate-700">Instruksi Ujian</h2>
+            </div>
+            <div className="space-y-2">
+              {instructions.map((i) => (
+                <Card key={i.id} className="bg-amber-50/50 border-amber-100">
+                  <CardBody><p className="text-sm text-slate-700">{i.instruction}</p></CardBody>
+                </Card>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
       )}
 
-      {/* Participants */}
       {participants.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Peserta Ujian (Anda)</h2>
-          </div>
-          <div className="space-y-2">
-            {participants.map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3">
-                <span className="text-sm text-slate-700">{p.exam?.title ?? `Ujian #${p.exam_id}`}</span>
-                <span className="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
-                  {p.status ?? "-"}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <Card className="mb-6">
+          <CardBody>
+            <div className="flex items-center gap-2 mb-4">
+              <Users className="h-5 w-5 text-indigo-500" />
+              <h2 className="text-sm font-semibold text-slate-700">Peserta Ujian (Anda)</h2>
+            </div>
+            <div className="space-y-2">
+              {participants.map((p) => (
+                <div key={p.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3">
+                  <span className="text-sm text-slate-700">{p.exam?.title ?? `Ujian #${p.exam_id}`}</span>
+                  <Badge variant="neutral">{p.status ?? "-"}</Badge>
+                </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
       )}
 
-      {/* Results */}
       {results.length > 0 && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Hasil</h2>
-          </div>
-          <div className="space-y-2">
-            {results.map((r) => (
-              <div key={r.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3">
-                <div className="text-sm text-slate-700">
-                  <span className="font-semibold">Nilai: {r.score ?? "-"}</span>
-                  {r.grade && <span className="ml-2 text-slate-500">({r.grade})</span>}
+        <Card>
+          <CardBody>
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="h-5 w-5 text-indigo-500" />
+              <h2 className="text-sm font-semibold text-slate-700">Hasil</h2>
+            </div>
+            <div className="space-y-2">
+              {results.map((r) => (
+                <div key={r.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3">
+                  <div className="text-sm text-slate-700">
+                    <span className="font-semibold">Nilai: {r.score ?? "-"}</span>
+                    {r.grade && <span className="ml-2 text-slate-500">({r.grade})</span>}
+                  </div>
+                  {r.status && <Badge variant="success">{r.status}</Badge>}
                 </div>
-                {r.status && (
-                  <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                    {r.status}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

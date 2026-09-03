@@ -1,10 +1,14 @@
 ﻿import { useCallback, useEffect, useState } from "react";
-import { Loader2, ShieldAlert, AlertTriangle } from "lucide-react";
+import { ShieldAlert, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { STUDENTS } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
 import { formatDate } from "@/lib/format";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import Card, { CardBody } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 
 interface ViolationRow {
   id: number;
@@ -42,17 +46,19 @@ export default function StudentViolationsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-      </div>
+      <PageContainer>
+        <PageHeader title="Pelanggaran" description="Catatan pelanggaran" />
+        <Card><CardBody><p className="text-sm text-slate-500">Memuat...</p></CardBody></Card>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-300 bg-red-50 p-6 text-red-600">
-        <p className="text-sm">{error}</p>
-      </div>
+      <PageContainer>
+        <PageHeader title="Pelanggaran" description="Catatan pelanggaran" />
+        <Card><CardBody className="text-sm text-red-600">{error}</CardBody></Card>
+      </PageContainer>
     );
   }
 
@@ -60,54 +66,48 @@ export default function StudentViolationsPage() {
 
   if (rows.length === 0) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Pelanggaran</h1>
-          <p className="mt-1 text-sm text-slate-500">Catatan pelanggaran</p>
-        </div>
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-12 text-center shadow-sm">
-          <ShieldAlert className="mx-auto h-10 w-10 text-emerald-400" />
-          <p className="mt-3 text-sm font-medium text-emerald-700">Tidak ada catatan pelanggaran</p>
-          <p className="mt-1 text-sm text-emerald-600">Pertahankan perilaku baik!</p>
-        </div>
-      </div>
+      <PageContainer>
+        <PageHeader title="Pelanggaran" description="Catatan pelanggaran" />
+        <Card>
+          <CardBody className="p-12 text-center">
+            <ShieldAlert className="mx-auto h-10 w-10 text-emerald-400" />
+            <p className="mt-3 text-sm font-medium text-emerald-700">Tidak ada catatan pelanggaran</p>
+            <p className="mt-1 text-sm text-emerald-600">Pertahankan perilaku baik!</p>
+          </CardBody>
+        </Card>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Pelanggaran</h1>
-        <p className="mt-1 text-sm text-slate-500">Catatan pelanggaran • Total poin: {totalPoints}</p>
-      </div>
+    <PageContainer>
+      <PageHeader title="Pelanggaran" description={`Catatan pelanggaran • Total poin: ${totalPoints}`} />
 
       <div className="space-y-3">
         {rows.map((v) => (
-          <div key={v.id} className="rounded-2xl border border-amber-200 bg-amber-50/50 p-5 shadow-sm">
-            <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
-                <AlertTriangle className="h-5 w-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-semibold text-slate-900">{v.category}</h3>
-                  {v.points != null && (
-                    <span className="inline-flex rounded-full bg-rose-100 px-2.5 py-1 text-xs font-semibold text-rose-700">
-                      -{v.points} poin
-                    </span>
+          <Card key={v.id} className="bg-amber-50/50 border-amber-200">
+            <CardBody>
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-semibold text-slate-900">{v.category}</h3>
+                    {v.points != null && <Badge variant="danger">-{v.points} poin</Badge>}
+                  </div>
+                  <p className="mt-1 text-sm text-slate-600">{v.description}</p>
+                  {v.violated_at && (
+                    <p className="mt-2 text-xs text-slate-500">
+                      Tanggal: {formatDate(v.violated_at)}
+                    </p>
                   )}
                 </div>
-                <p className="mt-1 text-sm text-slate-600">{v.description}</p>
-                {v.violated_at && (
-                  <p className="mt-2 text-xs text-slate-500">
-                    Tanggal: {formatDate(v.violated_at)}
-                  </p>
-                )}
               </div>
-            </div>
-          </div>
+            </CardBody>
+          </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 }

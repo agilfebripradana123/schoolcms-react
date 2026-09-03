@@ -1,9 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Wallet, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { toApiError } from "@/lib/api/error";
 import { formatRupiah } from "@/lib/format";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import Card, { CardBody } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import DataTable from "@/components/ui/DataTable";
 
 interface SummaryData {
   totals: {
@@ -11,8 +16,6 @@ interface SummaryData {
     total_paid: number;
     total_outstanding: number;
   };
-  status?: string;
-  paid_percentage?: number;
 }
 
 export default function StudentFinanceSummaryPage() {
@@ -31,9 +34,7 @@ export default function StudentFinanceSummaryPage() {
     } catch (err) {
       const apiErr = toApiError(err);
       setError(apiErr.message);
-      toast.error("Gagal memuat ringkasan keuangan", {
-        description: apiErr.message,
-      });
+      toast.error("Gagal memuat ringkasan keuangan", { description: apiErr.message });
     } finally {
       setLoading(false);
     }
@@ -43,95 +44,81 @@ export default function StudentFinanceSummaryPage() {
     load();
   }, [load]);
 
+  const totals = data?.totals;
+  const outstanding = totals?.total_outstanding ?? 0;
+  const billed = totals?.total_billed ?? 0;
+  const percentage = billed > 0 ? Math.round(((totals?.total_paid ?? 0) / billed) * 100) : 0;
+
+  const statusLabel = outstanding <= 0 ? "Lunas" : outstanding < billed ? "Sebagian" : "Belum lunas";
+  const variant: "success" | "warning" | "danger" =
+    outstanding <= 0 ? "success" : outstanding < billed ? "warning" : "danger";
+  const progressTone =
+    outstanding <= 0 ? "bg-emerald-600" : outstanding < billed ? "bg-amber-500" : "bg-rose-500";
+
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-      </div>
+      <PageContainer>
+        <PageHeader title="Ringkasan Keuangan" description="Ringkasan tagihan dan pembayaran Anda" />
+        <DataTable columns={[]} data={[]} loading />
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-300 bg-red-50 p-6 text-red-600">
-        <p className="text-sm">{error}</p>
-      </div>
+      <PageContainer>
+        <PageHeader title="Ringkasan Keuangan" description="Ringkasan tagihan dan pembayaran Anda" />
+        <Card>
+          <CardBody className="text-sm text-red-600">{error}</CardBody>
+        </Card>
+      </PageContainer>
     );
   }
 
-  const totals = data?.totals;
-  const outstanding = totals?.total_outstanding ?? 0;
-  const billed = totals?.total_billed ?? 0;
-  const percentage =
-    billed > 0 ? Math.round(((totals?.total_paid ?? 0) / billed) * 100) : 0;
-
-  const statusLabel =
-    outstanding <= 0 ? "Lunas" : outstanding < billed ? "Sebagian" : "Belum lunas";
-  const statusTone =
-    outstanding <= 0
-      ? "bg-emerald-100 text-emerald-700 ring-emerald-200"
-      : outstanding < billed
-        ? "bg-amber-100 text-amber-700 ring-amber-200"
-        : "bg-rose-100 text-rose-700 ring-rose-200";
-
-  const progressTone =
-    outstanding <= 0
-      ? "bg-emerald-600"
-      : outstanding < billed
-        ? "bg-amber-500"
-        : "bg-rose-500";
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Ringkasan Keuangan</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Ringkasan tagihan dan pembayaran Anda
-        </p>
+    <PageContainer>
+      <PageHeader title="Ringkasan Keuangan" description="Ringkasan tagihan dan pembayaran Anda" />
+
+      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardBody>
+            <div className="flex items-center gap-2 text-slate-500">
+              <CreditCard className="h-4 w-4" />
+              <p className="text-sm">Total Tagihan</p>
+            </div>
+            <p className="mt-1 text-2xl font-bold text-slate-900">{formatRupiah(totals?.total_billed)}</p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <div className="flex items-center gap-2 text-emerald-600">
+              <Wallet className="h-4 w-4" />
+              <p className="text-sm">Total Dibayar</p>
+            </div>
+            <p className="mt-1 text-2xl font-bold text-emerald-600">{formatRupiah(totals?.total_paid)}</p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody>
+            <p className="text-sm text-slate-500">Sisa Tagihan</p>
+            <p className="mt-1 text-2xl font-bold text-rose-600">{formatRupiah(totals?.total_outstanding)}</p>
+          </CardBody>
+        </Card>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Total Tagihan</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">
-            {formatRupiah(totals?.total_billed)}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Total Dibayar</p>
-          <p className="mt-1 text-2xl font-bold text-emerald-600">
-            {formatRupiah(totals?.total_paid)}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Sisa Tagihan</p>
-          <p className="mt-1 text-2xl font-bold text-rose-600">
-            {formatRupiah(totals?.total_outstanding)}
-          </p>
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-semibold text-slate-700">Status Pembayaran</h2>
-        <div className="mt-3 flex items-center gap-3">
-          <span
-            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${statusTone}`}
-          >
-            {statusLabel}
-          </span>
-          <span className="text-sm text-slate-500">{percentage}% dibayar</span>
-        </div>
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
-          <div
-            className={`h-2 rounded-full transition-all ${progressTone}`}
-            style={{ width: `${Math.min(percentage, 100)}%` }}
-            aria-hidden
-          />
-        </div>
-        <p className="mt-2 text-xs text-slate-400">
-          Progress pembayaran dihitung dari total dibayar terhadap total tagihan.
-        </p>
-      </div>
-    </div>
+      <Card>
+        <CardBody>
+          <h2 className="text-sm font-semibold text-slate-700">Status Pembayaran</h2>
+          <div className="mt-3 flex items-center gap-3">
+            <Badge variant={variant}>{statusLabel}</Badge>
+            <span className="text-sm text-slate-500">{percentage}% dibayar</span>
+          </div>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+            <div className={`h-2 rounded-full transition-all ${progressTone}`} style={{ width: `${Math.min(percentage, 100)}%` }} aria-hidden />
+          </div>
+          <p className="mt-2 text-xs text-slate-400">Progress dari total dibayar terhadap total tagihan.</p>
+        </CardBody>
+      </Card>
+    </PageContainer>
   );
 }
