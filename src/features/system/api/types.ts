@@ -60,6 +60,11 @@ export interface UserManagement {
   photo: string | null;
   is_active: boolean;
   role: UserRole | null;
+  permissions?: Permission[];
+}
+
+export interface SyncUserPermissionsPayload {
+  permission_ids: number[];
 }
 
 export interface CreateUserPayload {

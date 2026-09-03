@@ -3,6 +3,7 @@ import { SYSTEM } from "@/lib/api";
 import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateUserPayload,
+  SyncUserPermissionsPayload,
   SystemPaginatedResponse,
   UpdateUserPayload,
   UserListParams,
@@ -33,5 +34,15 @@ export const userManagementService = {
 
   async remove(id: number | string): Promise<ApiMessage> {
     return api.delete<ApiMessage>(`${SYSTEM.USERS}/${id}`);
+  },
+
+  async syncPermissions(
+    id: number | string,
+    payload: SyncUserPermissionsPayload,
+  ): Promise<ApiEnvelope<UserManagement>> {
+    return api.post<ApiEnvelope<UserManagement>>(
+      SYSTEM.USERS_PERMISSIONS.replace("{id}", String(id)),
+      payload,
+    );
   },
 };

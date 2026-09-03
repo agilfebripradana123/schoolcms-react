@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -15,6 +15,7 @@ import { roleService } from "../api/role.service";
 import { userManagementService } from "../api/user.service";
 import type { Role, UserManagement } from "../api/types";
 import UserForm from "../components/user/UserForm";
+import UserPermissionForm from "../components/user/UserPermissionForm";
 import UserDeleteDialog from "../components/user/UserDeleteDialog";
 
 const PER_PAGE = 10;
@@ -56,6 +57,8 @@ export default function UsersPage() {
   const [editing, setEditing] = useState<UserManagement | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toDelete, setToDelete] = useState<UserManagement | null>(null);
+  const [permOpen, setPermOpen] = useState(false);
+  const [permUser, setPermUser] = useState<UserManagement | null>(null);
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -184,6 +187,11 @@ export default function UsersPage() {
     setDeleteOpen(true);
   }, []);
 
+  const openPerm = useCallback((row: UserManagement) => {
+    setPermUser(row);
+    setPermOpen(true);
+  }, []);
+
   const columns = useMemo(() => {
     type Row = UserManagement;
     return [
@@ -246,6 +254,15 @@ export default function UsersPage() {
             </button>
             <button
               type="button"
+              onClick={() => openPerm(row)}
+              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              aria-label={`Atur permission ${row.name}`}
+              title="Atur Permission"
+            >
+              <ShieldCheck className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+            <button
+              type="button"
               onClick={() => openDelete(row)}
               className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
               aria-label={`Hapus ${row.name}`}
@@ -256,7 +273,7 @@ export default function UsersPage() {
         ),
       },
     ];
-  }, [openEdit, openDelete]);
+  }, [openEdit, openPerm, openDelete]);
 
   const isFirstPage = meta.current_page <= 1;
   const isLastPage = meta.current_page >= meta.last_page;
@@ -380,6 +397,13 @@ export default function UsersPage() {
                         <Pencil className="h-4 w-4" /> Edit
                       </Button>
                       <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => openPerm(row)}
+                      >
+                        <ShieldCheck className="h-4 w-4" /> Permission
+                      </Button>
+                      <Button
                         variant="danger"
                         size="sm"
                         onClick={() => openDelete(row)}
@@ -451,6 +475,20 @@ export default function UsersPage() {
         }}
         onDeleted={handleDeleted}
         data={toDelete}
+      />
+
+      <UserPermissionForm
+        open={permOpen}
+        onClose={() => {
+          setPermOpen(false);
+          setPermUser(null);
+        }}
+        onSaved={() => {
+          setLoading(true);
+          setError(null);
+          setQuery((prev) => ({ ...prev }));
+        }}
+        initialData={permUser}
       />
     </PageContainer>
   );
