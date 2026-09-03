@@ -14,8 +14,9 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
+  const [imgFailed, setImgFailed] = useState(false);
 
   const toggleUserMenu = useCallback(() => {
     setUserMenuOpen((prev) => !prev);
@@ -96,11 +97,20 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
               aria-label="Menu pengguna"
               aria-expanded={userMenuOpen}
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
-                <span className="text-sm font-bold">
-                  {userDisplayName.charAt(0).toUpperCase()}
-                </span>
-              </div>
+              {user?.photo && !imgFailed ? (
+                <img
+                  src={user.photo}
+                  alt={userDisplayName}
+                  className="h-9 w-9 rounded-full object-cover border border-slate-200"
+                  onError={() => setImgFailed(true)}
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
+                  <span className="text-sm font-bold">
+                    {userDisplayName.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
               <span className="hidden text-sm font-semibold md:block">
                 {userDisplayName}
               </span>
