@@ -215,6 +215,7 @@ export const teacherNavigation = [
       { label: "Ujian", path: "/guru/examinations", permission: "view-exams", icon: BookOpen },
       { label: "Jadwal Ujian", path: "/guru/examinations/schedules", permission: "view-exam-schedules", icon: CalendarClock },
       { label: "Hasil Ujian", path: "/guru/examinations/results", permission: "view-exam-results", icon: BarChart3 },
+      { label: "Monitoring", path: "/guru/exams/monitoring", permission: "view-exam-monitoring", icon: Activity },
     ],
   },
   {
