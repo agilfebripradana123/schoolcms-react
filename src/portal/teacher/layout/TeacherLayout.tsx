@@ -1,8 +1,8 @@
 ﻿import { useState, useCallback, Suspense, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import StudentHeader from "./StudentHeader";
-import StudentSidebar from "./StudentSidebar";
+import StudentHeader from "@/portal/student/layout/StudentHeader";
+import StudentSidebar from "@/portal/student/layout/StudentSidebar";
 
 function PageLoadingFallback() {
   return (

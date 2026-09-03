@@ -10,8 +10,8 @@ import ProtectedRoute from "@/features/auth/ProtectedRoute";
 import RoleRoute from "@/features/auth/RoleRoute";
 import StudentRoute, { AdminRoute } from "@/features/auth/StudentRoute";
 import GuruRoute from "@/features/auth/GuruRoute";
-import StudentLayout from "@/features/students/components/StudentLayout";
-import GuruLayout from "@/features/students/components/GuruLayout";
+import StudentLayout from "@/portal/student/layout/StudentLayout";
+import GuruLayout from "@/portal/teacher/layout/TeacherLayout";
 import { NotificationsPage } from "@/features/notifications";
 import {
   AcademicYearPage,
