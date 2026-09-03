@@ -8,6 +8,7 @@ export interface User {
   photo?: string | null;
   is_active?: boolean;
   role: string;
+  permissions?: string[];
 }
 
 export interface LoginPayload {

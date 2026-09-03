@@ -107,6 +107,7 @@ export const SYSTEM = {
   ROLES_PERMISSIONS: "/roles/{id}/permissions",
   PERMISSIONS: "/permissions",
   USERS: "/users",
+  USERS_PERMISSIONS: "/users/{id}/permissions",
   AUDIT_LOGS: "/audit-logs",
   SETTINGS: "/settings",
 } as const;
