@@ -40,3 +40,6 @@ dist-ssr/
 tsconfig.tsbuildinfo
 graphify-out/
 schoolcms_db.sql
+
+# Database dump
+schoolcms_db.sql
