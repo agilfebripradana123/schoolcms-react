@@ -14,6 +14,7 @@ export interface User {
 export interface LoginPayload {
   login: string;
   password: string;
+  expected_role?: string;
 }
 
 export interface LoginResponse {

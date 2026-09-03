@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2, Shield, Camera } from "lucide-react";
 import { api } from "@/lib/api";
 import { PROFILE } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
 import { toast } from "sonner";
+import { useAuth } from "@/features/auth/useAuth";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 
 interface ProfileData {
   id: number;
@@ -24,9 +29,14 @@ interface PasswordForm {
 }
 
 export default function ProfilePage() {
+  const { user, updateUser } = useAuth();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imgFailed, setImgFailed] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [photoSaving, setPhotoSaving] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [passwordForm, setPasswordForm] = useState<PasswordForm>({
     current_password: "",
@@ -35,10 +45,22 @@ export default function ProfilePage() {
   });
   const [saving, setSaving] = useState(false);
 
+  const load = async () => {
+    try {
+      const res = await api.get<{ success: boolean; data: ProfileData }>(PROFILE.PROFILE);
+      setProfile(res.data);
+    } catch (err) {
+      const msg = toApiError(err).message;
+      toast.error("Gagal memuat profil", { description: msg });
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     let active = true;
-
-    async function load() {
+    (async () => {
       try {
         const res = await api.get<{ success: boolean; data: ProfileData }>(PROFILE.PROFILE);
         if (active) setProfile(res.data);
@@ -51,13 +73,39 @@ export default function ProfilePage() {
       } finally {
         if (active) setLoading(false);
       }
-    }
-
-    load();
+    })();
     return () => {
       active = false;
     };
   }, []);
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const preview = URL.createObjectURL(f);
+    setPreviewUrl(preview);
+    setImgFailed(false);
+    const fd = new FormData();
+    fd.append("photo", f);
+    setPhotoSaving(true);
+    try {
+      await api.post("/profile/photo" as never, fd, { headers: { "Content-Type": undefined } } as never);
+      await load();
+      toast.success("Foto diperbarui");
+      // sync header: reload user photo from profile
+      try {
+        const r = await api.get<{ success: boolean; data: ProfileData }>(PROFILE.PROFILE);
+        if (r.data?.photo) updateUser({ photo: r.data.photo });
+      } catch {}
+    } catch (err) {
+      toast.error("Gagal upload foto", { description: toApiError(err).message });
+    } finally {
+      setPhotoSaving(false);
+      if (fileRef.current) fileRef.current.value = "";
+      URL.revokeObjectURL(preview);
+      setPreviewUrl(null);
+    }
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +117,6 @@ export default function ProfilePage() {
       toast.error("Password minimal 6 karakter");
       return;
     }
-
     setSaving(true);
     try {
       await api.put(PROFILE.PASSWORD, {
@@ -91,168 +138,77 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-red-300 bg-red-50 p-6 text-red-600">
-        <p className="text-sm">{error}</p>
-      </div>
+      <PageContainer>
+        <Card>
+          <div className="p-6 text-sm text-error">{error}</div>
+        </Card>
+      </PageContainer>
     );
   }
 
+  const displayPhoto = previewUrl ?? profile?.photo ?? user?.photo ?? null;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Profil Saya</h1>
-        <p className="mt-1 text-sm text-slate-500">Kelola informasi profil Anda</p>
-      </div>
+    <PageContainer>
+      <PageHeader title="Profil Saya" description="Kelola informasi profil Anda" />
 
-      {/* Foto Profil */}
-      {profile?.photo ? (
-        <section className="text-center">
-          <img
-            src={profile.photo}
-            alt={profile.name}
-            className="mx-auto mb-4 h-32 w-32 rounded-2xl object-cover"
-          />
-        </section>
-      ) : (
-        <section className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-200">
-            <Camera className="h-8 w-8 text-slate-400" />
-          </div>
-          <p className="text-sm text-slate-400">Belum ada foto profil</p>
-        </section>
-      )}
+      <Card className="mb-6">
+        <div className="flex flex-col items-center gap-4 p-2">
+          {previewUrl ? (
+            <img src={previewUrl} alt={profile?.name ?? "foto"} className="h-32 w-32 rounded-2xl object-cover border" />
+          ) : displayPhoto && !imgFailed ? (
+            <img src={displayPhoto} alt={profile?.name ?? "foto"} className="h-32 w-32 rounded-2xl object-cover border" onError={() => setImgFailed(true)} />
+          ) : (
+            <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-slate-100 border border-dashed">
+              <Camera className="h-10 w-10 text-slate-400" />
+            </div>
+          )}
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+          <Button variant="secondary" size="sm" onClick={() => fileRef.current?.click()} disabled={photoSaving}>
+            {photoSaving ? <><Loader2 className="h-4 w-4 animate-spin" /> Menyimpan...</> : <><Camera className="h-4 w-4" /> Ubah Foto</>}
+          </Button>
+          <p className="text-xs text-on-surface-variant">JPG/PNG/WEBP, maks 2 MB</p>
+        </div>
+      </Card>
 
-      {/* Informasi Profil */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-          Informasi Akun
-        </h2>
+      <Card className="mb-6">
+        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-on-surface-variant">Informasi Akun</h2>
         <dl className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <dt className="text-slate-500">Nama Lengkap</dt>
-            <dd className="font-semibold text-slate-900">{profile?.name ?? "Tidak tersedia"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Username</dt>
-            <dd className="font-semibold text-slate-900">{profile?.username ?? "Tidak tersedia"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Email</dt>
-            <dd className="font-semibold text-slate-900">{profile?.email ?? "Tidak tersedia"}</dd>
-          </div>
-          <div>
-            <dt className="text-slate-500">Role</dt>
-            <dd className="font-semibold text-slate-900">
-              <span className="inline-flex items-center gap-1">
-                <Shield className="h-4 w-4 text-indigo-500" />
-                {profile?.role ?? "Tidak tersedia"}
-              </span>
-            </dd>
-          </div>
+          <div><dt className="text-xs text-on-surface-variant">Nama Lengkap</dt><dd className="mt-1 font-medium text-on-surface">{profile?.name ?? "—"}</dd></div>
+          <div><dt className="text-xs text-on-surface-variant">Username</dt><dd className="mt-1 font-medium text-on-surface">{profile?.username ?? "—"}</dd></div>
+          <div><dt className="text-xs text-on-surface-variant">Email</dt><dd className="mt-1 font-medium text-on-surface break-words">{profile?.email ?? "—"}</dd></div>
+          <div><dt className="text-xs text-on-surface-variant">Role</dt><dd className="mt-1 font-medium text-on-surface inline-flex items-center gap-1"><Shield className="h-4 w-4 text-primary" />{profile?.role ?? "—"}</dd></div>
         </dl>
-      </section>
+      </Card>
 
-      {/* Ubah Password */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Keamanan
-          </h2>
+      <Card>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant">Keamanan</h2>
           {!showPasswordForm && (
-            <button
-              type="button"
-              onClick={() => setShowPasswordForm(true)}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
-            >
-              Ubah Password
-            </button>
+            <Button variant="ghost" size="sm" onClick={() => setShowPasswordForm(true)}>Ubah Password</Button>
           )}
         </div>
-
-        {showPasswordForm && (
-          <form onSubmit={handlePasswordChange} className="mt-4 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700">
-                Password Saat Ini
-              </label>
-              <input
-                type="password"
-                required
-                value={passwordForm.current_password}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, current_password: e.target.value })
-                }
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700">Password Baru</label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={passwordForm.password}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, password: e.target.value })
-                }
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700">
-                Konfirmasi Password Baru
-              </label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={passwordForm.password_confirmation}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, password_confirmation: e.target.value })
-                }
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-            </div>
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={saving}
-                className="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Simpan
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPasswordForm(false);
-                  setPasswordForm({
-                    current_password: "",
-                    password: "",
-                    password_confirmation: "",
-                  });
-                }}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-              >
-                Batal
-              </button>
+        {showPasswordForm ? (
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <label className="flex flex-col gap-1"><span className="text-xs font-medium text-on-surface-variant">Password Saat Ini</span><input type="password" required value={passwordForm.current_password} onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })} className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary" /></label>
+            <label className="flex flex-col gap-1"><span className="text-xs font-medium text-on-surface-variant">Password Baru</span><input type="password" required minLength={6} value={passwordForm.password} onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })} className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary" /></label>
+            <label className="flex flex-col gap-1"><span className="text-xs font-medium text-on-surface-variant">Konfirmasi Password Baru</span><input type="password" required minLength={6} value={passwordForm.password_confirmation} onChange={(e) => setPasswordForm({ ...passwordForm, password_confirmation: e.target.value })} className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary" /></label>
+            <div className="flex gap-2">
+              <Button type="submit" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Simpan</Button>
+              <Button type="button" variant="ghost" onClick={() => { setShowPasswordForm(false); setPasswordForm({ current_password: "", password: "", password_confirmation: "" }); }}>Batal</Button>
             </div>
           </form>
+        ) : (
+          <p className="text-sm text-on-surface-variant">Terakhir diperbarui: {profile?.updated_at ? new Date(profile.updated_at).toLocaleString("id-ID") : "—"}</p>
         )}
-
-        {!showPasswordForm && (
-          <p className="mt-3 text-sm text-slate-500">
-            Terakhir diperbarui: {profile?.updated_at ?? "-"}
-          </p>
-        )}
-      </section>
-    </div>
+      </Card>
+    </PageContainer>
   );
 }

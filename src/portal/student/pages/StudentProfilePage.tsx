@@ -395,47 +395,55 @@ export default function StudentProfilePage() {
             : [];
         return (
           <Card key={g.title} className="mb-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant flex items-center gap-2">
-                {g.title}
-                {incomplete.length > 0 && (
-                  <span className="inline-flex items-center rounded-full bg-error-container px-2 py-0.5 text-xs font-semibold text-error">
-                    {incomplete.length} belum lengkap
-                  </span>
-                )}
-              </h2>
-              {g.editable && !isEditing && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => startEdit(g.title, g.fields, src)}
-                >
-                  <Pencil className="h-4 w-4" /> Edit
-                </Button>
-              )}
-              {isEditing && (
-                <div className="flex gap-2">
+            <div className="mb-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="flex min-w-0 items-center gap-2 text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
+                  <span className="shrink-0">{g.title}</span>
+                  {incomplete.length > 0 && (
+                    <span className="hidden shrink-0 items-center whitespace-nowrap rounded-full bg-error-container px-2 py-0.5 text-xs font-semibold text-error sm:inline-flex">
+                      {incomplete.length} belum lengkap
+                    </span>
+                  )}
+                </h2>
+                {g.editable && !isEditing && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setEditing(null)}
-                    disabled={saving}
+                    className="shrink-0"
+                    onClick={() => startEdit(g.title, g.fields, src)}
                   >
-                    <X className="h-4 w-4" /> Batal
+                    <Pencil className="h-4 w-4" /> Edit
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => saveGroup(g.title, g.fields)}
-                    disabled={saving}
-                  >
-                    {saving ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4" />
-                    )}{" "}
-                    Simpan
-                  </Button>
-                </div>
+                )}
+                {isEditing && (
+                  <div className="flex shrink-0 gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditing(null)}
+                      disabled={saving}
+                    >
+                      <X className="h-4 w-4" /> Batal
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => saveGroup(g.title, g.fields)}
+                      disabled={saving}
+                    >
+                      {saving ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Save className="h-4 w-4" />
+                      )}{" "}
+                      Simpan
+                    </Button>
+                  </div>
+                )}
+              </div>
+              {incomplete.length > 0 && (
+                <span className="inline-flex w-fit items-center rounded-full bg-error-container px-2 py-0.5 text-xs font-semibold text-error sm:hidden">
+                  {incomplete.length} belum lengkap
+                </span>
               )}
             </div>
             {!isEditing ? (
@@ -513,61 +521,75 @@ export default function StudentProfilePage() {
 
       {/* Orang Tua / Wali */}
       <Card>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant flex items-center gap-2">
-            Orang Tua / Wali
-            {(() => {
-              const p = data.parent as Record<string, unknown> | null;
-              const miss = !p
-                ? PARENT_FIELDS.length
-                : PARENT_FIELDS.filter((f) => isEmpty(p[f.key])).length;
-              return miss > 0 ? (
-                <span className="inline-flex rounded-full bg-error-container px-2 py-0.5 text-xs font-semibold text-error">
-                  {miss} belum lengkap
-                </span>
-              ) : null;
-            })()}
-          </h2>
-          {editing !== "Orang Tua / Wali" ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() =>
-                startEdit(
-                  "Orang Tua / Wali",
-                  PARENT_FIELDS,
-                  (data.parent as Record<string, unknown>) ?? {},
-                )
-              }
-            >
-              <Pencil className="h-4 w-4" /> Edit
-            </Button>
-          ) : (
-            <div className="flex gap-2">
+        <div className="mb-4 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="flex min-w-0 items-center gap-2 text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
+              <span className="shrink-0">Orang Tua / Wali</span>
+              {(() => {
+                const p = data.parent as Record<string, unknown> | null;
+                const miss = !p
+                  ? PARENT_FIELDS.length
+                  : PARENT_FIELDS.filter((f) => isEmpty(p[f.key])).length;
+                return miss > 0 ? (
+                  <span className="hidden shrink-0 items-center whitespace-nowrap rounded-full bg-error-container px-2 py-0.5 text-xs font-semibold text-error sm:inline-flex">
+                    {miss} belum lengkap
+                  </span>
+                ) : null;
+              })()}
+            </h2>
+            {editing !== "Orang Tua / Wali" ? (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setEditing(null)}
-                disabled={saving}
-              >
-                <X className="h-4 w-4" /> Batal
-              </Button>
-              <Button
-                size="sm"
+                className="shrink-0"
                 onClick={() =>
-                  saveGroup("Orang Tua / Wali", PARENT_FIELDS, true)
+                  startEdit(
+                    "Orang Tua / Wali",
+                    PARENT_FIELDS,
+                    (data.parent as Record<string, unknown>) ?? {},
+                  )
                 }
-                disabled={saving}
               >
-                {saving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}{" "}
-                Simpan
+                <Pencil className="h-4 w-4" /> Edit
               </Button>
-            </div>
-          )}
+            ) : (
+              <div className="flex shrink-0 gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditing(null)}
+                  disabled={saving}
+                >
+                  <X className="h-4 w-4" /> Batal
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    saveGroup("Orang Tua / Wali", PARENT_FIELDS, true)
+                  }
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}{" "}
+                  Simpan
+                </Button>
+              </div>
+            )}
+          </div>
+          {(() => {
+            const p = data.parent as Record<string, unknown> | null;
+            const miss = !p
+              ? PARENT_FIELDS.length
+              : PARENT_FIELDS.filter((f) => isEmpty(p[f.key])).length;
+            return miss > 0 ? (
+              <span className="inline-flex w-fit items-center rounded-full bg-error-container px-2 py-0.5 text-xs font-semibold text-error sm:hidden">
+                {miss} belum lengkap
+              </span>
+            ) : null;
+          })()}
         </div>
         {editing !== "Orang Tua / Wali" ? (
           data.parent ? (

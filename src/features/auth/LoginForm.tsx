@@ -32,13 +32,13 @@ const configs = {
     shell: "teacher",
   },
   admin: {
-    label: "Username",
-    placeholder: "username admin",
+    label: "Username atau Email",
+    placeholder: "username atau email admin",
     icon: User,
     inputType: "text",
     autocomplete: "username",
     title: "Admin Console",
-    description: "Masuk menggunakan username administrator.",
+    description: "Masuk menggunakan username atau email administrator.",
     shell: "admin",
   },
 } as const;
@@ -62,10 +62,31 @@ export function LoginForm({ mode }: LoginFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // frontend field validation per mode
+    if (mode === "siswa" && !/^\d+$/.test(loginValue.trim())) {
+      toast.error("Login gagal", { description: "Siswa harus login dengan NIS (angka)." });
+      return;
+    }
+    if (mode === "guru" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginValue.trim())) {
+      toast.error("Login gagal", { description: "Guru harus login dengan email." });
+      return;
+    }
+    if (mode === "admin" && loginValue.trim().includes(" ")) {
+      toast.error("Login gagal", { description: "Username/email tidak valid." });
+      return;
+    }
     setIsLoading(true);
 
+    // prevent lintas halaman: jika sudah login role lain, logout dulu
+    const allowed = mode === "admin" ? ["admin", "administrator"] : [mode];
     try {
-      const user = await login({ login: loginValue, password });
+      const user = await login({ login: loginValue.trim(), password, expected_role: mode });
+      const actual = (user.role || "").toLowerCase();
+      const ok = allowed.includes(actual) || (mode === "admin" && ["admin", "administrator"].includes(actual));
+      if (!ok) {
+        toast.error("Login gagal", { description: `Akun ${user.role} tidak dapat login di halaman ${mode}.` });
+        return;
+      }
       toast.success("Login berhasil", {
         description: "Mempersiapkan dashboard...",
       });
@@ -78,18 +99,18 @@ export function LoginForm({ mode }: LoginFormProps) {
     }
   };
 
-  if (cfg.shell === "teacher") {
+  if (cfg.shell === "teacher" || cfg.shell === "admin") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-indigo-50 flex items-center justify-center px-4 py-10">
+      <div className="flex min-h-screen items-center justify-center bg-surface px-4 py-10">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-100 text-sky-700 shadow-lg shadow-sky-200/60">
-              <Mail className="h-7 w-7" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg">
+              <Icon className="h-7 w-7" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900">{cfg.title}</h1>
             <p className="mt-2 text-sm text-slate-500">{cfg.description}</p>
           </div>
-          <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/70">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] sm:p-8">
             <LoginFields
               cfg={cfg}
               Icon={Icon}
@@ -103,43 +124,6 @@ export function LoginForm({ mode }: LoginFormProps) {
               onSubmit={handleSubmit}
             />
           </div>
-          <p className="mt-6 text-center text-xs text-slate-400">
-            Portal Guru · SchoolCMS
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (cfg.shell === "admin") {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
-              <ShieldCheck className="h-7 w-7" />
-            </div>
-            <h1 className="text-2xl font-bold text-white">{cfg.title}</h1>
-            <p className="mt-2 text-sm text-slate-400">{cfg.description}</p>
-          </div>
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur">
-            <LoginFields
-              cfg={cfg}
-              Icon={Icon}
-              loginValue={loginValue}
-              password={password}
-              showPassword={showPassword}
-              isLoading={isLoading}
-              onLoginChange={setLoginValue}
-              onPasswordChange={setPassword}
-              onTogglePassword={() => setShowPassword((p) => !p)}
-              onSubmit={handleSubmit}
-              dark
-            />
-          </div>
-          <p className="mt-6 text-center text-xs text-slate-500">
-            Admin Console · SchoolCMS
-          </p>
         </div>
       </div>
     );
