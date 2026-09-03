@@ -87,6 +87,15 @@ export const PermissionsPage = lazy(() => import("@/features/system/pages/Permis
 export const AuditLogsPage = lazy(() => import("@/features/system/pages/AuditLogsPage"));
 export const SettingsPage = lazy(() => import("@/features/system/pages/SettingsPage"));
 
+export const SettingsGeneralPage = lazy(() => import("@/features/system/pages/settings/SettingsGeneralPage"));
+export const SettingsNotificationsPage = lazy(() => import("@/features/system/pages/settings/SettingsNotificationsPage"));
+export const SettingsEmailPage = lazy(() => import("@/features/system/pages/settings/SettingsEmailPage"));
+export const SettingsWhatsAppPage = lazy(() => import("@/features/system/pages/settings/SettingsWhatsAppPage"));
+export const SettingsPaymentPage = lazy(() => import("@/features/system/pages/settings/SettingsPaymentPage"));
+export const SettingsSecurityPage = lazy(() => import("@/features/system/pages/settings/SettingsSecurityPage"));
+export const SettingsBackupPage = lazy(() => import("@/features/system/pages/settings/SettingsBackupPage"));
+export const SettingsAppearancePage = lazy(() => import("@/features/system/pages/settings/SettingsAppearancePage"));
+
 export const AcademicReportsPage = lazy(() => import("@/features/reports/pages/AcademicReportsPage"));
 export const StudentReportsPage = lazy(() => import("@/features/reports/pages/StudentReportsPage"));
 export const TeacherReportsPage = lazy(() => import("@/features/reports/pages/TeacherReportsPage"));

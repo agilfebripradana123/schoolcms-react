@@ -88,23 +88,71 @@ export interface AuditLog {
   created_at?: string;
 }
 
-// ---- Setting ----
+// ---- Setting (Configuration Management) ----
+export type SettingType =
+  | "string"
+  | "text"
+  | "integer"
+  | "boolean"
+  | "select"
+  | "email"
+  | "url"
+  | "password"
+  | "timezone"
+  | "time"
+  | "color"
+  | "file";
+
+export const SUPPORTED_SETTING_TYPES: SettingType[] = [
+  "string",
+  "text",
+  "integer",
+  "boolean",
+  "select",
+  "email",
+  "url",
+  "password",
+  "timezone",
+  "time",
+  "color",
+  "file",
+];
+
 export interface Setting {
   id: number;
+  group: string | null;
   key: string;
   value: string | null;
+  type: SettingType;
   description: string | null;
+  is_encrypted: boolean;
+  is_public: boolean;
+  sort_order: number;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface CreateSettingPayload {
+  group?: string | null;
   key: string;
   value?: string | null;
+  type: SettingType;
   description?: string | null;
+  is_encrypted?: boolean;
+  is_public?: boolean;
+  sort_order?: number;
 }
 
-export interface UpdateSettingPayload extends Partial<CreateSettingPayload> {}
+export interface UpdateSettingPayload {
+  group?: string | null;
+  key?: string;
+  value?: string | null;
+  type?: SettingType;
+  description?: string | null;
+  is_encrypted?: boolean;
+  is_public?: boolean;
+  sort_order?: number;
+}
 
 export interface RoleListParams extends ListParams {
   search?: string;
@@ -129,6 +177,7 @@ export interface AuditLogListParams extends ListParams {
 
 export interface SettingListParams extends ListParams {
   q?: string;
+  group?: string;
 }
 
 // Re-export helper for single-resource responses
