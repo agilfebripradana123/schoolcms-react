@@ -33,6 +33,10 @@ export const STUDENTS = {
   TRANSFERS: "/transfers",
   ALUMNI: "/alumni",
   STUDENT_ID_CARDS: "/student-id-cards",
+  PROFILE: "/student/profile",
+  GRADES: "/student/grades",
+  SCHEDULES: "/student/schedules",
+  ATTENDANCE: "/student/attendance",
 } as const;
 
 export const STAFF = {

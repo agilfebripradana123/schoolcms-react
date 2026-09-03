@@ -184,18 +184,14 @@ export const dashboardItem = {
   icon: LayoutDashboard,
 } as const;
 
-// Student Portal navigation
+export const studentDashboardItem = {
+  label: "Dasbor",
+  path: "/siswa",
+  icon: LayoutDashboard,
+} as const;
+
+// Student Portal navigation — `navOverlay` pattern like Admin `navigation`
 export const studentNavigation = [
-  {
-    label: "Dashboard",
-    path: "/siswa",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Profil Saya",
-    path: "/siswa/profile",
-    icon: User,
-  },
   {
     label: "Akademik",
     items: [
@@ -223,11 +219,6 @@ export const studentNavigation = [
       { label: "Pelanggaran", path: "/siswa/violations", icon: ShieldAlert },
       { label: "Ekstrakurikuler", path: "/siswa/extracurricular", icon: Dumbbell },
     ],
-  },
-  {
-    label: "Notifikasi",
-    path: "/siswa/notifications",
-    icon: Bell,
   },
 ];
 
