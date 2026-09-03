@@ -14,7 +14,8 @@ import StudentLayout from "@/features/students/components/StudentLayout";
 import GuruLayout from "@/features/students/components/GuruLayout";
 import {
   AcademicYearPage,
-  SemesterPage,  CurriculumPage,
+  SemesterPage,
+  CurriculumPage,
   SubjectsPage,
   ClassesPage,
   ClassSubjectsPage,
@@ -124,16 +125,28 @@ const router = createBrowserRouter([
           {
             element: <AppLayout />,
             children: [
-              { index: true, element: <Navigate to="/admin/dashboard" replace /> },
+              {
+                index: true,
+                element: <Navigate to="/admin/dashboard" replace />,
+              },
               { path: "dashboard", element: <Dashboard /> },
               { path: "academic/years", element: <AcademicYearPage /> },
               { path: "academic/semesters", element: <SemesterPage /> },
               { path: "academic/curriculum", element: <CurriculumPage /> },
               { path: "academic/subjects", element: <SubjectsPage /> },
               { path: "academic/classes", element: <ClassesPage /> },
-              { path: "academic/class-subjects", element: <ClassSubjectsPage /> },
-              { path: "academic/class-students", element: <ClassStudentsPage /> },
-              { path: "academic/teacher-assignments", element: <TeacherAssignmentsPage /> },
+              {
+                path: "academic/class-subjects",
+                element: <ClassSubjectsPage />,
+              },
+              {
+                path: "academic/class-students",
+                element: <ClassStudentsPage />,
+              },
+              {
+                path: "academic/teacher-assignments",
+                element: <TeacherAssignmentsPage />,
+              },
               { path: "academic/schedules", element: <SchedulesPage /> },
               { path: "academic/periods", element: <PeriodsPage /> },
               { path: "academic/assignments", element: <AssignmentsPage /> },
@@ -153,45 +166,93 @@ const router = createBrowserRouter([
               { path: "finance/reports", element: <FinancialReportsPage /> },
               { path: "teachers", element: <TeacherListPage /> },
               { path: "teachers/staff", element: <StaffListPage /> },
-              { path: "teachers/assignments", element: <TeacherAssignmentsPage /> },
-              { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
+              {
+                path: "teachers/assignments",
+                element: <TeacherAssignmentsPage />,
+              },
+              {
+                path: "teachers/attendance",
+                element: <TeacherAttendanceListPage />,
+              },
               { path: "teachers/leave", element: <TeacherLeaveListPage /> },
-              { path: "teachers/documents", element: <TeacherDocumentListPage /> },
+              {
+                path: "teachers/documents",
+                element: <TeacherDocumentListPage />,
+              },
               { path: "examinations/questions", element: <QuestionsPage /> },
               { path: "examinations/exams", element: <ExamsPage /> },
-              { path: "examinations/schedules", element: <ExamSchedulesPage /> },
+              {
+                path: "examinations/schedules",
+                element: <ExamSchedulesPage />,
+              },
               { path: "examinations/sessions", element: <ExamSessionsPage /> },
-              { path: "examinations/participants", element: <ExamParticipantsPage /> },
+              {
+                path: "examinations/participants",
+                element: <ExamParticipantsPage />,
+              },
               { path: "examinations/results", element: <ExamResultsPage /> },
               { path: "facilities/rooms", element: <RoomsPage /> },
               { path: "facilities/assets", element: <AssetsPage /> },
               { path: "facilities/maintenance", element: <MaintenancesPage /> },
               { path: "facilities/inventory", element: <InventoryPage /> },
-              { path: "administration/incoming", element: <IncomingLettersPage /> },
-              { path: "administration/outgoing", element: <OutgoingLettersPage /> },
+              {
+                path: "administration/incoming",
+                element: <IncomingLettersPage />,
+              },
+              {
+                path: "administration/outgoing",
+                element: <OutgoingLettersPage />,
+              },
               { path: "administration/documents", element: <DocumentsPage /> },
-              { path: "administration/dispositions", element: <DispositionsPage /> },
+              {
+                path: "administration/dispositions",
+                element: <DispositionsPage />,
+              },
               { path: "development/counseling", element: <CounselingsPage /> },
-              { path: "development/extracurricular", element: <ExtracurricularsPage /> },
-              { path: "development/achievements", element: <AchievementsPage /> },
+              {
+                path: "development/extracurricular",
+                element: <ExtracurricularsPage />,
+              },
+              {
+                path: "development/achievements",
+                element: <AchievementsPage />,
+              },
               { path: "development/violations", element: <ViolationsPage /> },
-              { path: "communication/announcements", element: <AnnouncementsPage /> },
-              { path: "communication/notifications", element: <NotificationsPage /> },
+              {
+                path: "communication/announcements",
+                element: <AnnouncementsPage />,
+              },
+              {
+                path: "communication/notifications",
+                element: <NotificationsPage />,
+              },
               { path: "communication/calendar", element: <CalendarPage /> },
               {
                 element: <RoleRoute allow={["admin", "administrator"]} />,
                 children: [
-                  { path: "ppdb/registrations", element: <RegistrationsPage /> },
+                  {
+                    path: "ppdb/registrations",
+                    element: <RegistrationsPage />,
+                  },
                   { path: "ppdb/verification", element: <VerificationPage /> },
-                  { path: "ppdb/re-registration", element: <ReRegistrationPage /> },
-                  { path: "ppdb/export-dapodik", element: <ExportDapodikPage /> },
+                  {
+                    path: "ppdb/re-registration",
+                    element: <ReRegistrationPage />,
+                  },
+                  {
+                    path: "ppdb/export-dapodik",
+                    element: <ExportDapodikPage />,
+                  },
                 ],
               },
               { path: "reports/academic", element: <AcademicReportsPage /> },
               { path: "reports/students", element: <StudentReportsPage /> },
               { path: "reports/teachers", element: <TeacherReportsPage /> },
               { path: "reports/finance", element: <FinanceReportsPage /> },
-              { path: "reports/attendance", element: <AttendanceReportsPage /> },
+              {
+                path: "reports/attendance",
+                element: <AttendanceReportsPage />,
+              },
               { path: "reports/inventory", element: <InventoryReportsPage /> },
 
               { path: "system/roles", element: <RolesPage /> },
@@ -199,14 +260,35 @@ const router = createBrowserRouter([
               { path: "system/users", element: <UsersPage /> },
               { path: "system/audit-logs", element: <AuditLogsPage /> },
               { path: "system/settings", element: <SettingsPage /> },
-              { path: "system/settings/general", element: <SettingsGeneralPage /> },
-              { path: "system/settings/notifications", element: <SettingsNotificationsPage /> },
+              {
+                path: "system/settings/general",
+                element: <SettingsGeneralPage />,
+              },
+              {
+                path: "system/settings/notifications",
+                element: <SettingsNotificationsPage />,
+              },
               { path: "system/settings/email", element: <SettingsEmailPage /> },
-              { path: "system/settings/whatsapp", element: <SettingsWhatsAppPage /> },
-              { path: "system/settings/payment", element: <SettingsPaymentPage /> },
-              { path: "system/settings/security", element: <SettingsSecurityPage /> },
-              { path: "system/settings/backup", element: <SettingsBackupPage /> },
-              { path: "system/settings/appearance", element: <SettingsAppearancePage /> },
+              {
+                path: "system/settings/whatsapp",
+                element: <SettingsWhatsAppPage />,
+              },
+              {
+                path: "system/settings/payment",
+                element: <SettingsPaymentPage />,
+              },
+              {
+                path: "system/settings/security",
+                element: <SettingsSecurityPage />,
+              },
+              {
+                path: "system/settings/backup",
+                element: <SettingsBackupPage />,
+              },
+              {
+                path: "system/settings/appearance",
+                element: <SettingsAppearancePage />,
+              },
             ],
           },
         ],
@@ -226,9 +308,7 @@ const router = createBrowserRouter([
         children: [
           {
             element: <AppLayout />,
-            children: [
-              { index: true, element: <ProfilePage /> },
-            ],
+            children: [{ index: true, element: <ProfilePage /> }],
           },
         ],
       },
@@ -247,9 +327,7 @@ const router = createBrowserRouter([
         children: [
           {
             element: <AppLayout />,
-            children: [
-              { index: true, element: <AppNotificationsPage /> },
-            ],
+            children: [{ index: true, element: <AppNotificationsPage /> }],
           },
         ],
       },
@@ -269,15 +347,28 @@ const router = createBrowserRouter([
           {
             element: <GuruLayout />,
             children: [
-              { index: true, element: <Navigate to="/guru/dashboard" replace /> },
-              { path: "dashboard", element: <ModulePlaceholder title="Dashboard Guru" domain="Guru" /> },
               {
-                element: <RoleRoute allow={["guru", "admin", "administrator"]} />,
+                index: true,
+                element: <Navigate to="/guru/dashboard" replace />,
+              },
+              {
+                path: "dashboard",
+                element: (
+                  <ModulePlaceholder title="Dashboard Guru" domain="Guru" />
+                ),
+              },
+              {
+                element: (
+                  <RoleRoute allow={["guru", "admin", "administrator"]} />
+                ),
                 children: [
                   { path: "academic/classes", element: <ClassesPage /> },
                   { path: "academic/schedules", element: <SchedulesPage /> },
                   { path: "academic/grades", element: <GradesPage /> },
-                  { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
+                  {
+                    path: "teachers/attendance",
+                    element: <TeacherAttendanceListPage />,
+                  },
                 ],
               },
             ],
@@ -300,22 +391,37 @@ const router = createBrowserRouter([
           {
             element: <StudentLayout />,
             children: [
-              { index: true, element: <Navigate to="/siswa/dashboard" replace /> },
+              {
+                index: true,
+                element: <Navigate to="/siswa/dashboard" replace />,
+              },
               { path: "dashboard", element: <StudentPortalPage /> },
               { path: "profile", element: <StudentProfilePage /> },
               { path: "grades", element: <StudentGradesPage /> },
               { path: "schedule", element: <StudentSchedulePage /> },
               { path: "attendance", element: <StudentAttendancePage /> },
-              { path: "finance/summary", element: <StudentFinanceSummaryPage /> },
+              {
+                path: "finance/summary",
+                element: <StudentFinanceSummaryPage />,
+              },
               { path: "finance/billings", element: <StudentBillingsPage /> },
               { path: "finance/payments", element: <StudentPaymentsPage /> },
-              { path: "finance/transactions", element: <StudentTransactionsPage /> },
-              { path: "finance/scholarships", element: <StudentScholarshipsPage /> },
+              {
+                path: "finance/transactions",
+                element: <StudentTransactionsPage />,
+              },
+              {
+                path: "finance/scholarships",
+                element: <StudentScholarshipsPage />,
+              },
               { path: "assignments", element: <StudentAssignmentsPage /> },
               { path: "exams", element: <StudentExamsPage /> },
               { path: "achievements", element: <StudentAchievementsPage /> },
               { path: "violations", element: <StudentViolationsPage /> },
-              { path: "extracurricular", element: <StudentExtracurricularPage /> },
+              {
+                path: "extracurricular",
+                element: <StudentExtracurricularPage />,
+              },
               { path: "notifications", element: <StudentNotificationsPage /> },
             ],
           },
