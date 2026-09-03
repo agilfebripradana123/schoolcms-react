@@ -1,13 +1,13 @@
 import { useState, useCallback } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
-import { studentNavigation } from "@/config/navigation";
-import { useAuth } from "@/features/auth/useAuth";
-import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import { toast } from "sonner";
+import { useLocation, useNavigate } from "react-router-dom";
+import { studentNavigation, studentDashboardItem } from "@/config/navigation";
+import StudentSidebarSection from "./StudentSidebarSection";
+import StudentSidebarItem from "./StudentSidebarItem";
 
-export default function StudentSidebar({ collapsed = false }: { collapsed?: boolean }) {
-  const { logout } = useAuth();
+export default function StudentSidebar({
+  collapsed = false,
+  onNavigation,
+}: { collapsed?: boolean; onNavigation?: () => void }) {
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
@@ -18,7 +18,6 @@ export default function StudentSidebar({ collapsed = false }: { collapsed?: bool
     );
     return new Set(activeGroup && "label" in activeGroup ? [activeGroup.label] : []);
   });
-  const [logoutOpen, setLogoutOpen] = useState(false);
 
   const toggleSection = useCallback((label: string) => {
     setExpandedSections((prev) => {
@@ -29,14 +28,23 @@ export default function StudentSidebar({ collapsed = false }: { collapsed?: bool
     });
   }, []);
 
-  const isActive = (path: string) => pathname === path;
+  const goTo = useCallback(
+    (path: string) => {
+      onNavigation?.();
+      navigate(path, { replace: true });
+    },
+    [navigate, onNavigation]
+  );
 
-  const handleLogout = () => {
-    setLogoutOpen(false);
-    logout();
-    toast.success("Berhasil keluar", { description: "Sesi Anda telah diakhiri." });
-    navigate("/login", { replace: true });
-  };
+  const isActive = useCallback((path: string) => pathname === path, [pathname]);
+  const isGroupActive = useCallback(
+    (entry: (typeof studentNavigation)[number]) =>
+      "items" in entry &&
+      entry.items?.some((i) => pathname === i.path || pathname.startsWith(i.path + "/")),
+    [pathname],
+  );
+
+  const navOverlay = studentNavigation.filter((entry) => "items" in entry);
 
   return (
     <nav className="flex h-full flex-col bg-slate-950 text-white">
@@ -59,92 +67,52 @@ export default function StudentSidebar({ collapsed = false }: { collapsed?: bool
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="space-y-1">
+        <div className="mb-2">
+          <button
+            onClick={() => goTo(studentDashboardItem.path)}
+            className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
+              isActive(studentDashboardItem.path)
+                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
+                : "text-slate-300 hover:bg-white/5 hover:text-white"
+            } ${collapsed ? "justify-center" : ""}`}
+          >
+            <studentDashboardItem.icon
+              className={`h-5 w-5 shrink-0 ${
+                isActive(studentDashboardItem.path) ? "text-primary-fixed" : "text-slate-400"
+              }`}
+            />
+            {!collapsed && <span>{studentDashboardItem.label}</span>}
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-1">
           {studentNavigation.map((entry) => {
             if ("items" in entry) {
-              const expanded = expandedSections.has(entry.label);
               return (
-                <div key={entry.label} className="mb-1">
-                  <button
-                    onClick={() => toggleSection(entry.label)}
-                    className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors ${
-                      expanded
-                        ? "bg-primary-container/15 text-white"
-                        : "text-slate-300 hover:bg-white/5 hover:text-white"
-                    }`}
-                    aria-expanded={expanded}
-                  >
-                    <span>{entry.label}</span>
-                    <svg
-                      className={`h-4 w-4 text-slate-400 transition-transform ${expanded ? "rotate-90" : ""}`}
-                      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
-                  {expanded && (
-                    <div className="ml-2 mt-2 mb-2 space-y-0.5 border-l border-white/10 pl-2">
-                      {entry.items?.map((item) => (
-                        <Link
-                          key={item.path}
-                          to={item.path}
-                          className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
-                            isActive(item.path)
-                              ? "bg-primary-container/20 font-semibold text-white ring-1 ring-primary-fixed/30"
-                              : "text-slate-300 hover:bg-white/5 hover:text-white"
-                          }`}
-                        >
-                          <item.icon
-                            className={`h-4 w-4 shrink-0 ${isActive(item.path) ? "text-primary-fixed" : "text-slate-400"}`}
-                          />
-                          {!collapsed && <span>{item.label}</span>}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <StudentSidebarSection
+                  key={entry.label}
+                  entry={entry}
+                  collapsed={collapsed}
+                  expanded={expandedSections.has(entry.label)}
+                  active={isGroupActive(entry)}
+                  onToggle={() => toggleSection(entry.label)}
+                  onGo={goTo}
+                  currentPath={pathname}
+                />
               );
             }
             return (
-              <Link
+              <StudentSidebarItem
                 key={entry.path}
-                to={entry.path}
-                className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
-                  isActive(entry.path)
-                    ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
-                    : "text-slate-300 hover:bg-white/5 hover:text-white"
-                } ${collapsed ? "justify-center" : ""}`}
-              >
-                <entry.icon
-                  className={`h-5 w-5 shrink-0 ${isActive(entry.path) ? "text-primary-fixed" : "text-slate-400"}`}
-                />
-                {!collapsed && <span>{entry.label}</span>}
-              </Link>
+                item={entry}
+                collapsed={collapsed}
+                active={isActive(entry.path)}
+                onGo={goTo}
+              />
             );
           })}
-
-          <button
-            onClick={() => setLogoutOpen(true)}
-            className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold text-rose-400 transition-colors hover:bg-rose-500/10 ${
-              collapsed ? "justify-center" : ""
-            }`}
-          >
-            <LogOut className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>Keluar</span>}
-          </button>
         </div>
       </div>
-
-      <ConfirmDialog
-        open={logoutOpen}
-        onOpenChange={setLogoutOpen}
-        title="Keluar dari akun?"
-        description="Anda akan diarahkan ke halaman login."
-        confirmText="Keluar"
-        cancelText="Batal"
-        destructive
-        onConfirm={handleLogout}
-      />
     </nav>
   );
 }

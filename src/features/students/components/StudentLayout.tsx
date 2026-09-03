@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useState, Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import StudentHeader from "./StudentHeader";
 import StudentSidebar from "./StudentSidebar";
@@ -14,8 +14,14 @@ function PageLoadingFallback() {
 
 export default function StudentLayout() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const location = useLocation();
   const toggleMobileSidebar = useCallback(() => setMobileSidebarOpen((open) => !open), []);
   const closeMobileSidebar = useCallback(() => setMobileSidebarOpen(false), []);
+
+  // Auto-close mobile sidebar on route change (same as Admin MobileSidebar)
+  useEffect(() => {
+    closeMobileSidebar();
+  }, [location.pathname, closeMobileSidebar]);
 
   useEffect(() => {
     document.body.style.overflow = mobileSidebarOpen ? "hidden" : "";
@@ -26,10 +32,10 @@ export default function StudentLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop sidebar - fixed width 64px */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:w-64 overflow-hidden bg-slate-950">
+      {/* Desktop sidebar - fixed side */}
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col overflow-hidden transition-all duration-300 lg:w-64">
         <StudentSidebar collapsed={false} />
-      </div>
+      </aside>
 
       {/* Mobile sidebar overlay */}
       {mobileSidebarOpen && (
@@ -41,7 +47,7 @@ export default function StudentLayout() {
             aria-label="Tutup sidebar"
           />
           <div className="fixed inset-y-0 left-0 w-72 overflow-hidden bg-slate-950 shadow-2xl">
-            <StudentSidebar collapsed={false} />
+            <StudentSidebar collapsed={false} onNavigation={closeMobileSidebar} />
           </div>
         </div>
       )}
