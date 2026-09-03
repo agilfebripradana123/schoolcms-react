@@ -1,8 +1,8 @@
-﻿import { useState, useCallback, Suspense, useEffect } from "react";
-import { Outlet } from "react-router-dom";
+﻿import { useCallback, useEffect, useState, Suspense } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import StudentHeader from "@/portal/student/layout/StudentHeader";
-import StudentSidebar from "@/portal/student/layout/StudentSidebar";
+import TeacherHeader from "./TeacherHeader";
+import TeacherSidebar from "./TeacherSidebar";
 
 function PageLoadingFallback() {
   return (
@@ -12,11 +12,16 @@ function PageLoadingFallback() {
   );
 }
 
-export default function GuruLayout() {
+export default function TeacherLayout() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-
-  const toggleMobileSidebar = useCallback(() => setMobileSidebarOpen((p) => !p), []);
+  const location = useLocation();
+  const toggleMobileSidebar = useCallback(() => setMobileSidebarOpen((open) => !open), []);
   const closeMobileSidebar = useCallback(() => setMobileSidebarOpen(false), []);
+
+  // Auto-close mobile sidebar on route change
+  useEffect(() => {
+    closeMobileSidebar();
+  }, [location.pathname, closeMobileSidebar]);
 
   useEffect(() => {
     document.body.style.overflow = mobileSidebarOpen ? "hidden" : "";
@@ -27,23 +32,28 @@ export default function GuruLayout() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col lg:w-64 overflow-hidden bg-slate-950">
-        <StudentSidebar collapsed={false} />
-      </div>
+      {/* Desktop sidebar - fixed side */}
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col overflow-hidden transition-all duration-300 lg:w-64">
+        <TeacherSidebar collapsed={false} />
+      </aside>
 
       {/* Mobile sidebar overlay */}
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={closeMobileSidebar} />
-          <div className="fixed inset-y-0 left-0 w-72 bg-slate-950 shadow-2xl">
-            <StudentSidebar collapsed={false} />
+          <button
+            type="button"
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
+            onClick={closeMobileSidebar}
+            aria-label="Tutup sidebar"
+          />
+          <div className="fixed inset-y-0 left-0 w-72 overflow-hidden bg-slate-950 shadow-2xl">
+            <TeacherSidebar collapsed={false} onNavigation={closeMobileSidebar} />
           </div>
         </div>
       )}
 
-      <div className="flex flex-1 flex-col">
-        <StudentHeader onToggleSidebar={toggleMobileSidebar} />
+      <div className="flex flex-1 flex-col overflow-hidden lg:ml-64">
+        <TeacherHeader onToggleSidebar={toggleMobileSidebar} />
         <main className="flex-1 overflow-y-auto bg-background p-4 lg:p-8">
           <Suspense fallback={<PageLoadingFallback />}>
             <Outlet />

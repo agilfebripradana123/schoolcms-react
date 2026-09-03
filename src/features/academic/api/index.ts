@@ -12,3 +12,8 @@ export { periodService } from "./period.service";
 export { assignmentService } from "./assignment.service";
 export { gradeService } from "./grade.service";
 export { reportCardService } from "./report-card.service";
+export { teacherClassService } from "./teacher-class.service";
+export { teacherScheduleService } from "./teacher-schedule.service";
+export { teacherAttendanceService } from "./teacher-attendance.service";
+export { teacherGradeService } from "./teacher-grade.service";
+export { myAssignmentService } from "./my-assignment.service";

@@ -1,4 +1,5 @@
 ﻿import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { BookOpen, Calendar, FileText, Users, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
@@ -10,6 +11,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import DataTable from "@/components/ui/DataTable";
+import Button from "@/components/ui/Button";
 
 interface ExamRow {
   id: number;
@@ -54,6 +56,7 @@ interface ExamInstructionRow {
 }
 
 export default function StudentExamsPage() {
+  const navigate = useNavigate();
   const [exams, setExams] = useState<ExamRow[]>([]);
   const [schedules, setSchedules] = useState<ExamScheduleRow[]>([]);
   const [participants, setParticipants] = useState<ExamParticipantRow[]>([]);
@@ -150,12 +153,21 @@ export default function StudentExamsPage() {
             {exams.map((e) => (
               <Card key={e.id} className="bg-slate-50">
                 <CardBody>
-                  <h3 className="font-semibold text-slate-900">{e.title}</h3>
-                  <p className="mt-1 text-sm text-slate-600 line-clamp-2">{e.description ?? "-"}</p>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
-                    {e.subject?.name && <Badge variant="secondary">{e.subject.name}</Badge>}
-                    {e.exam_date && <span>{formatDate(e.exam_date)}</span>}
-                    {e.status && <Badge variant="primary">{e.status}</Badge>}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="font-semibold text-slate-900">{e.title}</h3>
+                      <p className="mt-1 text-sm text-slate-600 line-clamp-2">{e.description ?? "-"}</p>
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
+                        {e.subject?.name && <Badge variant="secondary">{e.subject.name}</Badge>}
+                        {e.exam_date && <span>{formatDate(e.exam_date)}</span>}
+                        {e.status && <Badge variant="primary">{e.status}</Badge>}
+                      </div>
+                    </div>
+                    {e.status === "published" || e.status === "ongoing" ? (
+                      <Button size="sm" onClick={() => navigate(`/siswa/exams/${e.id}`)}>
+                        Kerjakan
+                      </Button>
+                    ) : null}
                   </div>
                 </CardBody>
               </Card>

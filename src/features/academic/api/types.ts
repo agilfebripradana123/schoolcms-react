@@ -324,3 +324,206 @@ export interface AcademicListParams extends ListParams {
   class_id?: number;
   subject_id?: number;
 }
+
+// ---- Teacher self-service: Kelas & Siswa (Portal Guru) ----
+// Backend resolves data scope from the authenticated user, so the client never
+// passes teacher_id. `TeacherClass` extends the shared `SchoolClass` with the
+// teacher-scoped fields the self-service endpoint returns.
+
+export interface TeacherClassWali {
+  id: number;
+  full_name: string;
+}
+
+export interface TeacherClass extends SchoolClass {
+  students_count: number;
+  wali_kelas?: TeacherClassWali | null;
+}
+
+export interface TeacherClassStudentSlim {
+  id: number;
+  nisn?: string;
+  nis?: string;
+  name: string;
+  gender?: "L" | "P" | null;
+}
+
+export interface TeacherClassStudent {
+  id: number;
+  class_id: number;
+  student_id: number;
+  status: string;
+  student?: TeacherClassStudentSlim | null;
+}
+
+export interface TeacherClassStudentsListParams extends ListParams {
+  q?: string;
+  page?: number;
+  per_page?: number;
+}
+
+// ---- Teacher self-service: Jadwal Mengajar (Portal Guru) ----
+// Response slim dari /api/teacher/schedules (scope dari user login).
+
+export interface TeacherSchedulePeriodRef {
+  id: number;
+  name?: string;
+  start_time?: string | null;
+  end_time?: string | null;
+}
+
+export interface TeacherScheduleSubjectRef {
+  id: number;
+  name?: string;
+}
+
+export interface TeacherScheduleClassRef {
+  id: number;
+  name?: string;
+  level?: string | null;
+}
+
+export interface TeacherScheduleYearRef {
+  id: number;
+  name?: string;
+}
+
+export interface TeacherSchedule {
+  id: number;
+  day: ScheduleDay;
+  period?: TeacherSchedulePeriodRef | null;
+  subject?: TeacherScheduleSubjectRef | null;
+  class?: TeacherScheduleClassRef | null;
+  academic_year?: TeacherScheduleYearRef | null;
+  semester?: TeacherScheduleYearRef | null;
+}
+
+export interface TeacherScheduleListParams extends ListParams {
+  day?: ScheduleDay;
+  academic_year_id?: number;
+  semester_id?: number;
+  class_id?: number;
+  subject_id?: number;
+}
+
+export const SCHEDULE_DAYS: ScheduleDay[] = [
+  "senin",
+  "selasa",
+  "rabu",
+  "kamis",
+  "jumat",
+  "sabtu",
+];
+
+export const SCHEDULE_DAY_LABELS: Record<ScheduleDay, string> = {
+  senin: "Senin",
+  selasa: "Selasa",
+  rabu: "Rabu",
+  kamis: "Kamis",
+  jumat: "Jumat",
+  sabtu: "Sabtu",
+};
+
+// ---- Teacher self-service: Kehadiran Siswa (Portal Guru) ----
+// Status mengikuti nilai backend (bahasa Indonesia).
+
+export const ATTENDANCE_STATUSES = ["hadir", "sakit", "izin", "alpa"] as const;
+export type AttendanceStatus = (typeof ATTENDANCE_STATUSES)[number];
+
+export const ATTENDANCE_STATUS_LABELS: Record<AttendanceStatus, string> = {
+  hadir: "Hadir",
+  sakit: "Sakit",
+  izin: "Izin",
+  alpa: "Alpa",
+};
+
+export interface TeacherAttendanceStudent {
+  student_id: number;
+  nis: string;
+  nisn: string;
+  name: string;
+  gender?: "L" | "P" | null;
+  status: AttendanceStatus | null;
+  note?: string | null;
+}
+
+export interface TeacherAttendanceRoster {
+  class_id: number;
+  date: string;
+  students: TeacherAttendanceStudent[];
+}
+
+export interface TeacherAttendanceSaveItem {
+  student_id: number;
+  status: AttendanceStatus;
+  note?: string | null;
+}
+
+export interface TeacherAttendanceSavePayload {
+  class_id: number;
+  date: string;
+  items: TeacherAttendanceSaveItem[];
+}
+
+// ---- Teacher self-service: Nilai (Portal Guru) ----
+// Grade bersifat komponen (type = tugas/uts/uas), scope = TeacherAssignment.
+
+export const GRADE_TYPES = ["tugas", "uts", "uas"] as const;
+
+export const GRADE_TYPE_LABELS: Record<GradeType, string> = {
+  tugas: "Tugas",
+  uts: "UTS",
+  uas: "UAS",
+};
+
+export const SEMESTER_OPTIONS = [
+  { value: "1", label: "Semester 1" },
+  { value: "2", label: "Semester 2" },
+] as const;
+
+export interface TeacherGradeAssignment {
+  id: number;
+  class_id: number;
+  class_name?: string;
+  subject_id: number;
+  subject_name?: string;
+  academic_year_id: number;
+  academic_year_name?: string;
+}
+
+export interface TeacherGradeStudent {
+  student_id: number;
+  nis: string;
+  nisn: string;
+  name: string;
+  gender?: "L" | "P" | null;
+  score: number | null;
+}
+
+export interface TeacherGradeRoster {
+  class_id: number;
+  subject_id: number;
+  type: GradeType;
+  semester: string;
+  academic_year: string;
+  students: TeacherGradeStudent[];
+}
+
+export interface TeacherGradeBulkItem {
+  student_id: number;
+  score: number | null;
+}
+
+export interface TeacherGradeBulkPayload {
+  class_id: number;
+  subject_id: number;
+  type: GradeType;
+  semester: string;
+  academic_year?: string;
+  academic_year_id?: number;
+  items: TeacherGradeBulkItem[];
+}
+
+
+
+

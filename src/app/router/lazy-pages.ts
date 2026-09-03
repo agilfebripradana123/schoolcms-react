@@ -80,6 +80,8 @@ export const StudentTransactionsPage = lazy(() => import("@/portal/student/pages
 export const StudentScholarshipsPage = lazy(() => import("@/portal/student/pages/StudentScholarshipsPage"));
 export const StudentAssignmentsPage = lazy(() => import("@/portal/student/pages/StudentAssignmentsPage"));
 export const StudentExamsPage = lazy(() => import("@/portal/student/pages/StudentExamsPage"));
+export const StudentExamLobbyPage = lazy(() => import("@/portal/student/pages/StudentExamLobbyPage"));
+export const StudentExamAttemptPage = lazy(() => import("@/portal/student/pages/StudentExamAttemptPage"));
 export const StudentAchievementsPage = lazy(() => import("@/portal/student/pages/StudentAchievementsPage"));
 export const StudentViolationsPage = lazy(() => import("@/portal/student/pages/StudentViolationsPage"));
 export const StudentExtracurricularPage = lazy(() => import("@/portal/student/pages/StudentExtracurricularPage"));
