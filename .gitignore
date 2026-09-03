@@ -39,3 +39,4 @@ dist-ssr/
 .opencode
 tsconfig.tsbuildinfo
 graphify-out/
+schoolcms_db.sql
