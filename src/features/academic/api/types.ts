@@ -523,7 +523,3 @@ export interface TeacherGradeBulkPayload {
   academic_year_id?: number;
   items: TeacherGradeBulkItem[];
 }
-
-
-
-

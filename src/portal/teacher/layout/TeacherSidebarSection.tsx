@@ -20,7 +20,6 @@ interface TeacherSidebarSectionProps {
   active: boolean;
   can: (permission?: string) => boolean;
   onToggle: () => void;
-  onGo: (path: string) => void;
   currentPath: string;
 }
 
@@ -31,7 +30,6 @@ export default function TeacherSidebarSection({
   active,
   can,
   onToggle,
-  onGo,
   currentPath,
 }: TeacherSidebarSectionProps) {
   const visibleItems = entry.items.filter((i) => can(i.permission));
@@ -45,7 +43,6 @@ export default function TeacherSidebarSection({
             item={item}
             collapsed={true}
             active={currentPath === item.path}
-            onGo={onGo}
           />
         ))}
       </div>
@@ -80,7 +77,6 @@ export default function TeacherSidebarSection({
               item={item}
               collapsed={false}
               active={currentPath === item.path}
-              onGo={onGo}
             />
           ))}
         </div>
@@ -88,4 +84,3 @@ export default function TeacherSidebarSection({
     </div>
   );
 }
-

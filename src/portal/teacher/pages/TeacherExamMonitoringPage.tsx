@@ -9,13 +9,18 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
+import Search from "@/components/ui/Search";
+import Select from "@/components/ui/Select";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import { Eye, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import type { SelectOption } from "@/components/ui/Select";
 
-const statusColors: Record<ExamAttemptStatus, string> = {
-  active: "bg-blue-100 text-blue-800",
-  submitted: "bg-green-100 text-green-800",
-  expired: "bg-red-100 text-red-800",
+const statusVariants: Record<ExamAttemptStatus, "primary" | "success" | "danger"> = {
+  active: "primary",
+  submitted: "success",
+  expired: "danger",
 };
 
 const statusLabels: Record<ExamAttemptStatus, string> = {
@@ -23,6 +28,12 @@ const statusLabels: Record<ExamAttemptStatus, string> = {
   submitted: "Selesai",
   expired: "Waktu Habis",
 };
+
+const statusOptions: SelectOption<ExamAttemptStatus | "">[] = [
+  { value: "active", label: "Sedang Mengerjakan" },
+  { value: "submitted", label: "Selesai" },
+  { value: "expired", label: "Waktu Habis" },
+];
 
 export default function TeacherExamMonitoringPage() {
   const navigate = useNavigate();
@@ -33,10 +44,12 @@ export default function TeacherExamMonitoringPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchAttempts = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await myExamMonitoringService.list({
         page: currentPage,
         per_page: 15,
@@ -47,9 +60,9 @@ export default function TeacherExamMonitoringPage() {
       setAttempts(response.data);
       setTotalPages(response.meta.last_page);
       setTotal(response.meta.total);
-    } catch (error) {
+    } catch {
+      setError("Gagal memuat data monitoring");
       toast.error("Gagal memuat data monitoring");
-      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -57,6 +70,7 @@ export default function TeacherExamMonitoringPage() {
 
   useEffect(() => {
     fetchAttempts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, statusFilter]);
 
   const handleSearch = () => {
@@ -81,8 +95,8 @@ export default function TeacherExamMonitoringPage() {
       accessor: "student" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="font-medium">{row.student.name}</div>
-          <div className="text-sm text-gray-500">{row.student.nis}</div>
+          <div className="font-medium text-on-surface">{row.student.name}</div>
+          <div className="text-xs text-on-surface-variant">{row.student.nis}</div>
         </div>
       ),
     },
@@ -91,8 +105,8 @@ export default function TeacherExamMonitoringPage() {
       accessor: "exam" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="font-medium">{row.exam.title}</div>
-          <div className="text-sm text-gray-500">{row.exam.subject.name}</div>
+          <div className="font-medium text-on-surface">{row.exam.title}</div>
+          <div className="text-xs text-on-surface-variant">{row.exam.subject.name}</div>
         </div>
       ),
     },
@@ -105,7 +119,7 @@ export default function TeacherExamMonitoringPage() {
       header: "Status",
       accessor: "status" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
-        <Badge className={statusColors[row.status]}>
+        <Badge variant={statusVariants[row.status]}>
           {statusLabels[row.status]}
         </Badge>
       ),
@@ -115,10 +129,10 @@ export default function TeacherExamMonitoringPage() {
       accessor: "progress" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="text-sm">
+          <div className="text-sm text-on-surface">
             {row.progress.answered}/{row.progress.total_questions}
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-on-surface-variant">
             {row.progress.percentage.toFixed(0)}%
           </div>
         </div>
@@ -148,7 +162,7 @@ export default function TeacherExamMonitoringPage() {
           size="sm"
           onClick={() => handleViewDetail(row.id)}
         >
-          <Eye className="w-4 h-4 mr-1" />
+          <Eye className="h-4 w-4 mr-1" />
           Detail
         </Button>
       ),
@@ -156,71 +170,88 @@ export default function TeacherExamMonitoringPage() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Monitoring Ujian</h1>
-          <p className="text-gray-600">
-            Monitor aktivitas siswa selama ujian berlangsung
-          </p>
-        </div>
-        <Button
-          variant="secondary"
-          onClick={fetchAttempts}
-          disabled={loading}
-        >
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-          Refresh
-        </Button>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Monitoring Ujian"
+        description="Monitor aktivitas siswa selama ujian berlangsung"
+        actions={
+          <Button
+            variant="secondary"
+            onClick={fetchAttempts}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+            Muat Ulang
+          </Button>
+        }
+      />
 
-      <Card className="p-6">
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Cari siswa (nama/NIS)..."
+      <Card>
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Cari Siswa
+            </label>
+            <Search
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="w-full px-4 py-2 border rounded-lg"
+              onChange={setSearchQuery}
+              placeholder="Cari siswa (nama/NIS)..."
+              autoFocus={false}
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as ExamAttemptStatus | "")}
-            className="w-48 px-4 py-2 border rounded-lg"
-          >
-            <option value="">Semua Status</option>
-            <option value="active">Sedang Mengerjakan</option>
-            <option value="submitted">Selesai</option>
-            <option value="expired">Waktu Habis</option>
-          </select>
-          <Button onClick={handleSearch}>Cari</Button>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Status
+            </label>
+            <Select<ExamAttemptStatus | "">
+              options={statusOptions}
+              value={statusFilter || null}
+              onChange={(v) => setStatusFilter(v ?? "")}
+              placeholder="Semua Status"
+              isClearable
+            />
+          </div>
+          <div className="flex items-end">
+            <Button onClick={handleSearch} className="w-full">
+              Tampilkan
+            </Button>
+          </div>
         </div>
 
-        <DataTable
-          columns={columns}
-          data={attempts}
-          loading={loading}
-        />
+        {error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">{error}</p>
+            <Button variant="secondary" size="sm" onClick={fetchAttempts}>
+              Muat Ulang
+            </Button>
+          </div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={attempts}
+            loading={loading}
+            emptyMessage="Belum ada peserta ujian."
+          />
+        )}
 
-        {!loading && attempts.length > 0 && (
-          <div className="flex justify-between items-center mt-4">
-            <div className="text-sm text-gray-600">
-              Total: {total} data
-            </div>
-            <div className="flex gap-2">
+        {!loading && !error && attempts.length > 0 && (
+          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-sm text-on-surface-variant">
+              Menampilkan{" "}
+              {(currentPage - 1) * 15 + 1}–{Math.min(currentPage * 15, total)}{" "}
+              dari {total} data
+            </p>
+            <div className="flex items-center gap-2">
               <Button
                 variant="secondary"
                 size="sm"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
               >
-                Previous
+                Sebelumnya
               </Button>
-              <span className="px-4 py-2 text-sm">
-                Page {currentPage} of {totalPages}
+              <span className="text-sm text-on-surface-variant">
+                Halaman {currentPage} dari {totalPages || 1}
               </span>
               <Button
                 variant="secondary"
@@ -228,12 +259,12 @@ export default function TeacherExamMonitoringPage() {
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
               >
-                Next
+                Berikutnya
               </Button>
             </div>
           </div>
         )}
       </Card>
-    </div>
+    </PageContainer>
   );
 }

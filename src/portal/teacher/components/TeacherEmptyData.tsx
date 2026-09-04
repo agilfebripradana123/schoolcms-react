@@ -14,10 +14,12 @@ export default function TeacherEmptyData({
   description,
 }: TeacherEmptyDataProps) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
-      <Inbox className="mx-auto h-8 w-8 text-slate-300" />
-      <p className="mt-2 text-sm font-semibold text-slate-600">{title}</p>
-      {description && <p className="mx-auto mt-1 max-w-md text-xs text-slate-400">{description}</p>}
+    <div className="rounded-2xl border border-dashed border-slate-200 bg-surface-container-low p-6 text-center">
+      <Inbox className="mx-auto h-8 w-8 text-outline" />
+      <p className="mt-2 text-sm font-semibold text-on-surface">{title}</p>
+      {description && (
+        <p className="mx-auto mt-1 max-w-md text-xs text-on-surface-variant">{description}</p>
+      )}
     </div>
   );
 }

@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarCheck, Save } from "lucide-react";
 import { toast } from "sonner";
 import Select from "@/components/ui/Select";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card, { CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import { usePermission } from "@/features/auth/usePermission";
 import { teacherClassService, teacherAttendanceService } from "@/features/academic";
 import type {
@@ -95,17 +97,15 @@ export default function TeacherAttendancePage() {
   const hasAnyMissing = rows.some((r) => !statusById[r.student_id]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-on-surface">Kehadiran</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          Input kehadiran siswa pada kelas yang menjadi scope mengajar Anda.
-        </p>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Kehadiran"
+        description="Input kehadiran siswa pada kelas yang menjadi scope mengajar Anda."
+      />
 
-      {/* Filter: Tanggal + Kelas (server-side) */}
       <Card>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Filter toolbar */}
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
               Tanggal
@@ -134,54 +134,44 @@ export default function TeacherAttendancePage() {
             </Button>
           </div>
         </div>
-      </Card>
 
-      {!hasSelection ? (
-        <Card>
-          <CardBody>
-            <p className="text-center text-sm text-on-surface-variant">
-              Pilih tanggal dan kelas untuk melihat kehadiran.
+        {/* Content states */}
+        {!hasSelection ? (
+          <div className="py-10 text-center text-sm text-on-surface-variant">
+            Pilih tanggal dan kelas untuk melihat kehadiran.
+          </div>
+        ) : error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">{error}</p>
+            <Button variant="secondary" size="sm" onClick={loadRoster}>
+              Muat Ulang
+            </Button>
+          </div>
+        ) : loading ? (
+          <div className="py-10 text-center text-sm text-on-surface-variant">
+            Memuat data kehadiran...
+          </div>
+        ) : rows.length === 0 ? (
+          <div className="py-10 text-center">
+            <CalendarCheck className="mx-auto h-8 w-8 text-outline" />
+            <p className="mt-2 text-sm font-semibold text-on-surface">Tidak ada data kehadiran.</p>
+            <p className="mt-1 text-xs text-on-surface-variant">
+              Tidak ada siswa aktif pada kelas ini.
             </p>
-          </CardBody>
-        </Card>
-      ) : error ? (
-        <Card>
-          <CardBody>
-            <p className="text-sm text-error">Gagal memuat kehadiran: {error}</p>
-          </CardBody>
-        </Card>
-      ) : loading ? (
-        <Card>
-          <CardBody>
-            <p className="text-center text-sm text-on-surface-variant">Memuat data kehadiran...</p>
-          </CardBody>
-        </Card>
-      ) : rows.length === 0 ? (
-        <Card>
-          <CardBody>
-            <div className="text-center">
-              <CalendarCheck className="mx-auto h-8 w-8 text-slate-300" />
-              <p className="mt-2 text-sm font-semibold text-on-surface">Tidak ada data kehadiran.</p>
-              <p className="mt-1 text-xs text-on-surface-variant">
-                Tidak ada siswa aktif pada kelas ini.
-              </p>
-            </div>
-          </CardBody>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader
-            title="Daftar Siswa"
-            description={`${rows.length} siswa aktif`}
-            actions={
-              canManage ? (
-                <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
-                  Simpan Kehadiran
-                </Button>
-              ) : undefined
-            }
-          />
-          <CardBody>
+          </div>
+        ) : (
+          <>
+            <CardHeader
+              title="Daftar Siswa"
+              description={`${rows.length} siswa aktif`}
+              actions={
+                canManage ? (
+                  <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
+                    Simpan Kehadiran
+                  </Button>
+                ) : undefined
+              }
+            />
             <DataTable<TeacherAttendanceStudent>
               loading={loading}
               emptyMessage="Tidak ada data kehadiran."
@@ -234,9 +224,9 @@ export default function TeacherAttendancePage() {
             {canManage && hasAnyMissing && (
               <p className="mt-3 text-xs text-error">Beberapa siswa belum dipilih statusnya.</p>
             )}
-          </CardBody>
-        </Card>
-      )}
-    </div>
+          </>
+        )}
+      </Card>
+    </PageContainer>
   );
 }

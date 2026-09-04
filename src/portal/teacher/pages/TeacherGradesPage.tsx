@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Save, Award } from "lucide-react";
 import { toast } from "sonner";
 import Select from "@/components/ui/Select";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card, { CardHeader } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import { usePermission } from "@/features/auth/usePermission";
 import { teacherGradeService, myAssignmentService } from "@/features/academic";
 import type {
@@ -151,16 +153,15 @@ export default function TeacherGradesPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-on-surface">Nilai</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          Input nilai siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda.
-        </p>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Nilai"
+        description="Input nilai siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
+      />
 
       <Card>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {/* Filter toolbar */}
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
               Kelas
@@ -179,6 +180,8 @@ export default function TeacherGradesPage() {
             </label>
             <Select<GradeType> options={typeOptions} value={type} onChange={(v) => v && setType(v)} />
           </div>
+        </div>
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div>
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
               Semester
@@ -189,63 +192,53 @@ export default function TeacherGradesPage() {
               onChange={(v) => v && setSemester(v)}
             />
           </div>
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-                Tahun Ajaran
-              </label>
-              <Select<string> options={yearOptions} value={academicYear} onChange={setAcademicYear} placeholder="Tahun" isClearable />
-            </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Tahun Ajaran
+            </label>
+            <Select<string> options={yearOptions} value={academicYear} onChange={setAcademicYear} placeholder="Tahun" isClearable />
+          </div>
+          <div className="flex items-end">
             <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
               Tampilkan
             </Button>
           </div>
         </div>
-      </Card>
 
-      {!canLoad ? (
-        <Card>
-          <CardBody>
-            <p className="text-center text-sm text-on-surface-variant">
-              Pilih kelas dan mata pelajaran terlebih dahulu.
-            </p>
-          </CardBody>
-        </Card>
-      ) : error ? (
-        <Card>
-          <CardBody>
-            <p className="text-sm text-error">Gagal memuat nilai: {error}</p>
-          </CardBody>
-        </Card>
-      ) : status === "loading" ? (
-        <Card>
-          <CardBody>
-            <p className="text-center text-sm text-on-surface-variant">Memuat nilai...</p>
-          </CardBody>
-        </Card>
-      ) : status === "empty" ? (
-        <Card>
-          <CardBody>
-            <div className="text-center">
-              <Award className="mx-auto h-8 w-8 text-slate-300" />
-              <p className="mt-2 text-sm font-semibold text-on-surface">Belum ada data nilai.</p>
-            </div>
-          </CardBody>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader
-            title="Daftar Nilai"
-            description={`${rows.length} siswa`}
-            actions={
-              canManage ? (
-                <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
-                  Simpan Nilai
-                </Button>
-              ) : undefined
-            }
-          />
-          <CardBody>
+        {/* Content states */}
+        {!canLoad ? (
+          <div className="py-10 text-center text-sm text-on-surface-variant">
+            Pilih kelas dan mata pelajaran terlebih dahulu.
+          </div>
+        ) : error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">{error}</p>
+            <Button variant="secondary" size="sm" onClick={loadRoster}>
+              Muat Ulang
+            </Button>
+          </div>
+        ) : status === "loading" ? (
+          <div className="py-10 text-center text-sm text-on-surface-variant">
+            Memuat nilai...
+          </div>
+        ) : status === "empty" ? (
+          <div className="py-10 text-center">
+            <Award className="mx-auto h-8 w-8 text-outline" />
+            <p className="mt-2 text-sm font-semibold text-on-surface">Belum ada data nilai.</p>
+          </div>
+        ) : (
+          <>
+            <CardHeader
+              title="Daftar Nilai"
+              description={`${rows.length} siswa`}
+              actions={
+                canManage ? (
+                  <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
+                    Simpan Nilai
+                  </Button>
+                ) : undefined
+              }
+            />
             <DataTable<TeacherGradeStudent>
               loading={false}
               emptyMessage="Belum ada data nilai."
@@ -285,9 +278,9 @@ export default function TeacherGradesPage() {
               ]}
               data={rows}
             />
-          </CardBody>
-        </Card>
-      )}
-    </div>
+          </>
+        )}
+      </Card>
+    </PageContainer>
   );
 }
