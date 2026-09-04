@@ -83,14 +83,18 @@ export default function StudentPortalPage() {
     <div className="space-y-6">
       <Card>
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white">
-            <span className="text-xl font-bold">
-              {profile?.name?.charAt(0).toUpperCase() || "S"}
-            </span>
-          </div>
+          {profile?.photo ? (
+            <img src={profile.photo} alt={profile.name} className="h-14 w-14 rounded-full object-cover border" onError={(e)=>{ (e.target as HTMLImageElement).style.display='none'; }} />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white">
+              <span className="text-xl font-bold">
+                {profile?.name?.charAt(0).toUpperCase() || "S"}
+              </span>
+            </div>
+          )}
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              Selamat datang, {profile?.name || "Siswa"} 👋
+            <h1 className="text-lg font-bold leading-tight text-slate-900 sm:text-xl lg:text-2xl">
+              Selamat datang, {profile?.name || "Siswa"}
             </h1>
             <p className="text-sm text-slate-500">
               {profile?.nisn ? `NISN: ${profile.nisn}` : ""}

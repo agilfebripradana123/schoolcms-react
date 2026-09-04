@@ -16,6 +16,25 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [imgFailed, setImgFailed] = useState(false);
+  const [studentPhoto, setStudentPhoto] = useState<string | null>(null);
+
+  // fetch student photo (students.photo) and sync to header; users.photo is separate
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { api } = await import("@/lib/api");
+        const r = await api.get<{ success: boolean; data: { photo?: string | null } }>("/student/profile");
+        if (active && r.data?.photo) setStudentPhoto(r.data.photo as string);
+      } catch {
+        // ignore, fallback to user.photo / initial
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleUserMenu = useCallback(() => {
     setUserMenuOpen((prev) => !prev);
@@ -96,11 +115,20 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
               aria-label="Menu pengguna"
               aria-expanded={userMenuOpen}
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
-                <span className="text-sm font-bold">
-                  {userDisplayName.charAt(0).toUpperCase()}
-                </span>
-              </div>
+              {(studentPhoto ?? user?.photo) && !imgFailed ? (
+                <img
+                  src={(studentPhoto ?? user?.photo) as string}
+                  alt={userDisplayName}
+                  className="h-9 w-9 rounded-full object-cover border border-slate-200"
+                  onError={() => setImgFailed(true)}
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
+                  <span className="text-sm font-bold">
+                    {userDisplayName.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
               <span className="hidden text-sm font-semibold md:block">
                 {userDisplayName}
               </span>
