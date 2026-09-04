@@ -190,6 +190,59 @@ export const studentDashboardItem = {
   icon: LayoutDashboard,
 } as const;
 
+export const teacherDashboardItem = {
+  label: "Dasbor",
+  path: "/guru/dashboard",
+  icon: LayoutDashboard,
+} as const;
+
+// Guru Portal navigation — `navOverlay` pattern like Admin `navigation`
+// and `studentNavigation`. Hanya menu yang relevan untuk role guru.
+export const teacherNavigation = [
+  {
+    label: "Akademik",
+    items: [
+      { label: "Kelas Saya", path: "/guru/academic/classes", permission: "view-classes", icon: School },
+      { label: "Jadwal Mengajar", path: "/guru/academic/schedules", permission: "view-schedules", icon: CalendarClock },
+      { label: "Kehadiran", path: "/guru/academic/attendance", permission: "view-attendance", icon: ClipboardCheck },
+      { label: "Nilai", path: "/guru/academic/grades", permission: "view-grades", icon: Award },
+      { label: "Tugas", path: "/guru/academic/assignments", permission: "view-assignments", icon: ClipboardList },
+    ],
+  },
+  {
+    label: "Ujian",
+    items: [
+      { label: "Ujian", path: "/guru/examinations", permission: "view-exams", icon: BookOpen },
+      { label: "Jadwal Ujian", path: "/guru/examinations/schedules", permission: "view-exam-schedules", icon: CalendarClock },
+      { label: "Hasil Ujian", path: "/guru/examinations/results", permission: "view-exam-results", icon: BarChart3 },
+      { label: "Monitoring", path: "/guru/exams/monitoring", permission: "view-exam-monitoring", icon: Activity },
+    ],
+  },
+  {
+    label: "Kesiswaan",
+    items: [
+      { label: "Siswa", path: "/guru/students", icon: Users },
+      { label: "Prestasi", path: "/guru/achievements", icon: Trophy },
+      { label: "Pelanggaran", path: "/guru/violations", icon: ShieldAlert },
+      { label: "Ekstrakurikuler", path: "/guru/extracurricular", icon: Dumbbell },
+    ],
+  },
+  {
+    label: "Sarana & Prasarana",
+    permission: "manage-facilities",
+    items: [
+      { label: "Sarana & Prasarana", path: "/guru/facilities", icon: Building2 },
+    ],
+  },
+  {
+    label: "Akun",
+    items: [
+      { label: "Profil", path: "/guru/profile", icon: User },
+      { label: "Notifikasi", path: "/guru/notifications", icon: Bell },
+    ],
+  },
+];
+
 // Student Portal navigation — `navOverlay` pattern like Admin `navigation`
 export const studentNavigation = [
   {

@@ -1,7 +1,7 @@
 import { useState, ReactNode } from "react";
 import type { User, LoginPayload, LoginResponse } from "@/types";
 import { TOKEN_KEY, USER_KEY } from "@/lib/api/axios";
-import { login as loginRequest } from "./api/auth.service";
+import { login as loginRequest, me } from "./api/auth.service";
 import { AuthContext } from "./context";
 
 function parseStoredUser(): User | null {
@@ -49,6 +49,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(USER_KEY);
   };
 
+  // Re-fetch the authenticated user (GET /api/me) so effective permissions
+  // (role + additional) can be refreshed without logging out. Returns the
+  // refreshed user, or null when the session is no longer valid.
+  const refreshUser = async (): Promise<User | null> => {
+    try {
+      const data = await me();
+      setUser(data.user);
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      return data.user;
+    } catch {
+      return null;
+    }
+  };
+
   const updateUser = (patch: Partial<User>) => {
     setUser((prev) => {
       if (!prev) return prev;
@@ -65,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token,
         isLoading,
         login,
+        refreshUser,
         logout,
         updateUser,
         isAuthenticated: !!token,

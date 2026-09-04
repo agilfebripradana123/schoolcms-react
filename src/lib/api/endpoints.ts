@@ -45,6 +45,8 @@ export const STUDENTS = {
   EXAM_PARTICIPANTS: "/student/exam-participants",
   EXAM_RESULTS: "/student/exam-results",
   EXAM_ANSWERS: "/student/exam-answers",
+  EXAM_ATTEMPTS: "/student/exam-attempts",
+  EXAM_ATTEMPTS_START: "/student/exam-attempts/start",
   ACHIEVEMENTS: "/student/achievements",
   VIOLATIONS: "/student/violations",
   EXTRACURRICULARS: "/student/extracurriculars",
@@ -57,6 +59,21 @@ export const STAFF = {
   TEACHER_ATTENDANCES: "/teacher-attendances",
   TEACHER_LEAVES: "/teacher-leaves",
   TEACHER_DOCUMENTS: "/teacher-documents",
+} as const;
+
+// Teacher self-service (Portal Guru) — data scope resolved server-side.
+export const TEACHER = {
+  CLASSES: "/teacher/classes",
+  CLASS_STUDENTS: "/teacher/classes/{classId}/students",
+  SCHEDULES: "/teacher/schedules",
+  ATTENDANCE: "/teacher/attendance",
+  ASSIGNMENTS: "/teacher/assignments",
+  GRADES: "/teacher/grades",
+  GRADES_BULK: "/teacher/grades/bulk",
+  EXAMS: "/teacher/exams",
+  EXAM_SCHEDULES: "/teacher/exam-schedules",
+  EXAM_RESULTS: "/teacher/exam-results",
+  EXAM_MONITORING: "/teacher/exam-monitoring",
 } as const;
 
 export const PPDB = {

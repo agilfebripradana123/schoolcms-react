@@ -27,6 +27,7 @@ export default function UserPermissionForm({
   const [catalogError, setCatalogError] = useState(false);
 
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [rolePermissions, setRolePermissions] = useState<Permission[]>([]);
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -63,12 +64,15 @@ export default function UserPermissionForm({
         .then((res) => {
           const ids = res.data.permissions?.map((p) => p.id) ?? [];
           setSelectedIds(ids);
+          setRolePermissions(res.data.role?.permissions ?? []);
         })
         .catch(() => {
           setSelectedIds([]);
+          setRolePermissions([]);
         });
     } else {
       setSelectedIds([]);
+      setRolePermissions([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialData, loadCatalog]);
@@ -137,8 +141,30 @@ export default function UserPermissionForm({
     >
       <div>
         <p className="mb-4 text-sm text-on-surface-variant">
-          Permission ini berlaku langsung untuk pengguna (di luar permission
-          yang berasal dari role-nya).
+          Permission dari role bersifat inheritan (read-only). Centang di bawah
+          untuk menambahkan permission tambahan khusus pengguna ini.
+        </p>
+
+        {rolePermissions.length > 0 && (
+          <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-outline">
+              Hak akses dari Role{initialData?.role?.name ? ` — ${initialData.role.name}` : ""}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {rolePermissions.map((p) => (
+                <span
+                  key={p.id}
+                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-on-surface-variant"
+                >
+                  {p.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-outline">
+          Hak akses tambahan
         </p>
 
         {catalogLoading ? (

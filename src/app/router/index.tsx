@@ -5,13 +5,27 @@ import NotFound from "@/pages/NotFound";
 import Login from "@/pages/Login";
 import GuruLogin from "@/pages/Login/GuruLogin";
 import AdminLogin from "@/pages/Login/AdminLogin";
-import ModulePlaceholder from "@/components/ui/ModulePlaceholder";
 import ProtectedRoute from "@/features/auth/ProtectedRoute";
 import RoleRoute from "@/features/auth/RoleRoute";
 import StudentRoute, { AdminRoute } from "@/features/auth/StudentRoute";
 import GuruRoute from "@/features/auth/GuruRoute";
+import PermissionRoute from "@/features/auth/PermissionRoute";
 import StudentLayout from "@/portal/student/layout/StudentLayout";
-import GuruLayout from "@/portal/teacher/layout/TeacherLayout";
+import TeacherLayout from "@/portal/teacher/layout/TeacherLayout";
+import TeacherDashboardPage from "@/portal/teacher/pages/TeacherDashboardPage";
+import TeacherProfilePage from "@/portal/teacher/pages/TeacherProfilePage";
+import TeacherFacilitiesPlaceholderPage from "@/portal/teacher/pages/TeacherFacilitiesPlaceholderPage";
+import TeacherClassesPage from "@/portal/teacher/pages/TeacherClassesPage";
+import TeacherClassDetailPage from "@/portal/teacher/pages/TeacherClassDetailPage";
+import TeacherSchedulesPage from "@/portal/teacher/pages/TeacherSchedulesPage";
+import TeacherAttendancePage from "@/portal/teacher/pages/TeacherAttendancePage";
+import TeacherGradesPage from "@/portal/teacher/pages/TeacherGradesPage";
+import TeacherMyAssignmentsPage from "@/portal/teacher/pages/TeacherAssignmentsPage";
+import TeacherExamsPage from "@/portal/teacher/pages/TeacherExamsPage";
+import TeacherExamSchedulesPage from "@/portal/teacher/pages/TeacherExamSchedulesPage";
+import TeacherExamResultsPage from "@/portal/teacher/pages/TeacherExamResultsPage";
+import TeacherExamMonitoringPage from "@/portal/teacher/pages/TeacherExamMonitoringPage";
+import TeacherExamMonitoringDetailPage from "@/portal/teacher/pages/TeacherExamMonitoringDetailPage";
 import { NotificationsPage } from "@/features/notifications";
 import {
   AcademicYearPage,
@@ -80,6 +94,8 @@ import {
   StudentScholarshipsPage,
   StudentAssignmentsPage,
   StudentExamsPage,
+  StudentExamLobbyPage,
+  StudentExamAttemptPage,
   StudentAchievementsPage,
   StudentViolationsPage,
   StudentExtracurricularPage,
@@ -247,17 +263,80 @@ const router = createBrowserRouter([
         element: <GuruRoute />,
         children: [
           {
-            element: <GuruLayout />,
+            element: <TeacherLayout />,
             children: [
               { index: true, element: <Navigate to="/guru/dashboard" replace /> },
-              { path: "dashboard", element: <ModulePlaceholder title="Dashboard Guru" domain="Guru" /> },
+              { path: "dashboard", element: <TeacherDashboardPage /> },
+              { path: "profile", element: <TeacherProfilePage /> },
               {
                 element: <RoleRoute allow={["guru", "admin", "administrator"]} />,
                 children: [
-                  { path: "academic/classes", element: <ClassesPage /> },
-                  { path: "academic/schedules", element: <SchedulesPage /> },
-                  { path: "academic/grades", element: <GradesPage /> },
                   { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-classes" />,
+                children: [
+                  { path: "academic/classes", element: <TeacherClassesPage /> },
+                  { path: "academic/classes/:id", element: <TeacherClassDetailPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-schedules" />,
+                children: [
+                  { path: "academic/schedules", element: <TeacherSchedulesPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-attendance" />,
+                children: [
+                  { path: "academic/attendance", element: <TeacherAttendancePage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-grades" />,
+                children: [
+                  { path: "academic/grades", element: <TeacherGradesPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-assignments" />,
+                children: [
+                  { path: "academic/assignments", element: <TeacherMyAssignmentsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-exams" />,
+                children: [
+                  { path: "examinations", element: <TeacherExamsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-exam-schedules" />,
+                children: [
+                  { path: "examinations/schedules", element: <TeacherExamSchedulesPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-exam-results" />,
+                children: [
+                  { path: "examinations/results", element: <TeacherExamResultsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-exam-monitoring" />,
+                children: [
+                  { path: "exams/monitoring", element: <TeacherExamMonitoringPage /> },
+                  { path: "exams/monitoring/:attemptId", element: <TeacherExamMonitoringDetailPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-facilities" />,
+                children: [
+                  {
+                    path: "facilities",
+                    element: <TeacherFacilitiesPlaceholderPage />,
+                  },
                 ],
               },
             ],
@@ -293,11 +372,16 @@ const router = createBrowserRouter([
               { path: "finance/scholarships", element: <StudentScholarshipsPage /> },
               { path: "assignments", element: <StudentAssignmentsPage /> },
               { path: "exams", element: <StudentExamsPage /> },
+              { path: "exams/:examId", element: <StudentExamLobbyPage /> },
               { path: "achievements", element: <StudentAchievementsPage /> },
               { path: "violations", element: <StudentViolationsPage /> },
               { path: "extracurricular", element: <StudentExtracurricularPage /> },
               { path: "notifications", element: <StudentNotificationsPage /> },
             ],
+          },
+          {
+            path: "exams/attempt/:attemptId",
+            element: <StudentExamAttemptPage />,
           },
         ],
       },

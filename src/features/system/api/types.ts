@@ -49,6 +49,7 @@ export interface SyncRolePermissionsPayload {
 export interface UserRole {
   id: number;
   name: string;
+  permissions?: Permission[];
 }
 
 export interface UserManagement {
