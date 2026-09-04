@@ -8,6 +8,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import AppSelect from "../../../components/ui/Select";
 
 interface GradeRow {
   subject_name: string;
@@ -125,18 +126,17 @@ export default function StudentGradesPage() {
       <Card className="mb-6">
         <CardBody className="flex flex-wrap items-center gap-3">
           <label className="text-sm font-medium text-slate-700">Semester:</label>
-          <select
-            value={selectedSemester ?? ""}
-            onChange={(e) => setSelectedSemester(e.target.value ? Number(e.target.value) : null)}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="">Semua</option>
-            {semesters.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+          <div className="min-w-[200px]">
+            <AppSelect<number | string>
+              options={[
+                { value: "", label: "Semua" },
+                ...semesters.map((s) => ({ value: s.id, label: s.name })),
+              ]}
+              value={selectedSemester ?? ""}
+              onChange={(v) => setSelectedSemester(v === "" || v == null ? null : Number(v))}
+              placeholder="Pilih semester..."
+            />
+          </div>
         </CardBody>
       </Card>
 

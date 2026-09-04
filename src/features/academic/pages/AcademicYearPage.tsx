@@ -9,6 +9,7 @@ import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
+import Pagination from "@/components/ui/Pagination";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import { academicYearService } from "../api/academic-year.service";
@@ -39,7 +40,6 @@ export default function AcademicYearPage() {
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
-  const [page, setPage] = useState(1);
 
   const [query, setQuery] = useState<QueryState>({ q: "", is_active: undefined, page: 1 });
 
@@ -64,7 +64,6 @@ export default function AcademicYearPage() {
         if (!active) return;
         setData(res.data);
         setMeta(res.meta);
-        setPage(res.meta.current_page);
       })
       .catch((err) => {
         if (!active) return;
@@ -192,8 +191,6 @@ export default function AcademicYearPage() {
     ];
   }, [openEdit, openDelete]);
 
-  const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
-  const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
   const statusFilterOptions = [
     { value: "all", label: "Semua" },
@@ -310,34 +307,7 @@ export default function AcademicYearPage() {
           </>
         )}
 
-        {!error && !loading && meta.total > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan {from}-{to} dari {meta.total} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => goToPage(page - 1)}
-              >
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {page} dari {meta.last_page}
-              </span>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={page >= meta.last_page}
-                onClick={() => goToPage(page + 1)}
-              >
-                Berikutnya
-              </Button>
-            </div>
-          </div>
-        )}
+        <Pagination meta={meta} onPageChange={goToPage} loading={loading} error={error} />
       </Card>
 
       <AcademicYearForm

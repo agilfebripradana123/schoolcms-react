@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 import Search from "@/components/ui/Search";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
+import Pagination from "../../../components/ui/Pagination";
 
 interface NavState {
   className?: string;
@@ -142,35 +143,13 @@ export default function TeacherClassDetailPage() {
               data={students}
             />
         )}
-        {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan{" "}
-              {(meta.current_page - 1) * 20 + 1}–{Math.min(meta.current_page * 20, meta.total)}{" "}
-              dari {meta.total} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={page <= 1 || loading}
-                onClick={() => { const next = page - 1; setPage(next); load(next, search); }}
-              >
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {meta.current_page} dari {meta.last_page}
-              </span>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={page >= (meta.last_page ?? 1) || loading}
-                onClick={() => { const next = page + 1; setPage(next); load(next, search); }}
-              >
-                Berikutnya
-              </Button>
-            </div>
-          </div>
+        {meta && (
+          <Pagination
+            meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 20, total: meta.total }}
+            onPageChange={(n) => { setPage(n); load(n, search); }}
+            loading={loading}
+            error={error}
+          />
         )}
       </Card>
     </PageContainer>

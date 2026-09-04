@@ -20,6 +20,7 @@ interface AppSelectProps<T = string | number> {
   error?: boolean;
   id?: string;
   className?: string;
+  size?: "default" | "sm";
 }
 
 const primary = "#7c3aed";
@@ -31,12 +32,14 @@ const onSurface = "#191c1e";
 const outline = "#7b7487";
 const error = "#ba1a1a";
 
-function buildStyles(errorFlag?: boolean) {
+function buildStyles(errorFlag?: boolean, size: "default" | "sm" = "default") {
+  const compact = size === "sm";
+  const fontSize = compact ? "0.75rem" : "0.875rem";
   return {
     control: (base: object, state: { isFocused: boolean }) => ({
       ...base,
-      minHeight: 46,
-      borderRadius: "1rem",
+      minHeight: compact ? 32 : 46,
+      borderRadius: compact ? "0.5rem" : "1rem",
       borderColor: errorFlag
         ? error
         : state.isFocused
@@ -47,31 +50,31 @@ function buildStyles(errorFlag?: boolean) {
         borderColor: state.isFocused ? primary : borderHover,
       },
       backgroundColor: "#ffffff",
-      padding: "2px 4px",
+      padding: compact ? "0 2px" : "2px 4px",
       cursor: "pointer",
     }),
     valueContainer: (base: object) => ({
       ...base,
-      padding: "0 8px",
+      padding: compact ? "0 4px" : "0 8px",
     }),
     placeholder: (base: object) => ({
       ...base,
       color: outline,
-      fontSize: "0.875rem",
+      fontSize,
     }),
     singleValue: (base: object) => ({
       ...base,
       color: onSurface,
-      fontSize: "0.875rem",
+      fontSize,
     }),
     input: (base: object) => ({
       ...base,
-      fontSize: "0.875rem",
+      fontSize,
       color: onSurface,
     }),
     menu: (base: object) => ({
       ...base,
-      borderRadius: "1rem",
+      borderRadius: compact ? "0.5rem" : "1rem",
       border: `1px solid ${borderDefault}`,
       boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
       overflow: "hidden",
@@ -93,7 +96,8 @@ function buildStyles(errorFlag?: boolean) {
           ? primarySoft
           : "transparent",
       color: state.isSelected ? "#ffffff" : onSurface,
-      fontSize: "0.875rem",
+      fontSize,
+      padding: compact ? "4px 8px" : undefined,
       cursor: "pointer",
       "&:active": {
         backgroundColor: state.isSelected ? primary : primarySofter,
@@ -115,8 +119,9 @@ export default function AppSelect<T = string | number>({
   error = false,
   id,
   className = "",
+  size = "default",
 }: AppSelectProps<T>) {
-  const styles = useMemo(() => buildStyles(error), [error]);
+  const styles = useMemo(() => buildStyles(error, size), [error, size]);
 
   const selectedOption = useMemo(
     () => options.find((o) => String(o.value) === String(value)) ?? null,

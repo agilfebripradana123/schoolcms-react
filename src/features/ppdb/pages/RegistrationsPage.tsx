@@ -16,6 +16,7 @@ import { registrationService } from "../api/registration.service";
 import type { Registrant } from "../api/types";
 import RegistrantForm from "../components/RegistrantForm";
 import RegistrantDetail from "../components/RegistrantDetail";
+import Pagination from "../../../components/ui/Pagination";
 
 const PER_PAGE = 10;
 
@@ -255,11 +256,6 @@ const columns = useMemo(() => {
     ];
   }, [openEdit, openDelete, openDetail]);
 
-  const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
-  const to = Math.min(meta.current_page * meta.per_page, meta.total);
-  const isFirst = meta.current_page <= 1;
-  const isLast = meta.current_page >= meta.last_page;
-
   return (
     <PageContainer className="py-6">
       <PageHeader
@@ -311,16 +307,7 @@ const columns = useMemo(() => {
           <DataTable columns={columns} data={data} loading={loading} emptyMessage="Belum ada pendaftaran." />
         )}
 
-        {!error && !loading && meta.total > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">Menampilkan {from}-{to} dari {meta.total} data</p>
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" disabled={isFirst} onClick={() => goToPage(meta.current_page - 1)}>Sebelumnya</Button>
-              <span className="text-sm text-on-surface-variant">Halaman {meta.current_page} dari {meta.last_page}</span>
-              <Button variant="secondary" size="sm" disabled={isLast} onClick={() => goToPage(meta.current_page + 1)}>Berikutnya</Button>
-            </div>
-          </div>
-        )}
+        <Pagination meta={meta} onPageChange={goToPage} loading={loading} error={error} />
       </Card>
 
       <RegistrantForm

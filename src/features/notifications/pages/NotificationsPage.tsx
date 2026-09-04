@@ -3,6 +3,7 @@ import { CheckCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import Pagination from "@/components/ui/Pagination";
 import PageContainer from "@/components/layout/PageContainer";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
@@ -120,8 +121,6 @@ export default function NotificationsPage() {
   }, [filter]);
 
   const unreadCount = data.filter((n) => !n.is_read).length;
-  const from = total === 0 ? 0 : (page - 1) * PER_PAGE + 1;
-  const to = Math.min(page * PER_PAGE, total);
 
   return (
     <PageContainer className="py-6">
@@ -229,32 +228,12 @@ export default function NotificationsPage() {
       </Card>
 
       {!loading && !error && total > 0 && (
-        <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <p className="text-sm text-on-surface-variant">
-            Menampilkan {from}-{to} dari {total} data
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => goToPage(page - 1)}
-            >
-              Sebelumnya
-            </Button>
-            <span className="text-sm text-on-surface-variant">
-              Halaman {page} dari {lastPage}
-            </span>
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={page >= lastPage}
-              onClick={() => goToPage(page + 1)}
-            >
-              Berikutnya
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          meta={{ current_page: page, last_page: lastPage, per_page: PER_PAGE, total }}
+          onPageChange={goToPage}
+          loading={loading}
+          error={error}
+        />
       )}
     </PageContainer>
   );

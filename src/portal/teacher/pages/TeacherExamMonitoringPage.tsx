@@ -11,6 +11,7 @@ import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
 import Search from "@/components/ui/Search";
 import Select from "@/components/ui/Select";
+import Pagination from "@/components/ui/Pagination";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { Eye, RefreshCw } from "lucide-react";
@@ -235,34 +236,12 @@ export default function TeacherExamMonitoringPage() {
         )}
 
         {!loading && !error && attempts.length > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan{" "}
-              {(currentPage - 1) * 15 + 1}–{Math.min(currentPage * 15, total)}{" "}
-              dari {total} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {currentPage} dari {totalPages || 1}
-              </span>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >
-                Berikutnya
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            meta={{ current_page: currentPage, last_page: totalPages, per_page: 15, total }}
+            onPageChange={setCurrentPage}
+            loading={loading}
+            error={error}
+          />
         )}
       </Card>
     </PageContainer>

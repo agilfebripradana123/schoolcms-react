@@ -7,6 +7,7 @@ import DataTable from "@/components/ui/DataTable";
 import Search from "@/components/ui/Search";
 import SortSelect from "@/components/ui/SortSelect";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import Pagination from "@/components/ui/Pagination";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
@@ -219,9 +220,6 @@ export default function ParentListPage() {
     ];
   }, [openEdit, openDelete]);
 
-  const from = filtered.length === 0 ? 0 : (safePage - 1) * PER_PAGE + 1;
-  const to = Math.min(safePage * PER_PAGE, filtered.length);
-
   return (
     <PageContainer className="py-6">
       <PageHeader
@@ -302,34 +300,12 @@ export default function ParentListPage() {
           </>
         )}
 
-        {!error && !loading && filtered.length > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan {from}-{to} dari {filtered.length} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={safePage <= 1}
-                onClick={() => goToPage(safePage - 1)}
-              >
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {safePage} dari {totalPages}
-              </span>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={safePage >= totalPages}
-                onClick={() => goToPage(safePage + 1)}
-              >
-                Berikutnya
-              </Button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          meta={{ current_page: safePage, last_page: totalPages, per_page: PER_PAGE, total: filtered.length }}
+          onPageChange={goToPage}
+          loading={loading}
+          error={error}
+        />
       </Card>
 
       <ParentForm

@@ -7,6 +7,7 @@ import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
+import Pagination from "../../../components/ui/Pagination";
 import { myExamResultService } from "@/features/examinations";
 import type { ExamResult, ExamResultStatus } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
@@ -24,7 +25,7 @@ const STATUS_VARIANTS: Record<ExamResultStatus, "neutral" | "success"> = {
 
 export default function TeacherExamResultsPage() {
   const [results, setResults] = useState<ExamResult[]>([]);
-  const [meta, setMeta] = useState<{ total: number; last_page: number; current_page: number } | null>(null);
+  const [meta, setMeta] = useState<{ total: number; last_page: number; current_page: number; per_page?: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -166,25 +167,13 @@ export default function TeacherExamResultsPage() {
               data={results}
             />
         )}
-        {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan{" "}
-              {(meta.current_page - 1) * 15 + 1}–{Math.min(meta.current_page * 15, meta.total)}{" "}
-              dari {meta.total} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" disabled={page <= 1 || loading} onClick={() => { const n = page - 1; setPage(n); load(n, examId, status); }}>
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {meta.current_page} dari {meta.last_page}
-              </span>
-              <Button variant="secondary" size="sm" disabled={page >= (meta.last_page ?? 1) || loading} onClick={() => { const n = page + 1; setPage(n); load(n, examId, status); }}>
-                Berikutnya
-              </Button>
-            </div>
-          </div>
+        {meta && (
+          <Pagination
+            meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: (meta as { per_page?: number }).per_page ?? 15, total: meta.total }}
+            onPageChange={(n) => { setPage(n); load(n, examId, status); }}
+            loading={loading}
+            error={error}
+          />
         )}
       </Card>
 

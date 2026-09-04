@@ -8,6 +8,7 @@ import Modal from "@/components/ui/Modal";
 import Search from "@/components/ui/Search";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
+import Pagination from "../../../components/ui/Pagination";
 import { myExamService } from "@/features/examinations";
 import type { Exam, ExamStatus } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
@@ -171,25 +172,13 @@ export default function TeacherExamsPage() {
               data={exams}
             />
         )}
-        {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan{" "}
-              {(meta.current_page - 1) * 15 + 1}–{Math.min(meta.current_page * 15, meta.total)}{" "}
-              dari {meta.total} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" disabled={page <= 1 || loading} onClick={() => { const n = page - 1; setPage(n); load(n, search, subjectId, status); }}>
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {meta.current_page} dari {meta.last_page}
-              </span>
-              <Button variant="secondary" size="sm" disabled={page >= (meta.last_page ?? 1) || loading} onClick={() => { const n = page + 1; setPage(n); load(n, search, subjectId, status); }}>
-                Berikutnya
-              </Button>
-            </div>
-          </div>
+        {meta && (
+          <Pagination
+            meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 15, total: meta.total }}
+            onPageChange={(n) => { setPage(n); load(n, search, subjectId, status); }}
+            loading={loading}
+            error={error}
+          />
         )}
       </Card>
 

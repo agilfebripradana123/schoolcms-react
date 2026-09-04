@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarCheck, Save } from "lucide-react";
 import { toast } from "sonner";
-import Select from "@/components/ui/Select";
+import AppSelect from "@/components/ui/Select";
 import Card, { CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -121,7 +121,7 @@ export default function TeacherAttendancePage() {
             <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
               Kelas
             </label>
-            <Select<number>
+            <AppSelect<number>
               options={classOptions}
               value={classId}
               onChange={setClassId}
@@ -199,22 +199,15 @@ export default function TeacherAttendancePage() {
                       return <Badge variant={cur ? cls[cur] : "neutral"}>{cur ? ATTENDANCE_STATUS_LABELS[cur] : "—"}</Badge>;
                     }
                     return (
-                      <select
-                        value={cur}
-                        onChange={(e) =>
-                          setStatusById((prev) => ({
-                            ...prev,
-                            [row.student_id]: e.target.value as StatusKey,
-                          }))
-                        }
-                        className="rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-sm text-on-surface focus:border-primary-container focus:outline-none"
-                      >
-                        {ATTENDANCE_STATUSES.map((s) => (
-                          <option key={s} value={s}>
-                            {ATTENDANCE_STATUS_LABELS[s]}
-                          </option>
-                        ))}
-                      </select>
+                      <AppSelect
+                        size="sm"
+                        options={ATTENDANCE_STATUSES.map((s) => ({ value: s, label: ATTENDANCE_STATUS_LABELS[s] }))}
+                        value={cur || null}
+                        onChange={(v) => setStatusById((prev) => ({ ...prev, [row.student_id]: v as StatusKey }))}
+                        placeholder="Pilih"
+                        isSearchable={false}
+                        className="min-w-[140px]"
+                      />
                     );
                   },
                 },
