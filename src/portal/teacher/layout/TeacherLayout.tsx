@@ -18,7 +18,7 @@ export default function TeacherLayout() {
   const toggleMobileSidebar = useCallback(() => setMobileSidebarOpen((open) => !open), []);
   const closeMobileSidebar = useCallback(() => setMobileSidebarOpen(false), []);
 
-  // Auto-close mobile sidebar on route change
+  // Auto-close mobile sidebar on route change (same as Student MobileSidebar)
   useEffect(() => {
     closeMobileSidebar();
   }, [location.pathname, closeMobileSidebar]);
@@ -47,7 +47,7 @@ export default function TeacherLayout() {
             aria-label="Tutup sidebar"
           />
           <div className="fixed inset-y-0 left-0 w-72 overflow-hidden bg-slate-950 shadow-2xl">
-            <TeacherSidebar collapsed={false} />
+            <TeacherSidebar collapsed={false} onNavigation={closeMobileSidebar} />
           </div>
         </div>
       )}

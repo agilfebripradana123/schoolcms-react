@@ -7,6 +7,9 @@ import { toApiError } from "@/lib/api/error";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import Badge from "@/components/ui/Badge";
 
 interface ExtracurricularRow {
@@ -48,7 +51,7 @@ export default function StudentExtracurricularPage() {
     return (
       <PageContainer>
         <PageHeader title="Ekstrakurikuler" description="Kegiatan ekstrakurikuler" />
-        <Card><CardBody><p className="text-sm text-slate-500">Memuat...</p></CardBody></Card>
+        <PortalLoadingState message="Memuat..." />
       </PageContainer>
     );
   }
@@ -57,7 +60,7 @@ export default function StudentExtracurricularPage() {
     return (
       <PageContainer>
         <PageHeader title="Ekstrakurikuler" description="Kegiatan ekstrakurikuler" />
-        <Card><CardBody className="text-sm text-red-600">{error}</CardBody></Card>
+        <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
@@ -66,12 +69,7 @@ export default function StudentExtracurricularPage() {
     return (
       <PageContainer>
         <PageHeader title="Ekstrakurikuler" description="Kegiatan ekstrakurikuler" />
-        <Card>
-          <CardBody className="p-12 text-center">
-            <Dumbbell className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm text-slate-400">Belum ada kegiatan ekstrakurikuler.</p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState icon={<Dumbbell />} description="Belum ada kegiatan ekstrakurikuler." />
       </PageContainer>
     );
   }

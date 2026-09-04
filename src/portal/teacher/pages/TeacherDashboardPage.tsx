@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarClock, School, ClipboardList, BookOpen, Loader2 } from "lucide-react";
+import { CalendarClock, School, ClipboardList, BookOpen, Calendar, Bell } from "lucide-react";
 import { useAuth } from "@/features/auth/useAuth";
-import Card from "@/components/ui/Card";
+import Card, { CardBody } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import TeacherSectionCard from "@/portal/teacher/components/TeacherSectionCard";
-import TeacherNotificationsWidget from "@/portal/teacher/components/TeacherNotificationsWidget";
-import TeacherEmptyData from "@/portal/teacher/components/TeacherEmptyData";
+import PortalStatCard from "@/portal/components/PortalStatCard";
+import TeacherNotificationsWidget from "@/portal/components/TeacherNotificationsWidget";
 import { teacherClassService, teacherScheduleService, myAssignmentService } from "@/features/academic";
 import { myExamService } from "@/features/examinations";
 import { SCHEDULE_DAY_LABELS, type ScheduleDay, type TeacherSchedule } from "@/features/academic/api/types";
@@ -81,168 +80,159 @@ export default function TeacherDashboardPage() {
   };
 
   return (
-    <PageContainer className="py-6">
+    <PageContainer>
       <PageHeader
         title="Dashboard"
         description={`Selamat datang, ${displayName}. Ringkasan aktivitas mengajar Anda.`}
       />
 
-      {/* Summary cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <School className="h-6 w-6 text-primary" />
-          <p className="mt-3 text-sm font-semibold text-on-surface">Kelas yang diajar</p>
-          <p className="mt-1 text-lg font-bold text-on-surface">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin inline" /> : classCount ?? 0}
-          </p>
-        </Card>
-        <Card>
-          <CalendarClock className="h-6 w-6 text-primary" />
-          <p className="mt-3 text-sm font-semibold text-on-surface">Jadwal hari ini</p>
-          <p className="mt-1 text-lg font-bold text-on-surface">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin inline" /> : todaySchedules.length}
-          </p>
-        </Card>
-        <Card>
-          <ClipboardList className="h-6 w-6 text-primary" />
-          <p className="mt-3 text-sm font-semibold text-on-surface">Tugas aktif</p>
-          <p className="mt-1 text-lg font-bold text-on-surface">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin inline" /> : assignments.length}
-          </p>
-        </Card>
-        <Card>
-          <BookOpen className="h-6 w-6 text-primary" />
-          <p className="mt-3 text-sm font-semibold text-on-surface">Ujian</p>
-          <p className="mt-1 text-lg font-bold text-on-surface">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin inline" /> : exams.length}
-          </p>
-        </Card>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        <PortalStatCard
+          icon={<School className="h-5 w-5 text-indigo-500" />}
+          label="Kelas yang diajar"
+          value={classCount ?? 0}
+          loading={loading}
+        />
+        <PortalStatCard
+          icon={<CalendarClock className="h-5 w-5 text-indigo-500" />}
+          label="Jadwal hari ini"
+          value={todaySchedules.length}
+          loading={loading}
+        />
+        <PortalStatCard
+          icon={<ClipboardList className="h-5 w-5 text-indigo-500" />}
+          label="Tugas aktif"
+          value={assignments.length}
+          loading={loading}
+        />
+        <PortalStatCard
+          icon={<BookOpen className="h-5 w-5 text-indigo-500" />}
+          label="Ujian"
+          value={exams.length}
+          loading={loading}
+        />
       </div>
 
-      <div className="space-y-6">
-        {/* Notifications */}
-        <TeacherSectionCard
-          title="Notifikasi"
-          description="Pemberitahuan terbaru untuk Anda"
-          to="/guru/notifications"
-        >
+      <Card className="mb-6">
+        <CardBody>
+          <div className="flex items-center gap-2 mb-4">
+            <Bell className="h-5 w-5 text-indigo-500" />
+            <h2 className="text-sm font-semibold text-slate-700">Notifikasi</h2>
+          </div>
           <TeacherNotificationsWidget />
-        </TeacherSectionCard>
+        </CardBody>
+      </Card>
 
-        {/* Jadwal Hari Ini */}
-        <TeacherSectionCard
-          title="Jadwal Hari Ini"
-          description={todayDay ? SCHEDULE_DAY_LABELS[todayDay] : "Hari ini"}
-          to="/guru/academic/schedules"
-        >
+      <Card className="mb-6">
+        <CardBody>
+          <div className="flex items-center gap-2 mb-4">
+            <CalendarClock className="h-5 w-5 text-indigo-500" />
+            <h2 className="text-sm font-semibold text-slate-700">Jadwal Hari Ini</h2>
+            <span className="text-xs text-slate-500">{todayDay ? SCHEDULE_DAY_LABELS[todayDay] : "Hari ini"}</span>
+          </div>
           {loading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            </div>
+            <p className="py-6 text-center text-sm text-slate-500">Memuat...</p>
           ) : todaySchedules.length === 0 ? (
-            <TeacherEmptyData
-              title="Tidak ada jadwal hari ini"
-              description="Anda tidak memiliki jadwal mengajar hari ini."
-            />
+            <div className="p-6 text-center">
+              <Calendar className="mx-auto h-8 w-8 text-slate-300" />
+              <p className="mt-2 text-sm font-semibold text-slate-500">Tidak ada jadwal hari ini</p>
+              <p className="mt-1 text-xs text-slate-400">Anda tidak memiliki jadwal mengajar hari ini.</p>
+            </div>
           ) : (
             <div className="divide-y divide-slate-100">
               {todaySchedules.map((s) => (
                 <div key={s.id} className="flex flex-wrap items-center gap-4 py-3 first:pt-0 last:pb-0">
                   <div className="flex w-24 shrink-0 flex-col">
-                    <span className="text-sm font-semibold text-on-surface">
-                      {formatTime(s.period?.start_time)}
-                    </span>
-                    <span className="text-xs text-on-surface-variant">
-                      {formatTime(s.period?.end_time)}
-                    </span>
+                    <span className="text-sm font-semibold text-slate-900">{formatTime(s.period?.start_time)}</span>
+                    <span className="text-xs text-slate-500">{formatTime(s.period?.end_time)}</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-on-surface">
-                      {s.subject?.name ?? "—"}
-                    </p>
-                    <p className="text-xs text-on-surface-variant">
-                      Kelas {s.class?.name ?? "—"}
-                    </p>
+                    <p className="text-sm font-semibold text-slate-900">{s.subject?.name ?? "—"}</p>
+                    <p className="text-xs text-slate-500">Kelas {s.class?.name ?? "—"}</p>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </TeacherSectionCard>
+        </CardBody>
+      </Card>
 
-        {/* Tugas Terbaru */}
-        <TeacherSectionCard
-          title="Tugas Terbaru"
-          description="Tugas yang perlu diperhatikan"
-          to="/guru/academic/assignments"
-        >
-          {loading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            </div>
-          ) : assignments.length === 0 ? (
-            <TeacherEmptyData
-              title="Belum ada tugas"
-              description="Tidak ada tugas aktif pada scope mengajar Anda."
-            />
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {assignments.map((a) => (
-                <div key={a.id} className="py-3 first:pt-0 last:pb-0">
-                  <p className="text-sm font-semibold text-on-surface">{a.title}</p>
-                  <p className="text-xs text-on-surface-variant">
-                    {a.subject?.name ?? "—"} · {a.class?.name ?? "—"}
-                    {a.due_date ? ` · Deadline: ${a.due_date}` : ""}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </TeacherSectionCard>
-
-        {/* Ujian Terbaru */}
-        <TeacherSectionCard title="Ujian Terbaru" description="Ujian terdekat" to="/guru/examinations">
-          {loading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            </div>
-          ) : exams.length === 0 ? (
-            <TeacherEmptyData
-              title="Belum ada ujian"
-              description="Tidak ada ujian pada mata pelajaran scope mengajar Anda."
-            />
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {exams.map((e) => (
-                <div key={e.id} className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-on-surface">{e.title}</p>
-                    <p className="text-xs text-on-surface-variant">
-                      {e.subject?.name ?? "—"} · {e.duration_minutes} menit
-                    </p>
-                  </div>
-                  <Badge variant={statusVariants[e.status] ?? "neutral"}>
-                    {statusLabels[e.status] ?? e.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
-        </TeacherSectionCard>
-
-        {/* Kelas Saya */}
-        <TeacherSectionCard
-          title="Kelas Saya"
-          description="Kelas yang Anda ajar"
-          to="/guru/academic/classes"
-        >
-          <div className="px-4 py-3">
-            <Button variant="secondary" size="sm" onClick={loadAll} disabled={loading}>
-              {loading ? "Memuat..." : "Lihat Semua Kelas"}
-            </Button>
+      <Card className="mb-6">
+        <CardBody>
+          <div className="flex items-center gap-2 mb-4">
+            <ClipboardList className="h-5 w-5 text-indigo-500" />
+            <h2 className="text-sm font-semibold text-slate-700">Tugas Terbaru</h2>
           </div>
-        </TeacherSectionCard>
-      </div>
+          {loading ? (
+            <p className="py-6 text-center text-sm text-slate-500">Memuat...</p>
+          ) : assignments.length === 0 ? (
+            <div className="p-6 text-center">
+              <ClipboardList className="mx-auto h-8 w-8 text-slate-300" />
+              <p className="mt-2 text-sm text-slate-400">Belum ada tugas.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {assignments.map((a) => (
+                <Card key={a.id} className="bg-slate-50">
+                  <CardBody>
+                    <p className="text-sm font-semibold text-slate-900">{a.title}</p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {a.subject?.name ?? "—"} · {a.class?.name ?? "—"}
+                      {a.due_date ? ` · Deadline: ${a.due_date}` : ""}
+                    </p>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      <Card className="mb-6">
+        <CardBody>
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen className="h-5 w-5 text-indigo-500" />
+            <h2 className="text-sm font-semibold text-slate-700">Ujian Terbaru</h2>
+          </div>
+          {loading ? (
+            <p className="py-6 text-center text-sm text-slate-500">Memuat...</p>
+          ) : exams.length === 0 ? (
+            <div className="p-6 text-center">
+              <BookOpen className="mx-auto h-8 w-8 text-slate-300" />
+              <p className="mt-2 text-sm text-slate-400">Belum ada ujian.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {exams.map((e) => (
+                <Card key={e.id} className="bg-slate-50">
+                  <CardBody>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-slate-900">{e.title}</p>
+                        <p className="text-xs text-slate-500">{e.subject?.name ?? "—"} · {e.duration_minutes} menit</p>
+                      </div>
+                      <Badge variant={statusVariants[e.status] ?? "neutral"}>{statusLabels[e.status] ?? e.status}</Badge>
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardBody>
+          <div className="flex items-center gap-2 mb-4">
+            <School className="h-5 w-5 text-indigo-500" />
+            <h2 className="text-sm font-semibold text-slate-700">Kelas Saya</h2>
+          </div>
+          <p className="text-sm text-slate-500 mb-3">Kelas yang Anda ajar</p>
+          <Button variant="secondary" size="sm" onClick={loadAll} disabled={loading}>
+            {loading ? "Memuat..." : "Lihat Semua Kelas"}
+          </Button>
+        </CardBody>
+      </Card>
     </PageContainer>
   );
 }

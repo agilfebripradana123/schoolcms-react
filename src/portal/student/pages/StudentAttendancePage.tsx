@@ -7,6 +7,9 @@ import { toApiError } from "@/lib/api/error";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
 import AppSelect from "../../../components/ui/Select";
@@ -111,9 +114,7 @@ export default function StudentAttendancePage() {
     return (
       <PageContainer>
         <PageHeader title="Kehadiran" description="Rekap kehadiran Anda" />
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
@@ -186,8 +187,7 @@ export default function StudentAttendancePage() {
         </Card>
       </div>
 
-      <Card className="mb-6">
-        <CardBody className="flex flex-wrap items-center gap-3">
+      <PortalFilterBar>
           <Filter className="h-4 w-4 text-slate-500" />
           <label className="text-sm font-medium text-slate-700">Status:</label>
           <div className="min-w-[200px]">
@@ -210,18 +210,13 @@ export default function StudentAttendancePage() {
               isSearchable={false}
             />
           </div>
-        </CardBody>
-      </Card>
+        </PortalFilterBar>
 
       {records.length === 0 && !loading ? (
-        <Card>
-          <CardBody className="p-6 text-center">
-            <Calendar className="mx-auto h-8 w-8 text-slate-300" />
-            <p className="mt-2 text-sm text-slate-400">
-              Tidak ada data kehadiran untuk filter yang dipilih.
-            </p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState
+          icon={<Calendar />}
+          description="Tidak ada data kehadiran untuk filter yang dipilih."
+        />
       ) : (
         <DataTable
           columns={columns}

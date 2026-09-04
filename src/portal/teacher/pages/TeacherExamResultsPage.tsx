@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
+import { BarChart3 } from "lucide-react";
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
 import Pagination from "../../../components/ui/Pagination";
 import { myExamResultService } from "@/features/examinations";
 import type { ExamResult, ExamResultStatus } from "@/features/examinations/api/types";
@@ -97,85 +100,77 @@ export default function TeacherExamResultsPage() {
   const [detail, setDetail] = useState<ExamResult | null>(null);
 
   return (
-    <PageContainer className="py-6">
+    <PageContainer>
       <PageHeader
         title="Hasil Ujian"
         description="Hasil ujian siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <Card>
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Ujian
-            </label>
+      <PortalFilterBar className="mb-6">
+          <BarChart3 className="h-4 w-4 text-slate-500" />
+          <label className="text-sm font-medium text-slate-700">Ujian:</label>
+          <div className="min-w-[200px]">
             <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Semua ujian" isClearable />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Status
-            </label>
+          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <div className="min-w-[180px]">
             <Select<ExamResultStatus> options={statusOptions()} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
           </div>
-          <div className="flex items-end">
-            <Button onClick={applyFilters} disabled={loading} className="w-full">
-              Tampilkan
-            </Button>
-          </div>
-        </div>
+          <Button onClick={applyFilters} disabled={loading}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
 
-        {error ? (
-          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error}</p>
-            <Button variant="secondary" size="sm" onClick={applyFilters}>
-              Muat Ulang
-            </Button>
-          </div>
-        ) : (
-            <DataTable<ExamResult>
-              loading={loading}
-              emptyMessage="Belum ada hasil ujian pada scope mengajar Anda."
-              columns={[
-                { header: "No", accessor: "id", render: (_v, row) => results.findIndex((r) => r.id === row.id) + 1 },
-                {
-                  header: "Siswa",
-                  accessor: "id",
-                  render: (_v, row) => (
-                    <button
-                      type="button"
-                      onClick={() => setDetail(row)}
-                      className="text-left font-semibold text-primary hover:underline"
-                    >
-                      {row.participant?.student?.name ?? "-"}
-                    </button>
-                  ),
-                },
-                { header: "Ujian", accessor: "id", render: (_v, row) => row.participant?.exam?.title ?? "-" },
-                { header: "Mapel", accessor: "id", render: (_v, row) => row.participant?.exam?.subject?.name ?? "-" },
-                { header: "Skor", accessor: "total_score", render: (v) => String(v ?? "-") },
-                { header: "Benar", accessor: "correct_count", render: (v) => String(v ?? "0") },
-                { header: "Salah", accessor: "wrong_count", render: (v) => String(v ?? "0") },
-                {
-                  header: "Status",
-                  accessor: "status",
-                  render: (v) => {
-                    const st = v as ExamResultStatus;
-                    return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
-                  },
-                },
-              ]}
-              data={results}
-            />
-        )}
-        {meta && (
+      {error ? (
+        <PortalErrorState message={error} />
+      ) : results.length === 0 && !loading ? (
+        <PortalEmptyState icon={<BarChart3 className="h-10 w-10" />} description="Belum ada hasil ujian pada scope mengajar Anda." />
+      ) : (
+        <DataTable<ExamResult>
+          loading={loading}
+          emptyMessage="Belum ada hasil ujian pada scope mengajar Anda."
+          columns={[
+            { header: "No", accessor: "id", render: (_v, row) => results.findIndex((r) => r.id === row.id) + 1 },
+            {
+              header: "Siswa",
+              accessor: "id",
+              render: (_v, row) => (
+                <button
+                  type="button"
+                  onClick={() => setDetail(row)}
+                  className="text-left font-semibold text-indigo-600 hover:underline"
+                >
+                  {row.participant?.student?.name ?? "-"}
+                </button>
+              ),
+            },
+            { header: "Ujian", accessor: "id", render: (_v, row) => row.participant?.exam?.title ?? "-" },
+            { header: "Mapel", accessor: "id", render: (_v, row) => row.participant?.exam?.subject?.name ?? "-" },
+            { header: "Skor", accessor: "total_score", render: (v) => String(v ?? "-") },
+            { header: "Benar", accessor: "correct_count", render: (v) => String(v ?? "0") },
+            { header: "Salah", accessor: "wrong_count", render: (v) => String(v ?? "0") },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (v) => {
+                const st = v as ExamResultStatus;
+                return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
+              },
+            },
+          ]}
+          data={results}
+        />
+      )}
+      {meta && !error && (
+        <div className="mt-4">
           <Pagination
             meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: (meta as { per_page?: number }).per_page ?? 15, total: meta.total }}
             onPageChange={(n) => { setPage(n); load(n, examId, status); }}
             loading={loading}
             error={error}
           />
-        )}
-      </Card>
+        </div>
+      )}
 
       <Modal
         open={!!detail}
@@ -190,43 +185,43 @@ export default function TeacherExamResultsPage() {
         {detail && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-on-surface">{detail.participant?.student?.name ?? "-"}</h3>
-              <p className="mt-1 text-sm text-on-surface-variant">
+              <h3 className="text-lg font-bold text-slate-900">{detail.participant?.student?.name ?? "-"}</h3>
+              <p className="mt-1 text-sm text-slate-500">
                 {detail.participant?.exam?.title ?? "-"} · {detail.participant?.exam?.subject?.name ?? "-"}
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Skor</p>
-                <p className="mt-1 text-lg font-bold text-on-surface">{detail.total_score}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Skor</p>
+                <p className="mt-1 text-lg font-bold text-slate-900">{detail.total_score}</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Nilai Huruf</p>
-                <p className="mt-1 text-lg font-bold text-on-surface">{detail.grade ?? "-"}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Nilai Huruf</p>
+                <p className="mt-1 text-lg font-bold text-slate-900">{detail.grade ?? "-"}</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Status</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Status</p>
                 <p className="mt-1">
                   <Badge variant={STATUS_VARIANTS[detail.status] ?? "neutral"}>{STATUS_LABELS[detail.status]}</Badge>
                 </p>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Benar</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.correct_count}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Benar</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.correct_count}</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Salah</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.wrong_count}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Salah</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.wrong_count}</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Tidak Dijawab</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.unanswered_count}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Tidak Dijawab</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.unanswered_count}</p>
               </div>
             </div>
             {detail.graded_at && (
-              <p className="text-xs text-on-surface-variant">
+              <p className="text-xs text-slate-500">
                 Dinilai pada {String(detail.graded_at)}
               </p>
             )}

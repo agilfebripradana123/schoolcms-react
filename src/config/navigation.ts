@@ -45,7 +45,6 @@
   Dumbbell,
   Clock,
   ShieldCheck,
-  User,
 } from "lucide-react";
 import type { NavigationGroup } from "@/types";
 
@@ -223,13 +222,6 @@ export const teacherNavigation = [
     permission: "manage-facilities",
     items: [
       { label: "Sarana & Prasarana", path: "/guru/facilities", icon: Building2 },
-    ],
-  },
-  {
-    label: "Akun",
-    items: [
-      { label: "Profil", path: "/guru/profile", icon: User },
-      { label: "Notifikasi", path: "/guru/notifications", icon: Bell },
     ],
   },
 ];

@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarCheck, Save } from "lucide-react";
+import { CalendarCheck, Save, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import AppSelect from "@/components/ui/Select";
-import Card, { CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { usePermission } from "@/features/auth/usePermission";
@@ -97,30 +100,23 @@ export default function TeacherAttendancePage() {
   const hasAnyMissing = rows.some((r) => !statusById[r.student_id]);
 
   return (
-    <PageContainer className="py-6">
+    <PageContainer>
       <PageHeader
         title="Kehadiran"
         description="Input kehadiran siswa pada kelas yang menjadi scope mengajar Anda."
       />
 
-      <Card>
-        {/* Filter toolbar */}
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Tanggal
-            </label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Kelas
-            </label>
+      <PortalFilterBar className="mb-6">
+          <Calendar className="h-4 w-4 text-slate-500" />
+          <label className="text-sm font-medium text-slate-700">Tanggal:</label>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-300 focus:outline-none"
+          />
+          <label className="text-sm font-medium text-slate-700">Kelas:</label>
+          <div className="min-w-[200px]">
             <AppSelect<number>
               options={classOptions}
               value={classId}
@@ -128,98 +124,76 @@ export default function TeacherAttendancePage() {
               placeholder="Pilih kelas"
             />
           </div>
-          <div className="flex items-end">
-            <Button onClick={loadRoster} disabled={!hasSelection || loading} className="w-full">
-              Tampilkan
-            </Button>
-          </div>
-        </div>
+          <Button onClick={loadRoster} disabled={!hasSelection || loading}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
 
-        {/* Content states */}
-        {!hasSelection ? (
-          <div className="py-10 text-center text-sm text-on-surface-variant">
-            Pilih tanggal dan kelas untuk melihat kehadiran.
-          </div>
-        ) : error ? (
-          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error}</p>
-            <Button variant="secondary" size="sm" onClick={loadRoster}>
-              Muat Ulang
-            </Button>
-          </div>
-        ) : loading ? (
-          <div className="py-10 text-center text-sm text-on-surface-variant">
-            Memuat data kehadiran...
-          </div>
-        ) : rows.length === 0 ? (
-          <div className="py-10 text-center">
-            <CalendarCheck className="mx-auto h-8 w-8 text-outline" />
-            <p className="mt-2 text-sm font-semibold text-on-surface">Tidak ada data kehadiran.</p>
-            <p className="mt-1 text-xs text-on-surface-variant">
-              Tidak ada siswa aktif pada kelas ini.
-            </p>
-          </div>
-        ) : (
-          <>
-            <CardHeader
-              title="Daftar Siswa"
-              description={`${rows.length} siswa aktif`}
-              actions={
-                canManage ? (
-                  <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
-                    Simpan Kehadiran
-                  </Button>
-                ) : undefined
-              }
-            />
-            <DataTable<TeacherAttendanceStudent>
-              loading={loading}
-              emptyMessage="Tidak ada data kehadiran."
-              columns={[
-                {
-                  header: "No",
-                  accessor: "student_id",
-                  render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
-                },
-                { header: "Nama", accessor: "name", render: (v) => <span className="font-semibold text-on-surface">{String(v ?? "-")}</span> },
-                { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
-                { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
-                {
-                  header: "Status",
-                  accessor: "student_id",
-                  render: (_v, row) => {
-                    const cur = statusById[row.student_id] as AttendanceStatus | "";
-                    if (!canManage) {
-                      const cls: Record<string, "success" | "warning" | "danger" | "neutral"> = {
-                        hadir: "success",
-                        sakit: "warning",
-                        izin: "danger",
-                        alpa: "neutral",
-                      };
-                      return <Badge variant={cur ? cls[cur] : "neutral"}>{cur ? ATTENDANCE_STATUS_LABELS[cur] : "—"}</Badge>;
-                    }
-                    return (
-                      <AppSelect
-                        size="sm"
-                        options={ATTENDANCE_STATUSES.map((s) => ({ value: s, label: ATTENDANCE_STATUS_LABELS[s] }))}
-                        value={cur || null}
-                        onChange={(v) => setStatusById((prev) => ({ ...prev, [row.student_id]: v as StatusKey }))}
-                        placeholder="Pilih"
-                        isSearchable={false}
-                        className="min-w-[140px]"
-                      />
-                    );
-                  },
-                },
-              ]}
-              data={rows}
-            />
-            {canManage && hasAnyMissing && (
-              <p className="mt-3 text-xs text-error">Beberapa siswa belum dipilih statusnya.</p>
+      {!hasSelection ? (
+        <PortalEmptyState icon={<CalendarCheck className="h-10 w-10" />} description="Pilih tanggal dan kelas untuk melihat kehadiran." />
+      ) : error ? (
+        <PortalErrorState message={error} />
+      ) : loading ? (
+        <PortalLoadingState />
+      ) : rows.length === 0 ? (
+        <PortalEmptyState icon={<CalendarCheck className="h-10 w-10" />} description="Tidak ada siswa aktif pada kelas ini." />
+      ) : (
+        <>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">{rows.length} siswa aktif</p>
+            {canManage && (
+              <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
+                Simpan Kehadiran
+              </Button>
             )}
-          </>
-        )}
-      </Card>
+          </div>
+          <DataTable<TeacherAttendanceStudent>
+            loading={loading}
+            emptyMessage="Tidak ada data kehadiran."
+            columns={[
+              {
+                header: "No",
+                accessor: "student_id",
+                render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
+              },
+              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-slate-900">{String(v ?? "-")}</span> },
+              { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
+              { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
+              {
+                header: "Status",
+                accessor: "student_id",
+                render: (_v, row) => {
+                  const cur = statusById[row.student_id] as AttendanceStatus | "";
+                  if (!canManage) {
+                    const cls: Record<string, "success" | "warning" | "danger" | "neutral"> = {
+                      hadir: "success",
+                      sakit: "warning",
+                      izin: "danger",
+                      alpa: "neutral",
+                    };
+                    return <Badge variant={cur ? cls[cur] : "neutral"}>{cur ? ATTENDANCE_STATUS_LABELS[cur] : "—"}</Badge>;
+                  }
+                  return (
+                    <AppSelect
+                      size="sm"
+                      options={ATTENDANCE_STATUSES.map((s) => ({ value: s, label: ATTENDANCE_STATUS_LABELS[s] }))}
+                      value={cur || null}
+                      onChange={(v) => setStatusById((prev) => ({ ...prev, [row.student_id]: v as StatusKey }))}
+                      placeholder="Pilih"
+                      isSearchable={false}
+                      className="min-w-[140px]"
+                    />
+                  );
+                },
+              },
+            ]}
+            data={rows}
+          />
+          {canManage && hasAnyMissing && (
+            <p className="mt-3 text-xs text-red-600">Beberapa siswa belum dipilih statusnya.</p>
+          )}
+        </>
+      )}
     </PageContainer>
   );
 }

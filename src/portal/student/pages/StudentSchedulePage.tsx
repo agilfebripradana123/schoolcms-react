@@ -6,7 +6,8 @@ import { STUDENTS } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import Card, { CardBody } from "@/components/ui/Card";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
 import AppSelect from "../../../components/ui/Select";
@@ -84,8 +85,7 @@ export default function StudentSchedulePage() {
     <PageContainer>
       <PageHeader title="Jadwal" description="Jadwal pelajaran berdasarkan kelas Anda" />
 
-      <Card className="mb-6">
-        <CardBody className="flex flex-wrap items-center gap-3">
+      <PortalFilterBar>
           <Calendar className="h-4 w-4 text-slate-500" />
           <label className="text-sm font-medium text-slate-700">Hari:</label>
           <div className="min-w-[200px]">
@@ -100,13 +100,10 @@ export default function StudentSchedulePage() {
               isSearchable={false}
             />
           </div>
-        </CardBody>
-      </Card>
+        </PortalFilterBar>
 
       {error ? (
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error} onRetry={load} />
       ) : (
         <DataTable
           columns={columns}

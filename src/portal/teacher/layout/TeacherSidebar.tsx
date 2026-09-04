@@ -1,14 +1,18 @@
 import { useCallback, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { teacherNavigation, teacherDashboardItem } from "@/config/navigation";
 import { usePermission } from "@/features/auth/usePermission";
 import TeacherSidebarSection from "./TeacherSidebarSection";
+import TeacherSidebarItem from "./TeacherSidebarItem";
 
 export default function TeacherSidebar({
   collapsed = false,
+  onNavigation,
 }: {
   collapsed?: boolean;
+  onNavigation?: () => void;
 }) {
+  const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
   const { can } = usePermission();
@@ -34,6 +38,14 @@ export default function TeacherSidebar({
       return next;
     });
   }, []);
+
+  const goTo = useCallback(
+    (path: string) => {
+      onNavigation?.();
+      navigate(path, { replace: true });
+    },
+    [navigate, onNavigation],
+  );
 
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
   const isGroupActive = useCallback(
@@ -65,21 +77,21 @@ export default function TeacherSidebar({
 
       <div className="flex-1 overflow-y-auto px-3 py-4">
         <div className="mb-2">
-          <Link
-            to={teacherDashboardItem.path}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
+          <button
+            onClick={() => goTo(teacherDashboardItem.path)}
+            className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               isActive(teacherDashboardItem.path)
-                ? "bg-primary-container/20 font-semibold text-white ring-1 ring-primary-fixed/30"
+                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
                 : "text-slate-300 hover:bg-white/5 hover:text-white"
-            } ${collapsed ? "justify-center px-2" : ""}`}
+            } ${collapsed ? "justify-center" : ""}`}
           >
             <teacherDashboardItem.icon
-              className={`h-4 w-4 shrink-0 ${
+              className={`h-5 w-5 shrink-0 ${
                 isActive(teacherDashboardItem.path) ? "text-primary-fixed" : "text-slate-400"
               }`}
             />
             {!collapsed && <span>{teacherDashboardItem.label}</span>}
-          </Link>
+          </button>
         </div>
 
         <div className="mt-4 space-y-1">
@@ -94,11 +106,21 @@ export default function TeacherSidebar({
                   active={isGroupActive(entry)}
                   can={can}
                   onToggle={() => toggleSection(entry.label)}
+                  onGo={goTo}
                   currentPath={pathname}
                 />
               );
             }
-            return null;
+            const solo = entry as unknown as { path: string; label: string; icon: React.ComponentType<{ className?: string }> };
+            return (
+              <TeacherSidebarItem
+                key={solo.path}
+                item={solo}
+                collapsed={collapsed}
+                active={isActive(solo.path)}
+                onGo={goTo}
+              />
+            );
           })}
         </div>
       </div>

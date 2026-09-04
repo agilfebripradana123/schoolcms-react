@@ -7,6 +7,8 @@ import { formatRupiah } from "@/lib/format";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
+import PortalStatCard from "@/portal/components/PortalStatCard";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import Badge from "@/components/ui/Badge";
 import DataTable from "@/components/ui/DataTable";
 
@@ -68,9 +70,7 @@ export default function StudentFinanceSummaryPage() {
     return (
       <PageContainer>
         <PageHeader title="Ringkasan Keuangan" description="Ringkasan tagihan dan pembayaran Anda" />
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
@@ -80,30 +80,23 @@ export default function StudentFinanceSummaryPage() {
       <PageHeader title="Ringkasan Keuangan" description="Ringkasan tagihan dan pembayaran Anda" />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2 text-slate-500">
-              <CreditCard className="h-4 w-4" />
-              <p className="text-sm">Total Tagihan</p>
-            </div>
-            <p className="mt-1 text-2xl font-bold text-slate-900">{formatRupiah(totals?.total_billed)}</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2 text-emerald-600">
-              <Wallet className="h-4 w-4" />
-              <p className="text-sm">Total Dibayar</p>
-            </div>
-            <p className="mt-1 text-2xl font-bold text-emerald-600">{formatRupiah(totals?.total_paid)}</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <p className="text-sm text-slate-500">Sisa Tagihan</p>
-            <p className="mt-1 text-2xl font-bold text-rose-600">{formatRupiah(totals?.total_outstanding)}</p>
-          </CardBody>
-        </Card>
+        <PortalStatCard
+          icon={<CreditCard />}
+          label="Total Tagihan"
+          value={formatRupiah(totals?.total_billed) ?? "-"}
+        />
+        <PortalStatCard
+          icon={<Wallet />}
+          label="Total Dibayar"
+          value={formatRupiah(totals?.total_paid) ?? "-"}
+          valueClassName="text-emerald-600"
+        />
+        <PortalStatCard
+          icon={<Wallet />}
+          label="Sisa Tagihan"
+          value={formatRupiah(totals?.total_outstanding) ?? "-"}
+          valueClassName="text-rose-600"
+        />
       </div>
 
       <Card>

@@ -5,10 +5,11 @@ import { toApiError } from "@/lib/api/error";
 import { formatDate, formatRupiah } from "@/lib/format";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import Card, { CardBody } from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import PortalDetailRows from "@/portal/components/PortalDetailRows";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import Button from "@/components/ui/Button";
 
 interface PaymentRow {
@@ -41,39 +42,27 @@ function PaymentDetailDialog({
   onClose: () => void;
 }) {
   return (
-    <Modal open onOpenChange={onClose} title={`Detail Pembayaran #${payment.id}`}>
-      <dl className="space-y-3 text-sm">
-        {payment.billing?.fee_type?.name && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Tagihan</dt>
-            <dd className="font-medium text-slate-700">{payment.billing.fee_type.name}</dd>
-          </div>
-        )}
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Nominal</dt>
-          <dd className="font-semibold text-slate-900">{formatRupiah(payment.amount)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Tanggal</dt>
-          <dd className="font-medium text-slate-700">{formatDate(payment.payment_date ?? payment.created_at)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Metode</dt>
-          <dd><Badge variant="secondary">{methodLabel(payment.method)}</Badge></dd>
-        </div>
-        {payment.reference_number && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Referensi</dt>
-            <dd className="font-medium text-slate-700">{payment.reference_number}</dd>
-          </div>
-        )}
-        {payment.notes && (
-          <div>
-            <dt className="text-slate-500">Catatan</dt>
-            <dd className="mt-1 text-slate-700">{payment.notes}</dd>
-          </div>
-        )}
-      </dl>
+    <Modal open onClose={onClose} title={`Detail Pembayaran #${payment.id}`}>
+      <PortalDetailRows
+        rows={[
+          ...(payment.billing?.fee_type?.name
+            ? [{ label: "Tagihan", value: payment.billing.fee_type.name }]
+            : []),
+          { label: "Nominal", value: formatRupiah(payment.amount) },
+          {
+            label: "Tanggal",
+            value: formatDate(payment.payment_date ?? payment.created_at),
+          },
+          {
+            label: "Metode",
+            value: <Badge variant="secondary">{methodLabel(payment.method)}</Badge>,
+          },
+          ...(payment.reference_number
+            ? [{ label: "Referensi", value: payment.reference_number }]
+            : []),
+          ...(payment.notes ? [{ label: "Catatan", value: payment.notes }] : []),
+        ]}
+      />
       <div className="mt-6 flex justify-end">
         <Button variant="ghost" onClick={onClose}>Tutup</Button>
       </div>
@@ -145,7 +134,7 @@ export default function StudentPaymentsPage() {
       <PageHeader title="Pembayaran" description="Riwayat pembayaran keuangan Anda" />
 
       {error ? (
-        <Card><CardBody className="text-sm text-red-600">{error}</CardBody></Card>
+        <PortalErrorState message={error} onRetry={load} />
       ) : (
         <DataTable columns={columns} data={tableData} loading={loading} emptyMessage="Belum ada pembayaran." />
       )}

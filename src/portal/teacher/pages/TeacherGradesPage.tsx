@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Save, Award } from "lucide-react";
+import { Save, Award, Filter } from "lucide-react";
 import { toast } from "sonner";
 import Select from "@/components/ui/Select";
-import Card, { CardHeader } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { usePermission } from "@/features/auth/usePermission";
@@ -153,134 +156,102 @@ export default function TeacherGradesPage() {
   };
 
   return (
-    <PageContainer className="py-6">
+    <PageContainer>
       <PageHeader
         title="Nilai"
         description="Input nilai siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <Card>
-        {/* Filter toolbar */}
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Kelas
-            </label>
+      <PortalFilterBar className="mb-6">
+          <Filter className="h-4 w-4 text-slate-500" />
+          <label className="text-sm font-medium text-slate-700">Kelas:</label>
+          <div className="min-w-[180px]">
             <Select<number> options={classOptions} value={classId} onChange={setClassId} placeholder="Pilih kelas" />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Mata Pelajaran
-            </label>
+          <label className="text-sm font-medium text-slate-700">Mapel:</label>
+          <div className="min-w-[180px]">
             <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Pilih mapel" />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Komponen
-            </label>
+          <label className="text-sm font-medium text-slate-700">Komponen:</label>
+          <div className="min-w-[150px]">
             <Select<GradeType> options={typeOptions} value={type} onChange={(v) => v && setType(v)} />
           </div>
-        </div>
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Semester
-            </label>
+          <label className="text-sm font-medium text-slate-700">Semester:</label>
+          <div className="min-w-[150px]">
             <Select<string>
               options={Array.from(SEMESTER_OPTIONS, (o) => ({ value: o.value, label: o.label }))}
               value={semester}
               onChange={(v) => v && setSemester(v)}
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Tahun Ajaran
-            </label>
+          <label className="text-sm font-medium text-slate-700">Tahun:</label>
+          <div className="min-w-[150px]">
             <Select<string> options={yearOptions} value={academicYear} onChange={setAcademicYear} placeholder="Tahun" isClearable />
           </div>
-          <div className="flex items-end">
-            <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
-              Tampilkan
-            </Button>
-          </div>
-        </div>
+          <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
 
-        {/* Content states */}
-        {!canLoad ? (
-          <div className="py-10 text-center text-sm text-on-surface-variant">
-            Pilih kelas dan mata pelajaran terlebih dahulu.
+      {!canLoad ? (
+        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Pilih kelas dan mata pelajaran terlebih dahulu." />
+      ) : error ? (
+        <PortalErrorState message={error} />
+      ) : status === "loading" ? (
+        <PortalLoadingState />
+      ) : status === "empty" ? (
+        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Belum ada data nilai." />
+      ) : (
+        <>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">{rows.length} siswa</p>
+            {canManage && (
+              <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
+                Simpan Nilai
+              </Button>
+            )}
           </div>
-        ) : error ? (
-          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error}</p>
-            <Button variant="secondary" size="sm" onClick={loadRoster}>
-              Muat Ulang
-            </Button>
-          </div>
-        ) : status === "loading" ? (
-          <div className="py-10 text-center text-sm text-on-surface-variant">
-            Memuat nilai...
-          </div>
-        ) : status === "empty" ? (
-          <div className="py-10 text-center">
-            <Award className="mx-auto h-8 w-8 text-outline" />
-            <p className="mt-2 text-sm font-semibold text-on-surface">Belum ada data nilai.</p>
-          </div>
-        ) : (
-          <>
-            <CardHeader
-              title="Daftar Nilai"
-              description={`${rows.length} siswa`}
-              actions={
-                canManage ? (
-                  <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
-                    Simpan Nilai
-                  </Button>
-                ) : undefined
-              }
-            />
-            <DataTable<TeacherGradeStudent>
-              loading={false}
-              emptyMessage="Belum ada data nilai."
-              columns={[
-                {
-                  header: "No",
-                  accessor: "student_id",
-                  render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
-                },
-                { header: "Nama", accessor: "name", render: (v) => <span className="font-semibold text-on-surface">{String(v ?? "-")}</span> },
-                { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
-                { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
-                {
-                  header: "Nilai",
-                  accessor: "student_id",
-                  render: (_v, row) =>
-                    canManage ? (
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        step="0.01"
-                        value={scoreById[row.student_id] ?? ""}
-                        onChange={(e) =>
-                          setScoreById((prev) => ({ ...prev, [row.student_id]: e.target.value }))
-                        }
-                        className="w-24 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-                      />
-                    ) : (
-                      <span className="text-sm text-on-surface">
-                        {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
-                          ? scoreById[row.student_id]
-                          : "—"}
-                      </span>
-                    ),
-                },
-              ]}
-              data={rows}
-            />
-          </>
-        )}
-      </Card>
+          <DataTable<TeacherGradeStudent>
+            loading={false}
+            emptyMessage="Belum ada data nilai."
+            columns={[
+              {
+                header: "No",
+                accessor: "student_id",
+                render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
+              },
+              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-slate-900">{String(v ?? "-")}</span> },
+              { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
+              { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
+              {
+                header: "Nilai",
+                accessor: "student_id",
+                render: (_v, row) =>
+                  canManage ? (
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step="0.01"
+                      value={scoreById[row.student_id] ?? ""}
+                      onChange={(e) =>
+                        setScoreById((prev) => ({ ...prev, [row.student_id]: e.target.value }))
+                      }
+                      className="w-24 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-indigo-300 focus:outline-none"
+                    />
+                  ) : (
+                    <span className="text-sm text-slate-900">
+                      {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
+                        ? scoreById[row.student_id]
+                        : "—"}
+                    </span>
+                  ),
+              },
+            ]}
+            data={rows}
+          />
+        </>
+      )}
     </PageContainer>
   );
 }

@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarClock } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card, { CardBody } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import {
@@ -108,19 +113,16 @@ export default function TeacherSchedulesPage() {
   const formatTime = (t?: string | null) => t ?? "—";
 
   return (
-    <PageContainer className="py-6">
+    <PageContainer>
       <PageHeader
         title="Jadwal Mengajar"
         description="Jadwal mengajar Anda, scoped dari identitas login."
       />
 
-      <Card>
-        {/* Filter toolbar */}
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Hari
-            </label>
+      <PortalFilterBar className="mb-6">
+          <Calendar className="h-4 w-4 text-slate-500" />
+          <label className="text-sm font-medium text-slate-700">Hari:</label>
+          <div className="min-w-[200px]">
             <Select<string>
               options={dayOptions}
               value={day ? String(day) : null}
@@ -129,10 +131,8 @@ export default function TeacherSchedulesPage() {
               isClearable
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Tahun Ajaran
-            </label>
+          <label className="text-sm font-medium text-slate-700">Tahun:</label>
+          <div className="min-w-[180px]">
             <Select<number>
               options={yearOptions}
               value={academicYearId}
@@ -142,10 +142,8 @@ export default function TeacherSchedulesPage() {
               isLoading={yearsLoading}
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Semester
-            </label>
+          <label className="text-sm font-medium text-slate-700">Semester:</label>
+          <div className="min-w-[180px]">
             <Select<number>
               options={semesterOptions}
               value={semesterId}
@@ -155,79 +153,57 @@ export default function TeacherSchedulesPage() {
               isLoading={semestersLoading}
             />
           </div>
-          <div className="flex items-end">
-            <Button type="button" onClick={applyFilters} disabled={loading}>
-              Terapkan Filter
-            </Button>
-          </div>
-        </div>
+          <Button type="button" onClick={applyFilters} disabled={loading}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
 
-        {/* Content states */}
-        {error ? (
-          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error}</p>
-            <Button variant="secondary" size="sm" onClick={applyFilters}>
-              Muat Ulang
-            </Button>
-          </div>
-        ) : loading ? (
-          <div className="py-10 text-center text-sm text-on-surface-variant">Memuat jadwal...</div>
-        ) : schedules.length === 0 ? (
-          <div className="py-10 text-center">
-            <CalendarClock className="mx-auto h-8 w-8 text-outline" />
-            <p className="mt-2 text-sm font-semibold text-on-surface">Belum ada jadwal mengajar.</p>
-            <p className="mt-1 text-xs text-on-surface-variant">
-              Tidak ditemukan jadwal untuk filter yang dipilih.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {SCHEDULE_DAYS.map((d) => {
-              const items = grouped[d];
-              if (!items || items.length === 0) return null;
-              return (
-                <Card key={d}>
-                  <CardHeader title={SCHEDULE_DAY_LABELS[d]} />
-                  <CardBody className="divide-y divide-slate-100">
+      {error ? (
+        <PortalErrorState message={error} />
+      ) : loading ? (
+        <PortalLoadingState />
+      ) : schedules.length === 0 ? (
+        <PortalEmptyState icon={<Calendar className="h-10 w-10" />} description="Belum ada jadwal mengajar untuk filter yang dipilih." />
+      ) : (
+        <div className="space-y-6">
+          {SCHEDULE_DAYS.map((d) => {
+            const items = grouped[d];
+            if (!items || items.length === 0) return null;
+            return (
+              <Card key={d}>
+                <CardBody>
+                  <div className="flex items-center gap-2 mb-4">
+                    <Clock className="h-5 w-5 text-indigo-500" />
+                    <h2 className="text-sm font-semibold text-slate-700">{SCHEDULE_DAY_LABELS[d]}</h2>
+                  </div>
+                  <div className="space-y-3">
                     {items.map((s) => (
-                      <div key={s.id} className="flex flex-wrap items-center gap-4 py-3 first:pt-0 last:pb-0">
-                        <div className="flex w-28 shrink-0 flex-col">
-                          <span className="text-sm font-semibold text-on-surface">
-                            {formatTime(s.period?.start_time)}
-                          </span>
-                          <span className="text-xs text-on-surface-variant">
-                            {formatTime(s.period?.end_time)}
-                          </span>
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-on-surface">
-                            {s.subject?.name ?? "—"}
-                          </p>
-                          <p className="text-xs text-on-surface-variant">
-                            Kelas {s.class?.name ?? "—"}
-                          </p>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-2 text-xs text-on-surface-variant">
-                          {s.academic_year?.name && (
-                            <span className="rounded-full bg-surface-container-high px-2 py-0.5">
-                              {s.academic_year.name}
-                            </span>
-                          )}
-                          {s.semester?.name && (
-                            <span className="rounded-full bg-surface-container-high px-2 py-0.5">
-                              {s.semester.name}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                      <Card key={s.id} className="bg-slate-50">
+                        <CardBody>
+                          <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex w-28 shrink-0 flex-col">
+                              <span className="text-sm font-semibold text-slate-900">{formatTime(s.period?.start_time)}</span>
+                              <span className="text-xs text-slate-500">{formatTime(s.period?.end_time)}</span>
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-slate-900">{s.subject?.name ?? "—"}</p>
+                              <p className="text-xs text-slate-500">Kelas {s.class?.name ?? "—"}</p>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2">
+                              {s.academic_year?.name && <Badge variant="neutral">{s.academic_year.name}</Badge>}
+                              {s.semester?.name && <Badge variant="neutral">{s.semester.name}</Badge>}
+                            </div>
+                          </div>
+                        </CardBody>
+                      </Card>
                     ))}
-                  </CardBody>
-                </Card>
-              );
-            })}
-          </div>
-        )}
-      </Card>
+                  </div>
+                </CardBody>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </PageContainer>
   );
 }

@@ -9,6 +9,10 @@ import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import PortalDetailRows from "@/portal/components/PortalDetailRows";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import Button from "@/components/ui/Button";
 
 interface ScholarshipRow {
@@ -37,35 +41,28 @@ function ScholarshipDetailDialog({
 }) {
   const badge = statusBadge(scholarship.status);
   return (
-    <Modal open onOpenChange={onClose} title={scholarship.name}>
+    <Modal open onClose={onClose} title={scholarship.name}>
       <div className="flex items-center gap-3 mb-4">
         <Award className="h-8 w-8 text-amber-500" />
         <span className="text-sm text-slate-500">{scholarship.provider ?? "Sekolah"}</span>
       </div>
-      <dl className="space-y-3 text-sm">
-        {scholarship.amount != null && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Nominal</dt>
-            <dd className="font-semibold text-slate-900">{formatRupiah(scholarship.amount)}</dd>
-          </div>
-        )}
-        <div className="flex justify-between items-center">
-          <dt className="text-slate-500">Status</dt>
-          <dd><Badge variant={badge.variant}>{badge.label}</Badge></dd>
-        </div>
-        {scholarship.start_date && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Mulai</dt>
-            <dd className="font-medium text-slate-700">{formatDate(scholarship.start_date)}</dd>
-          </div>
-        )}
-        {scholarship.end_date && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Berakhir</dt>
-            <dd className="font-medium text-slate-700">{formatDate(scholarship.end_date)}</dd>
-          </div>
-        )}
-      </dl>
+      <PortalDetailRows
+        rows={[
+          ...(scholarship.amount != null
+            ? [{ label: "Nominal", value: formatRupiah(scholarship.amount) }]
+            : []),
+          {
+            label: "Status",
+            value: <Badge variant={badge.variant}>{badge.label}</Badge>,
+          },
+          ...(scholarship.start_date
+            ? [{ label: "Mulai", value: formatDate(scholarship.start_date) }]
+            : []),
+          ...(scholarship.end_date
+            ? [{ label: "Berakhir", value: formatDate(scholarship.end_date) }]
+            : []),
+        ]}
+      />
       <div className="mt-6 flex justify-end">
         <Button variant="ghost" onClick={onClose}>Tutup</Button>
       </div>
@@ -115,7 +112,7 @@ export default function StudentScholarshipsPage() {
     return (
       <PageContainer>
         <PageHeader title="Beasiswa" description="Beasiswa yang Anda terima" />
-        <Card><CardBody><p className="text-sm text-slate-500">Memuat...</p></CardBody></Card>
+        <PortalLoadingState message="Memuat..." />
       </PageContainer>
     );
   }
@@ -124,7 +121,7 @@ export default function StudentScholarshipsPage() {
     return (
       <PageContainer>
         <PageHeader title="Beasiswa" description="Beasiswa yang Anda terima" />
-        <Card><CardBody className="text-sm text-red-600">{error}</CardBody></Card>
+        <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
@@ -133,12 +130,7 @@ export default function StudentScholarshipsPage() {
     return (
       <PageContainer>
         <PageHeader title="Beasiswa" description="Beasiswa yang Anda terima" />
-        <Card>
-          <CardBody className="p-12 text-center">
-            <Award className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm text-slate-400">Belum ada beasiswa.</p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState icon={<Award />} description="Belum ada beasiswa." />
       </PageContainer>
     );
   }

@@ -5,7 +5,6 @@ import {
   type ExamAttemptMonitoring,
   type ExamAttemptStatus,
 } from "@/features/examinations";
-import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
@@ -14,7 +13,9 @@ import Select from "@/components/ui/Select";
 import Pagination from "@/components/ui/Pagination";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import { Eye, RefreshCw } from "lucide-react";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import { Eye, RefreshCw, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import type { SelectOption } from "@/components/ui/Select";
 
@@ -96,8 +97,8 @@ export default function TeacherExamMonitoringPage() {
       accessor: "student" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="font-medium text-on-surface">{row.student.name}</div>
-          <div className="text-xs text-on-surface-variant">{row.student.nis}</div>
+          <div className="font-medium text-slate-900">{row.student.name}</div>
+          <div className="text-xs text-slate-500">{row.student.nis}</div>
         </div>
       ),
     },
@@ -106,8 +107,8 @@ export default function TeacherExamMonitoringPage() {
       accessor: "exam" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="font-medium text-on-surface">{row.exam.title}</div>
-          <div className="text-xs text-on-surface-variant">{row.exam.subject.name}</div>
+          <div className="font-medium text-slate-900">{row.exam.title}</div>
+          <div className="text-xs text-slate-500">{row.exam.subject.name}</div>
         </div>
       ),
     },
@@ -130,10 +131,10 @@ export default function TeacherExamMonitoringPage() {
       accessor: "progress" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="text-sm text-on-surface">
+          <div className="text-sm text-slate-900">
             {row.progress.answered}/{row.progress.total_questions}
           </div>
-          <div className="text-xs text-on-surface-variant">
+          <div className="text-xs text-slate-500">
             {row.progress.percentage.toFixed(0)}%
           </div>
         </div>
@@ -171,7 +172,7 @@ export default function TeacherExamMonitoringPage() {
   ];
 
   return (
-    <PageContainer className="py-6">
+    <PageContainer>
       <PageHeader
         title="Monitoring Ujian"
         description="Monitor aktivitas siswa selama ujian berlangsung"
@@ -187,12 +188,10 @@ export default function TeacherExamMonitoringPage() {
         }
       />
 
-      <Card>
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Cari Siswa
-            </label>
+      <PortalFilterBar className="mb-6">
+          <BarChart3 className="h-4 w-4 text-slate-500" />
+          <label className="text-sm font-medium text-slate-700">Cari:</label>
+          <div className="min-w-[200px]">
             <Search
               value={searchQuery}
               onChange={setSearchQuery}
@@ -200,10 +199,8 @@ export default function TeacherExamMonitoringPage() {
               autoFocus={false}
             />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Status
-            </label>
+          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <div className="min-w-[180px]">
             <Select<ExamAttemptStatus | "">
               options={statusOptions}
               value={statusFilter || null}
@@ -212,38 +209,32 @@ export default function TeacherExamMonitoringPage() {
               isClearable
             />
           </div>
-          <div className="flex items-end">
-            <Button onClick={handleSearch} className="w-full">
-              Tampilkan
-            </Button>
-          </div>
-        </div>
+          <Button onClick={handleSearch}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
 
-        {error ? (
-          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error}</p>
-            <Button variant="secondary" size="sm" onClick={fetchAttempts}>
-              Muat Ulang
-            </Button>
-          </div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={attempts}
-            loading={loading}
-            emptyMessage="Belum ada peserta ujian."
-          />
-        )}
+      {error ? (
+        <PortalErrorState message={error} />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={attempts}
+          loading={loading}
+          emptyMessage="Belum ada peserta ujian."
+        />
+      )}
 
-        {!loading && !error && attempts.length > 0 && (
+      {!loading && !error && attempts.length > 0 && (
+        <div className="mt-4">
           <Pagination
             meta={{ current_page: currentPage, last_page: totalPages, per_page: 15, total }}
             onPageChange={setCurrentPage}
             loading={loading}
             error={error}
           />
-        )}
-      </Card>
+        </div>
+      )}
     </PageContainer>
   );
 }

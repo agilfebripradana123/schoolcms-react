@@ -6,7 +6,10 @@ import { STUDENTS } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import Card, { CardBody } from "@/components/ui/Card";
+import PortalStatCard from "@/portal/components/PortalStatCard";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import DataTable from "@/components/ui/DataTable";
 import AppSelect from "../../../components/ui/Select";
 
@@ -98,9 +101,7 @@ export default function StudentGradesPage() {
     return (
       <PageContainer>
         <PageHeader title="Nilai" description="Nilai akademik Anda" />
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error ?? ""} onRetry={load} />
       </PageContainer>
     );
   }
@@ -109,12 +110,7 @@ export default function StudentGradesPage() {
     return (
       <PageContainer>
         <PageHeader title="Nilai" description="Nilai akademik Anda" />
-        <Card>
-          <CardBody className="p-12 text-center">
-            <BookOpen className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm text-slate-400">Belum ada nilai.</p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState icon={<BookOpen />} description="Belum ada nilai." />
       </PageContainer>
     );
   }
@@ -123,8 +119,7 @@ export default function StudentGradesPage() {
     <PageContainer>
       <PageHeader title="Nilai" description="Nilai akademik Anda" />
 
-      <Card className="mb-6">
-        <CardBody className="flex flex-wrap items-center gap-3">
+      <PortalFilterBar>
           <label className="text-sm font-medium text-slate-700">Semester:</label>
           <div className="min-w-[200px]">
             <AppSelect<number | string>
@@ -137,41 +132,24 @@ export default function StudentGradesPage() {
               placeholder="Pilih semester..."
             />
           </div>
-        </CardBody>
-      </Card>
+        </PortalFilterBar>
 
       <div className="mb-6 grid grid-cols-3 gap-4">
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-indigo-500" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Rata-rata</p>
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              {summary?.average.toFixed(1) ?? "-"}
-            </p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-amber-500" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Tertinggi</p>
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{summary?.highest ?? "-"}</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-emerald-500" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Mata Pelajaran</p>
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              {summary?.total_subjects ?? "-"}
-            </p>
-          </CardBody>
-        </Card>
+        <PortalStatCard
+          icon={<TrendingUp />}
+          label="Rata-rata"
+          value={summary?.average.toFixed(1) ?? "-"}
+        />
+        <PortalStatCard
+          icon={<Award />}
+          label="Tertinggi"
+          value={summary?.highest ?? "-"}
+        />
+        <PortalStatCard
+          icon={<BookOpen />}
+          label="Mata Pelajaran"
+          value={summary?.total_subjects ?? "-"}
+        />
       </div>
 
       <DataTable

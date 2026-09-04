@@ -5,10 +5,11 @@ import { toApiError } from "@/lib/api/error";
 import { formatDate, formatRupiah } from "@/lib/format";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import Card, { CardBody } from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import PortalDetailRows from "@/portal/components/PortalDetailRows";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import Button from "@/components/ui/Button";
 
 interface TransactionRow {
@@ -46,35 +47,25 @@ function TransactionDetailDialog({
   const t = typeBadge(tx.type);
   const s = statusBadge(tx.status);
   return (
-    <Modal open onOpenChange={onClose} title="Detail Transaksi">
-      <dl className="space-y-3 text-sm">
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Kode</dt>
-          <dd className="font-mono font-medium text-slate-900">{tx.transaction_code}</dd>
-        </div>
-        <div className="flex justify-between items-center">
-          <dt className="text-slate-500">Jenis</dt>
-          <dd><Badge variant={t.variant}>{t.label}</Badge></dd>
-        </div>
-        <div className="flex justify-between items-center">
-          <dt className="text-slate-500">Status</dt>
-          <dd><Badge variant={s.variant}>{s.label}</Badge></dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Nominal</dt>
-          <dd className="font-semibold text-slate-900">{formatRupiah(tx.amount)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Tanggal</dt>
-          <dd className="font-medium text-slate-700">{formatDate(tx.transaction_date)}</dd>
-        </div>
-        {tx.payment?.id && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Pembayaran</dt>
-            <dd className="font-medium text-slate-700">#{tx.payment.id}</dd>
-          </div>
-        )}
-      </dl>
+    <Modal open onClose={onClose} title="Detail Transaksi">
+      <PortalDetailRows
+        rows={[
+          { label: "Kode", value: tx.transaction_code },
+          {
+            label: "Jenis",
+            value: <Badge variant={t.variant}>{t.label}</Badge>,
+          },
+          {
+            label: "Status",
+            value: <Badge variant={s.variant}>{s.label}</Badge>,
+          },
+          { label: "Nominal", value: formatRupiah(tx.amount) },
+          { label: "Tanggal", value: formatDate(tx.transaction_date) },
+          ...(tx.payment?.id
+            ? [{ label: "Pembayaran", value: `#${tx.payment.id}` }]
+            : []),
+        ]}
+      />
       <div className="mt-6 flex justify-end">
         <Button variant="ghost" onClick={onClose}>Tutup</Button>
       </div>
@@ -154,7 +145,7 @@ export default function StudentTransactionsPage() {
       <PageHeader title="Transaksi" description="Riwayat transaksi keuangan Anda" />
 
       {error ? (
-        <Card><CardBody className="text-sm text-red-600">{error}</CardBody></Card>
+        <PortalErrorState message={error} onRetry={load} />
       ) : (
         <DataTable columns={columns} data={tableData} loading={loading} emptyMessage="Belum ada transaksi." />
       )}

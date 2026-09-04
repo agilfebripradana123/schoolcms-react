@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
@@ -8,6 +7,8 @@ import Modal from "@/components/ui/Modal";
 import Search from "@/components/ui/Search";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
 import Pagination from "../../../components/ui/Pagination";
 import { myExamService } from "@/features/examinations";
 import type { Exam, ExamStatus } from "@/features/examinations/api/types";
@@ -41,7 +42,6 @@ export default function TeacherExamsPage() {
   const [status, setStatus] = useState<ExamStatus | null>(null);
   const [page, setPage] = useState(1);
 
-  // Scope options (mata pelajaran mengajar guru) dari salah satu hasil.
   const [subjectOptions, setSubjectOptions] = useState<SelectOption<number>[]>([]);
 
   const load = useCallback(
@@ -97,90 +97,77 @@ export default function TeacherExamsPage() {
   const [detail, setDetail] = useState<Exam | null>(null);
 
   return (
-    <PageContainer className="py-6">
+    <PageContainer>
       <PageHeader
         title="Ujian"
         description="Ujian pada mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <Card>
-        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Cari Judul
-            </label>
+      <PortalFilterBar className="mb-6">
+          <label className="text-sm font-medium text-slate-700">Cari:</label>
+          <div className="min-w-[200px]">
             <Search value={search} onChange={setSearch} placeholder="Cari judul..." />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Mata Pelajaran
-            </label>
+          <label className="text-sm font-medium text-slate-700">Mapel:</label>
+          <div className="min-w-[180px]">
             <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Semua mapel" isClearable />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Status
-            </label>
+          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <div className="min-w-[180px]">
             <Select<ExamStatus> options={statusOptions} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
           </div>
-          <div className="flex items-end">
-            <Button onClick={applyFilters} disabled={loading}>
-              Tampilkan
-            </Button>
-          </div>
-        </div>
+          <Button onClick={applyFilters} disabled={loading}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
 
-        {error ? (
-          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
-            <p className="text-sm text-error">{error}</p>
-            <Button variant="secondary" size="sm" onClick={applyFilters}>
-              Muat Ulang
-            </Button>
-          </div>
-        ) : (
-            <DataTable<Exam>
-              loading={loading}
-              emptyMessage="Belum ada ujian pada scope mengajar Anda."
-              columns={[
-                { header: "No", accessor: "id", render: (_v, row) => exams.findIndex((e) => e.id === row.id) + 1 },
-                {
-                  header: "Judul",
-                  accessor: "title",
-                  render: (v, row) => (
-                    <button
-                      type="button"
-                      onClick={() => setDetail(row)}
-                      className="font-semibold text-primary hover:underline"
-                    >
-                      {String(v ?? "-")}
-                    </button>
-                  ),
-                },
-                { header: "Mata Pelajaran", accessor: "id", render: (_v, row) => row.subject?.name ?? "-" },
-                { header: "Durasi", accessor: "duration_minutes", render: (v) => `${String(v ?? "-")} menit` },
-                { header: "Soal", accessor: "total_questions", render: (v) => String(v ?? "-") },
-                { header: "KKM", accessor: "passing_score", render: (v) => String(v ?? "-") },
-                {
-                  header: "Status",
-                  accessor: "status",
-                  render: (v) => {
-                    const st = v as ExamStatus;
-                    return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
-                  },
-                },
-              ]}
-              data={exams}
-            />
-        )}
-        {meta && (
+      {error ? (
+        <PortalErrorState message={error} />
+      ) : (
+        <DataTable<Exam>
+          loading={loading}
+          emptyMessage="Belum ada ujian pada scope mengajar Anda."
+          columns={[
+            { header: "No", accessor: "id", render: (_v, row) => exams.findIndex((e) => e.id === row.id) + 1 },
+            {
+              header: "Judul",
+              accessor: "title",
+              render: (v, row) => (
+                <button
+                  type="button"
+                  onClick={() => setDetail(row)}
+                  className="font-semibold text-indigo-600 hover:underline"
+                >
+                  {String(v ?? "-")}
+                </button>
+              ),
+            },
+            { header: "Mata Pelajaran", accessor: "id", render: (_v, row) => row.subject?.name ?? "-" },
+            { header: "Durasi", accessor: "duration_minutes", render: (v) => `${String(v ?? "-")} menit` },
+            { header: "Soal", accessor: "total_questions", render: (v) => String(v ?? "-") },
+            { header: "KKM", accessor: "passing_score", render: (v) => String(v ?? "-") },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (v) => {
+                const st = v as ExamStatus;
+                return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
+              },
+            },
+          ]}
+          data={exams}
+        />
+      )}
+      {meta && !error && (
+        <div className="mt-4">
           <Pagination
             meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 15, total: meta.total }}
             onPageChange={(n) => { setPage(n); load(n, search, subjectId, status); }}
             loading={loading}
             error={error}
           />
-        )}
-      </Card>
+        </div>
+      )}
 
       <Modal
         open={!!detail}
@@ -196,25 +183,25 @@ export default function TeacherExamsPage() {
         {detail && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-on-surface">{detail.title}</h3>
-              <p className="mt-1 text-sm text-on-surface-variant">{detail.subject?.name ?? "-"}</p>
+              <h3 className="text-lg font-bold text-slate-900">{detail.title}</h3>
+              <p className="mt-1 text-sm text-slate-500">{detail.subject?.name ?? "-"}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Durasi</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.duration_minutes} menit</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Durasi</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.duration_minutes} menit</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Jumlah Soal</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.total_questions}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Jumlah Soal</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.total_questions}</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Maks. Percobaan</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.max_attempts}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Maks. Percobaan</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.max_attempts}</p>
               </div>
             </div>
             {detail.description && (
-              <p className="text-sm text-on-surface-variant">{detail.description}</p>
+              <p className="text-sm text-slate-500">{detail.description}</p>
             )}
             <div className="flex flex-wrap gap-2">
               <Badge variant={STATUS_VARIANTS[detail.status] ?? "neutral"}>{STATUS_LABELS[detail.status]}</Badge>

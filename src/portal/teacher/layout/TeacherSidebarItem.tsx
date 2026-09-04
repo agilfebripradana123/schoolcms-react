@@ -1,32 +1,32 @@
-import { Link } from "react-router-dom";
-
 interface TeacherSidebarItemProps {
   item: { path: string; label: string; icon: React.ComponentType<{ className?: string }> };
   collapsed: boolean;
   active: boolean;
+  onGo: (path: string) => void;
 }
 
 export default function TeacherSidebarItem({
   item,
   collapsed,
   active,
+  onGo,
 }: TeacherSidebarItemProps) {
   return (
-    <Link
-      to={item.path}
-      className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
+    <button
+      onClick={() => onGo(item.path)}
+      className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
         active
-          ? "bg-primary-container/20 font-semibold text-white ring-1 ring-primary-fixed/30"
+          ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
           : "text-slate-300 hover:bg-white/5 hover:text-white"
       } ${collapsed ? "justify-center px-2" : ""}`}
       title={collapsed ? item.label : undefined}
     >
       <item.icon
-        className={`h-4 w-4 shrink-0 ${
+        className={`h-5 w-5 shrink-0 ${
           active ? "text-primary-fixed" : "text-slate-400"
         }`}
       />
       {!collapsed && <span>{item.label}</span>}
-    </Link>
+    </button>
   );
 }

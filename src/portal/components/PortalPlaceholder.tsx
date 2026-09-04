@@ -1,16 +1,9 @@
-interface StudentPlaceholderProps {
+interface PortalPlaceholderProps {
   title: string;
   description?: string;
 }
 
-/**
- * Placeholder halaman Student Portal untuk modul yang backend-nya belum siap.
- * Konsisten dengan design system (rounded-xl border bg-white shadow-sm).
- */
-export default function StudentPlaceholder({
-  title,
-  description,
-}: StudentPlaceholderProps) {
+export default function PortalPlaceholder({ title, description }: PortalPlaceholderProps) {
   return (
     <div className="space-y-6">
       <div>
