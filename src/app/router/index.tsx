@@ -11,10 +11,9 @@ import StudentRoute, { AdminRoute } from "@/features/auth/StudentRoute";
 import GuruRoute from "@/features/auth/GuruRoute";
 import PermissionRoute from "@/features/auth/PermissionRoute";
 import StudentLayout from "@/portal/student/layout/StudentLayout";
-import TeacherLayout from "@/portal/teacher/layout/TeacherLayout";
+import GuruLayout from "@/portal/teacher/layout/TeacherLayout";
 import TeacherDashboardPage from "@/portal/teacher/pages/TeacherDashboardPage";
 import TeacherProfilePage from "@/portal/teacher/pages/TeacherProfilePage";
-import TeacherFacilitiesPlaceholderPage from "@/portal/teacher/pages/TeacherFacilitiesPlaceholderPage";
 import TeacherClassesPage from "@/portal/teacher/pages/TeacherClassesPage";
 import TeacherClassDetailPage from "@/portal/teacher/pages/TeacherClassDetailPage";
 import TeacherSchedulesPage from "@/portal/teacher/pages/TeacherSchedulesPage";
@@ -26,6 +25,7 @@ import TeacherExamSchedulesPage from "@/portal/teacher/pages/TeacherExamSchedule
 import TeacherExamResultsPage from "@/portal/teacher/pages/TeacherExamResultsPage";
 import TeacherExamMonitoringPage from "@/portal/teacher/pages/TeacherExamMonitoringPage";
 import TeacherExamMonitoringDetailPage from "@/portal/teacher/pages/TeacherExamMonitoringDetailPage";
+import TeacherFacilitiesPlaceholderPage from "@/portal/teacher/pages/TeacherFacilitiesPlaceholderPage";
 import { NotificationsPage } from "@/features/notifications";
 import {
   AcademicYearPage,
@@ -263,17 +263,12 @@ const router = createBrowserRouter([
         element: <GuruRoute />,
         children: [
           {
-            element: <TeacherLayout />,
+            element: <GuruLayout />,
             children: [
               { index: true, element: <Navigate to="/guru/dashboard" replace /> },
               { path: "dashboard", element: <TeacherDashboardPage /> },
               { path: "profile", element: <TeacherProfilePage /> },
-              {
-                element: <RoleRoute allow={["guru", "admin", "administrator"]} />,
-                children: [
-                  { path: "teachers/attendance", element: <TeacherAttendanceListPage /> },
-                ],
-              },
+              { path: "notifications", element: <NotificationsPage /> },
               {
                 element: <PermissionRoute permission="view-classes" />,
                 children: [

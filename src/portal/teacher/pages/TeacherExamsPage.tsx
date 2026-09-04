@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Search as SearchIcon } from "lucide-react";
 import Button from "@/components/ui/Button";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import Search from "@/components/ui/Search";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import { myExamService } from "@/features/examinations";
 import type { Exam, ExamStatus } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
@@ -94,44 +96,47 @@ export default function TeacherExamsPage() {
   const [detail, setDetail] = useState<Exam | null>(null);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Ujian</h1>
-          <p className="mt-1 text-sm text-on-surface-variant">
-            Ujian pada mata pelajaran yang menjadi scope mengajar Anda.
-          </p>
-        </div>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Ujian"
+        description="Ujian pada mata pelajaran yang menjadi scope mengajar Anda."
+      />
 
       <Card>
-        <CardHeader
-          title="Daftar Ujian"
-          description={meta ? `${meta.total} ujian` : undefined}
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
-                <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari judul..."
-                  className="w-48 rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-primary-container focus:outline-none"
-                />
-              </div>
-              <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Mapel" isClearable className="w-32" />
-              <Select<ExamStatus> options={statusOptions} value={status} onChange={setStatus} placeholder="Status" isClearable className="w-32" />
-              <Button size="sm" onClick={applyFilters} disabled={loading}>
-                Cari
-              </Button>
-            </div>
-          }
-        />
-        <CardBody>
-          {error ? (
-            <p className="text-sm text-error">Gagal memuat ujian: {error}</p>
-          ) : (
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Cari Judul
+            </label>
+            <Search value={search} onChange={setSearch} placeholder="Cari judul..." />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Mata Pelajaran
+            </label>
+            <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Semua mapel" isClearable />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Status
+            </label>
+            <Select<ExamStatus> options={statusOptions} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
+          </div>
+          <div className="flex items-end">
+            <Button onClick={applyFilters} disabled={loading}>
+              Tampilkan
+            </Button>
+          </div>
+        </div>
+
+        {error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">{error}</p>
+            <Button variant="secondary" size="sm" onClick={applyFilters}>
+              Muat Ulang
+            </Button>
+          </div>
+        ) : (
             <DataTable<Exam>
               loading={loading}
               emptyMessage="Belum ada ujian pada scope mengajar Anda."
@@ -165,17 +170,21 @@ export default function TeacherExamsPage() {
               ]}
               data={exams}
             />
-          )}
-        </CardBody>
+        )}
         {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-on-surface-variant">
-              Halaman {meta.current_page} dari {meta.last_page}
+          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-sm text-on-surface-variant">
+              Menampilkan{" "}
+              {(meta.current_page - 1) * 15 + 1}–{Math.min(meta.current_page * 15, meta.total)}{" "}
+              dari {meta.total} data
             </p>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Button variant="secondary" size="sm" disabled={page <= 1 || loading} onClick={() => { const n = page - 1; setPage(n); load(n, search, subjectId, status); }}>
                 Sebelumnya
               </Button>
+              <span className="text-sm text-on-surface-variant">
+                Halaman {meta.current_page} dari {meta.last_page}
+              </span>
               <Button variant="secondary" size="sm" disabled={page >= (meta.last_page ?? 1) || loading} onClick={() => { const n = page + 1; setPage(n); load(n, search, subjectId, status); }}>
                 Berikutnya
               </Button>
@@ -227,6 +236,6 @@ export default function TeacherExamsPage() {
           </div>
         )}
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

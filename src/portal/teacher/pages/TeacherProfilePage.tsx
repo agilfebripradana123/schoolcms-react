@@ -2,6 +2,8 @@ import { Mail, User as UserIcon, AtSign, Shield } from "lucide-react";
 import { useAuth } from "@/features/auth/useAuth";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import TeacherEmptyData from "@/portal/teacher/components/TeacherEmptyData";
 
 interface InfoRowProps {
@@ -41,13 +43,11 @@ export default function TeacherProfilePage() {
   const roleLabel = user?.role ? String(user.role) : "";
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-on-surface">Profil Saya</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          Informasi identitas akun Portal Guru
-        </p>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Profil Saya"
+        description="Informasi identitas akun Portal Guru"
+      />
 
       {/* Identitas Akun (dari useAuth / /api/me) */}
       <Card>
@@ -98,6 +98,6 @@ export default function TeacherProfilePage() {
           />
         </div>
       </Card>
-    </div>
+    </PageContainer>
   );
 }

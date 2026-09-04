@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { Search as SearchIcon } from "lucide-react";
 import Button from "@/components/ui/Button";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import { myExamScheduleService } from "@/features/examinations";
 import type { ExamSchedule } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
@@ -65,42 +66,46 @@ export default function TeacherExamSchedulesPage() {
   const formatTime = (t?: string | null) => t ?? "—";
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Jadwal Ujian</h1>
-          <p className="mt-1 text-sm text-on-surface-variant">
-            Jadwal ujian pada mata pelajaran yang menjadi scope mengajar Anda.
-          </p>
-        </div>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Jadwal Ujian"
+        description="Jadwal ujian pada mata pelajaran yang menjadi scope mengajar Anda."
+      />
 
       <Card>
-        <CardHeader
-          title="Daftar Jadwal Ujian"
-          description={meta ? `${meta.total} jadwal` : undefined}
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
-                <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline" />
-                <input
-                  type="date"
-                  value={examDate}
-                  onChange={(e) => setExamDate(e.target.value)}
-                  className="w-44 rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-primary-container focus:outline-none"
-                />
-              </div>
-              <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Ujian" isClearable className="w-36" />
-              <Button size="sm" onClick={applyFilters} disabled={loading}>
-                Cari
-              </Button>
-            </div>
-          }
-        />
-        <CardBody>
-          {error ? (
-            <p className="text-sm text-error">Gagal memuat jadwal: {error}</p>
-          ) : (
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Tanggal
+            </label>
+            <input
+              type="date"
+              value={examDate}
+              onChange={(e) => setExamDate(e.target.value)}
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Ujian
+            </label>
+            <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Semua ujian" isClearable />
+          </div>
+          <div className="flex items-end">
+            <Button onClick={applyFilters} disabled={loading} className="w-full">
+              Tampilkan
+            </Button>
+          </div>
+        </div>
+
+        {error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">{error}</p>
+            <Button variant="secondary" size="sm" onClick={applyFilters}>
+              Muat Ulang
+            </Button>
+          </div>
+        ) : (
             <DataTable<ExamSchedule>
               loading={loading}
               emptyMessage="Belum ada jadwal ujian pada scope mengajar Anda."
@@ -135,17 +140,21 @@ export default function TeacherExamSchedulesPage() {
               ]}
               data={schedules}
             />
-          )}
-        </CardBody>
+        )}
         {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-on-surface-variant">
-              Halaman {meta.current_page} dari {meta.last_page}
+          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-sm text-on-surface-variant">
+              Menampilkan{" "}
+              {(meta.current_page - 1) * 15 + 1}–{Math.min(meta.current_page * 15, meta.total)}{" "}
+              dari {meta.total} data
             </p>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Button variant="secondary" size="sm" disabled={page <= 1 || loading} onClick={() => { const n = page - 1; setPage(n); load(n, examId, examDate); }}>
                 Sebelumnya
               </Button>
+              <span className="text-sm text-on-surface-variant">
+                Halaman {meta.current_page} dari {meta.last_page}
+              </span>
               <Button variant="secondary" size="sm" disabled={page >= (meta.last_page ?? 1) || loading} onClick={() => { const n = page + 1; setPage(n); load(n, examId, examDate); }}>
                 Berikutnya
               </Button>
@@ -195,6 +204,6 @@ export default function TeacherExamSchedulesPage() {
           </div>
         )}
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

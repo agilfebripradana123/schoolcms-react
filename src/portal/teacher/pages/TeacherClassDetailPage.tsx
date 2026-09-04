@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
-import { ArrowLeft, Search as SearchIcon } from "lucide-react";
+import { useParams, useLocation } from "react-router-dom";
 import { teacherClassService } from "@/features/academic";
 import type { TeacherClassStudent } from "@/features/academic";
 import { toApiError } from "@/lib/api";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import DataTable from "@/components/ui/DataTable";
 import Button from "@/components/ui/Button";
+import Search from "@/components/ui/Search";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 
 interface NavState {
   className?: string;
@@ -57,51 +59,38 @@ export default function TeacherClassDetailPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <Link
-            to="/guru/academic/classes"
-            className="mb-1 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary-container"
-          >
-            <ArrowLeft className="h-4 w-4" /> Kembali
-          </Link>
-          <h1 className="text-2xl font-bold text-on-surface">
-            Siswa Kelas {className ?? id}
-          </h1>
-        </div>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title={`Siswa Kelas ${className ?? id}`}
+        description="Daftar siswa pada kelas yang menjadi scope mengajar Anda."
+      />
 
-      {error ? (
-        <Card>
-          <CardBody>
-            <p className="text-sm text-error">Gagal memuat data siswa: {error}</p>
-          </CardBody>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader
-            title="Daftar Siswa"
-            description={
-              meta ? `${meta.total} siswa aktif` : undefined
-            }
-            actions={
-              <form onSubmit={handleSearch} className="flex items-center gap-2">
-                <div className="relative">
-                  <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Cari nama / NIS / NISN"
-                    className="w-56 rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-                  />
-                </div>
-                <Button type="submit" size="sm">Cari</Button>
-              </form>
-            }
-          />
-          <CardBody>
+      <Card>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:max-w-xs">
+            <form onSubmit={handleSearch}>
+              <Search
+                value={search}
+                onChange={setSearch}
+                placeholder="Cari nama / NIS / NISN"
+              />
+            </form>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-on-surface-variant">
+              {meta ? `${meta.total} siswa aktif` : ""}
+            </span>
+          </div>
+        </div>
+
+        {error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">{error}</p>
+            <Button variant="secondary" size="sm" onClick={() => load(page, search)}>
+              Muat Ulang
+            </Button>
+          </div>
+        ) : (
             <DataTable<TeacherClassStudent>
               loading={loading}
               emptyMessage={search ? "Tidak ada siswa yang cocok" : "Belum ada siswa di kelas ini"}
@@ -152,42 +141,38 @@ export default function TeacherClassDetailPage() {
               ]}
               data={students}
             />
-          </CardBody>
-          {meta && meta.last_page > 1 && (
-            <div className="mt-4 flex items-center justify-between">
-              <p className="text-xs text-on-surface-variant">
+        )}
+        {meta && meta.last_page > 1 && (
+          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-sm text-on-surface-variant">
+              Menampilkan{" "}
+              {(meta.current_page - 1) * 20 + 1}–{Math.min(meta.current_page * 20, meta.total)}{" "}
+              dari {meta.total} data
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={page <= 1 || loading}
+                onClick={() => { const next = page - 1; setPage(next); load(next, search); }}
+              >
+                Sebelumnya
+              </Button>
+              <span className="text-sm text-on-surface-variant">
                 Halaman {meta.current_page} dari {meta.last_page}
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={page <= 1 || loading}
-                  onClick={() => {
-                    const next = page - 1;
-                    setPage(next);
-                    load(next, search);
-                  }}
-                >
-                  Sebelumnya
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={page >= (meta.last_page ?? 1) || loading}
-                  onClick={() => {
-                    const next = page + 1;
-                    setPage(next);
-                    load(next, search);
-                  }}
-                >
-                  Berikutnya
-                </Button>
-              </div>
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={page >= (meta.last_page ?? 1) || loading}
+                onClick={() => { const next = page + 1; setPage(next); load(next, search); }}
+              >
+                Berikutnya
+              </Button>
             </div>
-          )}
-        </Card>
-      )}
-    </div>
+          </div>
+        )}
+      </Card>
+    </PageContainer>
   );
 }

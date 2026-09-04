@@ -1,3 +1,6 @@
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+
 interface TeacherPlaceholderProps {
   title: string;
   description?: string;
@@ -5,22 +8,18 @@ interface TeacherPlaceholderProps {
 
 /**
  * Placeholder halaman Portal Guru untuk modul yang belum tersedia
- * pada fase pengembangan saat ini. Konsisten dengan design system
- * (rounded-xl border bg-white shadow-sm).
+ * pada fase pengembangan saat ini. Konsisten dengan design system.
  */
 export default function TeacherPlaceholder({
   title,
   description,
 }: TeacherPlaceholderProps) {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+    <PageContainer className="py-6">
+      <PageHeader title={title} description={description} />
+      <div className="rounded-2xl border border-dashed border-slate-200 bg-surface-container-lowest p-12 text-center">
+        <p className="text-sm text-on-surface-variant">Modul belum tersedia.</p>
       </div>
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center shadow-sm">
-        <p className="text-sm text-slate-400">Modul belum tersedia.</p>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import { myExamResultService } from "@/features/examinations";
 import type { ExamResult, ExamResultStatus } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
@@ -32,33 +34,45 @@ export default function TeacherExamResultsPage() {
 
   const [examOptions, setExamOptions] = useState<SelectOption<number>[]>([]);
 
-  const load = useCallback((pageNum: number, _exam: number | null, st: ExamResultStatus | null) => {
-    setLoading(true);
-    setError(null);
-    myExamResultService
-      .list({
-        page: pageNum,
-        per_page: 15,
-        participant_id: undefined,
-        status: st ?? undefined,
-      })
-      .then((res) => {
-        setResults(res.data ?? []);
-        setMeta(res.meta ?? null);
-        setExamOptions((prev) => {
-          const seen = new Map<number, string>(prev.map((o) => [o.value, o.label]));
-          for (const r of res.data ?? []) {
-            const exam = r.participant?.exam;
-            if (exam?.id != null) {
-              seen.set(exam.id, exam.title ?? `Ujian ${exam.id}`);
-            }
+  const load = useCallback(
+    (pageNum: number, exam: number | null, st: ExamResultStatus | null) => {
+      setLoading(true);
+      setError(null);
+      const useLargePage = exam != null;
+      myExamResultService
+        .list({
+          page: useLargePage ? 1 : pageNum,
+          per_page: useLargePage ? 200 : 15,
+          participant_id: undefined,
+          status: st ?? undefined,
+        })
+        .then((res) => {
+          let data = res.data ?? [];
+          if (exam != null) {
+            data = data.filter((r) => r.participant?.exam?.id === exam);
           }
-          return Array.from(seen, ([value, label]) => ({ value, label }));
-        });
-      })
-      .catch((err) => setError(toApiError(err).message))
-      .finally(() => setLoading(false));
-  }, []);
+          setResults(data);
+          if (useLargePage) {
+            setMeta({ current_page: 1, last_page: 1, total: data.length, per_page: data.length });
+          } else {
+            setMeta(res.meta ?? null);
+          }
+          setExamOptions((prev) => {
+            const seen = new Map<number, string>(prev.map((o) => [o.value, o.label]));
+            for (const r of res.data ?? []) {
+              const examRef = r.participant?.exam;
+              if (examRef?.id != null) {
+                seen.set(examRef.id, examRef.title ?? `Ujian ${examRef.id}`);
+              }
+            }
+            return Array.from(seen, ([value, label]) => ({ value, label }));
+          });
+        })
+        .catch((err) => setError(toApiError(err).message))
+        .finally(() => setLoading(false));
+    },
+    [],
+  );
 
   useEffect(() => {
     load(page, examId, status);
@@ -82,34 +96,41 @@ export default function TeacherExamResultsPage() {
   const [detail, setDetail] = useState<ExamResult | null>(null);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Hasil Ujian</h1>
-          <p className="mt-1 text-sm text-on-surface-variant">
-            Hasil ujian siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda.
-          </p>
-        </div>
-      </div>
+    <PageContainer className="py-6">
+      <PageHeader
+        title="Hasil Ujian"
+        description="Hasil ujian siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
+      />
 
       <Card>
-        <CardHeader
-          title="Daftar Hasil Ujian"
-          description={meta ? `${meta.total} hasil` : undefined}
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Ujian" isClearable className="w-36" />
-              <Select<ExamResultStatus> options={statusOptions()} value={status} onChange={setStatus} placeholder="Status" isClearable className="w-32" />
-              <Button size="sm" onClick={applyFilters} disabled={loading}>
-                Cari
-              </Button>
-            </div>
-          }
-        />
-        <CardBody>
-          {error ? (
-            <p className="text-sm text-error">Gagal memuat hasil: {error}</p>
-          ) : (
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Ujian
+            </label>
+            <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Semua ujian" isClearable />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
+              Status
+            </label>
+            <Select<ExamResultStatus> options={statusOptions()} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
+          </div>
+          <div className="flex items-end">
+            <Button onClick={applyFilters} disabled={loading} className="w-full">
+              Tampilkan
+            </Button>
+          </div>
+        </div>
+
+        {error ? (
+          <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl py-10">
+            <p className="text-sm text-error">{error}</p>
+            <Button variant="secondary" size="sm" onClick={applyFilters}>
+              Muat Ulang
+            </Button>
+          </div>
+        ) : (
             <DataTable<ExamResult>
               loading={loading}
               emptyMessage="Belum ada hasil ujian pada scope mengajar Anda."
@@ -144,17 +165,21 @@ export default function TeacherExamResultsPage() {
               ]}
               data={results}
             />
-          )}
-        </CardBody>
+        )}
         {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-on-surface-variant">
-              Halaman {meta.current_page} dari {meta.last_page}
+          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-sm text-on-surface-variant">
+              Menampilkan{" "}
+              {(meta.current_page - 1) * 15 + 1}–{Math.min(meta.current_page * 15, meta.total)}{" "}
+              dari {meta.total} data
             </p>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Button variant="secondary" size="sm" disabled={page <= 1 || loading} onClick={() => { const n = page - 1; setPage(n); load(n, examId, status); }}>
                 Sebelumnya
               </Button>
+              <span className="text-sm text-on-surface-variant">
+                Halaman {meta.current_page} dari {meta.last_page}
+              </span>
               <Button variant="secondary" size="sm" disabled={page >= (meta.last_page ?? 1) || loading} onClick={() => { const n = page + 1; setPage(n); load(n, examId, status); }}>
                 Berikutnya
               </Button>
@@ -219,6 +244,6 @@ export default function TeacherExamResultsPage() {
           </div>
         )}
       </Modal>
-    </div>
+    </PageContainer>
   );
 }
