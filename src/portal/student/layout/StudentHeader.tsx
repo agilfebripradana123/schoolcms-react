@@ -77,7 +77,7 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
         onConfirm={handleLogout}
       />
 
-      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
+      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
@@ -148,7 +148,7 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-2xl border border-slate-200 bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
+              <div className="absolute right-0 top-full z-[61] mt-2 w-56 rounded-2xl border border-slate-200 bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
                 <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">
                   Akun
                 </div>
