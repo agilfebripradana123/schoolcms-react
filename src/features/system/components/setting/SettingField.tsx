@@ -64,8 +64,8 @@ export default function SettingField({
     case "boolean":
       return (
         <AppSelect
-          value={value || "1"}
-          onChange={(v) => onChange(v ?? "1")}
+          value={value}
+          onChange={(v) => onChange(v ?? "")}
           options={BOOLEAN_OPTIONS}
           placeholder="Pilih Ya / Tidak"
           isDisabled={disabled}

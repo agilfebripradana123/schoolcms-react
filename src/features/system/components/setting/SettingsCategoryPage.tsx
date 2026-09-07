@@ -18,11 +18,12 @@ const SECRET_MASK = "********";
 
 interface SettingsCategoryPageProps {
   group: string;
+  noContainer?: boolean;
 }
 
 const loadGroup = async (group: string) => settingService.list({ group, per_page: 100 });
 
-export default function SettingsCategoryPage({ group }: SettingsCategoryPageProps) {
+export default function SettingsCategoryPage({ group, noContainer = false }: SettingsCategoryPageProps) {
   const category = getSettingsCategory(group);
 
   const [settings, setSettings] = useState<Setting[]>([]);
@@ -92,6 +93,21 @@ export default function SettingsCategoryPage({ group }: SettingsCategoryPageProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    for (const field of category.fields) {
+      const raw = (values[field.key] ?? "").trim();
+      if (raw === "") continue;
+      if (field.type === "integer") {
+        const n = Number(raw);
+        if (!Number.isInteger(n) || n < 0) {
+          toast.error(`Nilai ${field.label} harus bilangan bulat >= 0.`);
+          return;
+        }
+      }
+      if (field.type === "time" && !/^([01]\d|2[0-3]):[0-5]\d$/.test(raw)) {
+        toast.error(`Format ${field.label} harus HH:MM.`);
+        return;
+      }
+    }
     setSaving(true);
     setSaveError(null);
 
@@ -156,8 +172,8 @@ export default function SettingsCategoryPage({ group }: SettingsCategoryPageProp
     }
   };
 
-  return (
-    <PageContainer className="py-6">
+  const content = (
+    <>
       <Link
         to="/admin/system/settings"
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-on-surface-variant hover:text-on-surface"
@@ -236,6 +252,9 @@ export default function SettingsCategoryPage({ group }: SettingsCategoryPageProp
           )}
         </Card>
       </form>
-    </PageContainer>
+    </>
   );
+
+  if (noContainer) return content;
+  return <PageContainer className="py-6">{content}</PageContainer>;
 }
