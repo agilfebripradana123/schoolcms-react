@@ -123,6 +123,7 @@ import {
 } from "./lazy-pages";
 
 const router = createBrowserRouter([
+  { path: "/", element: <Navigate to="/login" replace /> },
   { path: "/login", element: <Login /> },
   { path: "/login/guru", element: <GuruLogin /> },
   { path: "/login/admin", element: <AdminLogin /> },
