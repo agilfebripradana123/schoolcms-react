@@ -23,6 +23,9 @@ export interface SettingsFieldConfig {
   label: string;
   type: SettingType;
   description?: string;
+  placeholder?: string;
+  isPublic?: boolean;
+  uploadable?: boolean;
 }
 
 export interface SettingsCategoryConfig {
@@ -42,10 +45,14 @@ export const settingsCategories: SettingsCategoryConfig[] = [
     route: "/admin/system/settings/general",
     icon: Settings2,
     fields: [
-      { key: "app_name", label: "Nama aplikasi", type: "string" },
-      { key: "school_name", label: "Nama sekolah", type: "string" },
-      { key: "school_logo", label: "Logo sekolah", type: "file", description: "Upload file belum didukung backend — diisi via nilai teks/path." },
-      { key: "favicon", label: "Favicon", type: "file", description: "Upload file belum didukung backend — diisi via nilai teks/path." },
+      { key: "app_name", label: "Nama aplikasi", type: "string", description: "Nama yang ditampilkan di header dan login page.", placeholder: "SchoolCMS", isPublic: true },
+      { key: "school_name", label: "Nama sekolah", type: "string", description: "Nama lembaga.", placeholder: "SMA Negeri 1 Jakarta", isPublic: true },
+      { key: "school_address", label: "Alamat sekolah", type: "string", description: "Alamat lengkap sekolah.", placeholder: "Jl. Pendidikan No. 1, Jakarta", isPublic: true },
+      { key: "school_logo", label: "Logo sekolah", type: "file", description: "Upload gambar logo sekolah.", isPublic: true },
+      { key: "favicon", label: "Favicon", type: "file", description: "Upload favicon (.ico, .png).", isPublic: true },
+      { key: "hero_image", label: "Gambar hero login", type: "file", description: "Gambar background halaman login.", isPublic: true },
+      { key: "hero_text", label: "Teks hero login", type: "string", description: "Judul utama halaman login.", placeholder: "Kelola sekolah dengan mudah", isPublic: true },
+      { key: "hero_text_sub", label: "Teks hero login (sub)", type: "string", description: "Subteks sambutan di bawah judul hero.", placeholder: "Satu platform untuk mengelola siswa, guru, akademik, keuangan, dll.", isPublic: true },
       { key: "timezone", label: "Zona waktu", type: "timezone" },
     ],
   },

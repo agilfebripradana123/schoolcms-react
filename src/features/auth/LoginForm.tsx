@@ -5,6 +5,7 @@ import { useAuth } from "@/features/auth/useAuth";
 import loginBg from "@/assets/images/gambar_login.webp";
 import { toast } from "sonner";
 import { toApiError } from "@/lib/api/error";
+import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 
 interface LoginFormProps {
   mode: "siswa" | "guru" | "admin";
@@ -53,6 +54,7 @@ function getRedirectPath(role: string): string {
 export function LoginForm({ mode }: LoginFormProps) {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { heroImage, heroText, heroTextSub, schoolName, schoolAddress, schoolLogo, faviconUrl, appName } = usePublicSettings();
   const [loginValue, setLoginValue] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -129,18 +131,25 @@ export function LoginForm({ mode }: LoginFormProps) {
     );
   }
 
+  const heroBg = heroImage || loginBg;
+
   return (
-    <div className="relative min-h-screen bg-surface text-on-surface">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden lg:hidden">
-        <div className="absolute -top-32 -right-32 h-80 w-80 rounded-full bg-primary-container/10 blur-3xl" />
-        <div className="absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl" />
-      </div>
+    <div className="relative min-h-screen bg-white text-on-surface">
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden bg-white lg:hidden"
+        style={{
+          backgroundImage: `url(${heroBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.22,
+        }}
+      />
 
       <div className="relative grid min-h-screen lg:grid-cols-[1.2fr_0.8fr]">
         <section
           className="relative hidden flex-col justify-between bg-slate-950 px-10 py-10 text-white lg:flex"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(15,23,42,0.94) 0%, rgba(30,41,59,0.82) 45%, rgba(88,28,135,0.68) 100%), url(${loginBg})`,
+            backgroundImage: `linear-gradient(135deg, rgba(15,23,42,0.94) 0%, rgba(30,41,59,0.82) 45%, rgba(88,28,135,0.68) 100%), url(${heroImage || loginBg})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -148,23 +157,27 @@ export function LoginForm({ mode }: LoginFormProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
           <div className="relative z-10 flex h-full w-full flex-col justify-center p-10 xl:p-14">
             <div className="max-w-xl">
-              <ShieldCheck className="mb-4 h-8 w-8 text-primary-fixed" />
-              <h2 className="text-2xl font-bold">SchoolCMS</h2>
-              <p className="mt-1 text-sm text-slate-300">Sistem Pengelolaan Sekolah</p>
+              {schoolLogo ? (
+                <div className="flex items-center gap-3">
+                  {faviconUrl ? <img src={faviconUrl} alt="" className="h-10 w-10 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" /> : null}
+                  <img src={schoolLogo ?? undefined} alt={appName} className="h-14 w-14 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+                </div>
+              ) : faviconUrl ? (
+                <img src={faviconUrl} alt={appName} className="mb-4 h-14 w-14 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+              ) : (
+                <ShieldCheck className="mb-4 h-8 w-8 text-primary-fixed" />
+              )}
+              <h2 className="text-2xl font-bold">{appName}</h2>
+              <p className="mt-1 text-sm text-slate-300">{schoolName}</p>
+              {schoolAddress && (
+                <p className="mt-1 text-xs text-slate-400">{schoolAddress}</p>
+              )}
               <h1 className="mt-10 text-4xl font-bold leading-tight tracking-tight">
-                Kelola sekolah <span className="text-primary-container">dengan mudah</span>
+                {heroText}
               </h1>
               <p className="mt-4 max-w-md text-base text-slate-200">
-                Satu platform untuk mengelola siswa, guru, akademik, keuangan, dll.
+                {heroTextSub}
               </p>
-              <div className="mt-6 space-y-3">
-                {["Data siswa & guru terpusat", "Akses cepat & aman", "Dashboard untuk monitoring"].map((item) => (
-                  <div key={item} className="flex items-center gap-3 text-sm text-slate-100">
-                    <div className="h-5 w-5 rounded-full bg-primary-container/20" />
-                    {item}
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </section>
@@ -172,13 +185,24 @@ export function LoginForm({ mode }: LoginFormProps) {
         <section className="flex items-center justify-center px-4 py-8 lg:px-12">
           <div className="w-full max-w-md">
             <div className="mb-10 flex justify-center lg:hidden">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
+              <div className="flex items-center gap-2">
+                {faviconUrl && (
+                  <img src={faviconUrl} alt={appName} className="h-10 w-10 object-contain rounded-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+                )}
+                {schoolLogo && (
+                  <img src={schoolLogo ?? undefined} alt={appName} className="h-10 w-10 object-contain rounded-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+                )}
+                {!faviconUrl && !schoolLogo && (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg">
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                )}
                 <div>
-                  <h2 className="font-bold text-slate-900">SchoolCMS</h2>
-                  <p className="text-xs text-slate-500">Manajemen Sekolah</p>
+                  <h2 className="font-bold text-slate-900">{appName}</h2>
+                  <p className="text-xs text-slate-500">{schoolName}</p>
+                  {schoolAddress && (
+                    <p className="text-[10px] text-slate-400">{schoolAddress}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -200,7 +224,6 @@ export function LoginForm({ mode }: LoginFormProps) {
                 onSubmit={handleSubmit}
               />
             </div>
-            <p className="mt-6 text-center text-xs text-slate-400">Aman dan terintegrasi untuk manajemen sekolah modern.</p>
           </div>
         </section>
       </div>

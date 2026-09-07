@@ -107,6 +107,7 @@ export default function SettingsCategoryPage({ group }: SettingsCategoryPageProp
             ...(isSecret && unchangedSecret
               ? {}
               : { value: raw }),
+            is_public: field.isPublic ?? existing.is_public,
           };
           await settingService.update(existing.id, payload);
         } else if (!isSecret && raw !== "") {
@@ -117,10 +118,26 @@ export default function SettingsCategoryPage({ group }: SettingsCategoryPageProp
             value: raw,
             description: field.description,
             is_encrypted: false,
-            is_public: false,
+            is_public: field.isPublic ?? false,
             sort_order: category.fields.indexOf(field),
           };
-          await settingService.create(payload);
+          try {
+            await settingService.create(payload);
+          } catch (err) {
+            const apiError = toApiError(err);
+            const duplicateKey =
+              apiError.errors?.key?.some((msg) =>
+                msg.toLowerCase().includes("already been taken"),
+              ) ?? false;
+            if (!duplicateKey) throw err;
+            const fresh = await loadGroup(group);
+            const found = fresh.data.find((s) => s.key === field.key);
+            if (!found) throw err;
+            await settingService.update(found.id, {
+              value: raw,
+              is_public: field.isPublic ?? found.is_public,
+            });
+          }
         }
       }
 
@@ -191,11 +208,13 @@ export default function SettingsCategoryPage({ group }: SettingsCategoryPageProp
                     </div>
                     <div className="w-full sm:w-64">
                       <SettingField
+                        settingKey={field.key}
                         type={field.type}
                         value={values[field.key] ?? ""}
                         onChange={(v) => setValue(field.key, v)}
                         disabled={saving}
                         isSecretEdit={Boolean(existing) && isSecret}
+                        placeholder={field.placeholder}
                       />
                     </div>
                   </div>

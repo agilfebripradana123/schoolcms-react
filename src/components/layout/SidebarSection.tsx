@@ -26,7 +26,7 @@ export default function SidebarSection({
             key={item.path}
             item={item}
             collapsed={collapsed}
-            active={currentPath === item.path}
+            active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
           />
         ))}
       </div>
@@ -63,7 +63,7 @@ export default function SidebarSection({
               key={item.path}
               item={item}
               collapsed={false}
-              active={currentPath === item.path}
+              active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
             />
           ))}
         </div>

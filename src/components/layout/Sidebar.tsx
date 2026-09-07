@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { navigation, dashboardItem } from "@/config/navigation";
 import SidebarSection from "./SidebarSection";
+import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -14,6 +15,8 @@ export default function Sidebar({
   onToggleCollapse: _onToggleCollapse,
 
 }: SidebarProps) {
+  const { appName, faviconUrl } = usePublicSettings();
+
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -52,14 +55,19 @@ export default function Sidebar({
           }`}
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
-              <span className="text-base font-bold">A</span>
-            </div>
+            {faviconUrl ? (
+              <img src={faviconUrl} alt={appName ?? "SchoolCMS"} className="h-10 w-10 rounded-2xl object-cover shadow-lg shadow-primary-container/30" />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
+                <span className="text-base font-bold">A</span>
+              </div>
+            )}
             {!collapsed && (
               <div>
                 <div className="font-display text-base font-bold leading-none">
-                  SchoolCMS
+                  {appName}
                 </div>
+                <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Administrator</div>
               </div>
             )}
           </div>
