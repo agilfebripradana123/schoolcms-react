@@ -181,6 +181,26 @@ export interface AuditLogListParams extends ListParams {
   model?: string;
 }
 
+// ---- Backup Log ----
+export interface BackupLog {
+  id: number;
+  user_id: number | null;
+  status: string;
+  file_path: string | null;
+  file_size: number | null;
+  type: string;
+  description: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  user: UserManagement | null;
+  created_at?: string;
+}
+
+export interface BackupLogListParams extends ListParams {
+  q?: string;
+  status?: string;
+}
+
 export interface SettingListParams extends ListParams {
   q?: string;
   group?: string;
