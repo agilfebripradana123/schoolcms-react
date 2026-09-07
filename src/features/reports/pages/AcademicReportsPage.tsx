@@ -14,22 +14,17 @@ import type { AcademicGradesSummaryRow } from "../api/types";
 import { classService } from "@/features/academic/api/class.service";
 import { subjectService } from "@/features/academic/api/subject.service";
 import { academicYearService } from "@/features/academic/api/academic-year.service";
-import type { AcademicYear, SchoolClass, Subject } from "@/features/academic/api/types";
+import { semesterService } from "@/features/academic/api/semester.service";
+import type { AcademicYear, SchoolClass, Semester, Subject } from "@/features/academic/api/types";
 import Pagination from "../../../components/ui/Pagination";
 
 const PER_PAGE = 10;
 
-const SEMESTER_OPTIONS = [
-  { value: "all", label: "Semua Semester" },
-  { value: "1", label: "Semester 1" },
-  { value: "2", label: "Semester 2" },
-];
-
 interface QueryState {
   class_id: number | undefined;
   subject_id: number | undefined;
-  semester: "1" | "2" | undefined;
-  academic_year: string | undefined;
+  semester_id: number | undefined;
+  academic_year_id: number | undefined;
   page: number;
 }
 
@@ -47,17 +42,18 @@ export default function AcademicReportsPage() {
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
 
   const [classFilter, setClassFilter] = useState<string>("all");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [semesterFilter, setSemesterFilter] = useState<string>("all");
-  const [academicYearId, setAcademicYearId] = useState("all");
+  const [academicYearFilter, setAcademicYearFilter] = useState<string>("all");
 
   const [query, setQuery] = useState<QueryState>({
     class_id: undefined,
     subject_id: undefined,
-    semester: undefined,
-    academic_year: undefined,
+    semester_id: undefined,
+    academic_year_id: undefined,
     page: 1,
   });
 
@@ -68,12 +64,14 @@ export default function AcademicReportsPage() {
       classService.list({ per_page: 100 }),
       subjectService.list({ per_page: 100 }),
       academicYearService.list({ per_page: 100 }),
+      semesterService.list({ per_page: 100 }),
     ])
-      .then(([classesRes, subjectsRes, yearsRes]) => {
+      .then(([classesRes, subjectsRes, yearsRes, semestersRes]) => {
         if (!active) return;
         setClasses(classesRes.data);
         setSubjects(subjectsRes.data);
         setAcademicYears(yearsRes.data);
+        setSemesters(semestersRes.data);
       })
       .catch(() => {
         // Filter relasi opsional; list tetap dapat ditampilkan tanpa nama.
@@ -95,8 +93,8 @@ export default function AcademicReportsPage() {
       .academicGradesSummary({
         class_id: query.class_id,
         subject_id: query.subject_id,
-        semester: query.semester,
-        academic_year: query.academic_year,
+        semester_id: query.semester_id,
+        academic_year_id: query.academic_year_id,
         page: query.page,
         per_page: PER_PAGE,
       })
@@ -156,22 +154,23 @@ export default function AcademicReportsPage() {
     setError(null);
     setQuery((prev) => ({
       ...prev,
-      semester: value === "all" ? undefined : (value as "1" | "2"),
+      semester_id: value === "all" ? undefined : Number(value),
       page: 1,
     }));
   }, []);
 
   const handleAcademicYearChange = useCallback((value: string) => {
-    setAcademicYearId(value);
-    const selected = academicYears.find((y) => String(y.id) === value);
+    setAcademicYearFilter(value);
+    setSemesterFilter("all");
     setLoading(true);
     setError(null);
     setQuery((prev) => ({
       ...prev,
-      academic_year: selected?.name ?? undefined,
+      academic_year_id: value === "all" ? undefined : Number(value),
+      semester_id: undefined,
       page: 1,
     }));
-  }, [academicYears]);
+  }, []);
 
   const classOptions = useMemo(
     () => [
@@ -196,6 +195,16 @@ export default function AcademicReportsPage() {
     ],
     [academicYears],
   );
+
+  const semesterOptions = useMemo(() => {
+    const filtered = academicYearFilter !== "all"
+      ? semesters.filter((s) => s.academic_year_id === Number(academicYearFilter))
+      : semesters;
+    return [
+      { value: "all", label: "Semua Semester" },
+      ...filtered.map((s) => ({ value: String(s.id), label: `Semester ${s.name}` })),
+    ];
+  }, [semesters, academicYearFilter]);
 
   const columns = [
     {
@@ -233,8 +242,8 @@ export default function AcademicReportsPage() {
   const emptyMessage =
     query.class_id ||
     query.subject_id ||
-    query.semester ||
-    query.academic_year
+    query.semester_id ||
+    query.academic_year_id
       ? "Tidak ada data nilai yang sesuai dengan filter."
       : "Belum ada data nilai.";
 
@@ -263,20 +272,20 @@ export default function AcademicReportsPage() {
               placeholder="Pilih Mata Pelajaran"
             />
           </FormField>
-          <FormField label="Semester" className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
-            <AppSelect
-              options={SEMESTER_OPTIONS}
-              value={semesterFilter}
-              onChange={(v) => handleSemesterChange(v ?? "all")}
-              placeholder="Pilih Semester"
-            />
-          </FormField>
           <FormField label="Tahun Ajaran" className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <AppSelect
               options={academicYearOptions}
-              value={academicYearId}
+              value={academicYearFilter}
               onChange={(v) => handleAcademicYearChange(v ?? "all")}
               placeholder="Pilih Tahun Ajaran"
+            />
+          </FormField>
+          <FormField label="Semester" className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <AppSelect
+              options={semesterOptions}
+              value={semesterFilter}
+              onChange={(v) => handleSemesterChange(v ?? "all")}
+              placeholder="Pilih Semester"
             />
           </FormField>
         </div>

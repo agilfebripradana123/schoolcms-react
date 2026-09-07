@@ -11,6 +11,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Pagination from "@/components/ui/Pagination";
 import { toApiError } from "@/lib/api";
+import { formatDate } from "@/lib/format";
 import type { ApiError } from "@/types";
 import { academicYearService } from "../api/academic-year.service";
 import type { AcademicYear } from "../api/types";
@@ -149,6 +150,15 @@ export default function AcademicYearPage() {
         ),
       },
       {
+        header: "Periode",
+        accessor: "start_date" as keyof Row,
+        render: (_value: Row[keyof Row], row: Row) => (
+          <span className="text-slate-700">
+            {row.start_date ? `${formatDate(row.start_date)} - ${formatDate(row.end_date)}` : "-"}
+          </span>
+        ),
+      },
+      {
         header: "Status",
         accessor: "is_active" as keyof Row,
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
@@ -267,6 +277,11 @@ export default function AcademicYearPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold text-on-surface">{row.name}</p>
+                        {row.start_date && (
+                          <p className="mt-0.5 text-xs text-on-surface-variant">
+                            {formatDate(row.start_date)} - {formatDate(row.end_date)}
+                          </p>
+                        )}
                       </div>
                       <Badge
                         variant={row.is_active ? "success" : "secondary"}

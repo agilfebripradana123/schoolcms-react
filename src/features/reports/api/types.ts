@@ -26,6 +26,8 @@ export interface AcademicGradesSummaryResponse {
 export interface AcademicGradesSummaryParams {
   class_id?: number;
   subject_id?: number;
+  semester_id?: number;
+  academic_year_id?: number;
   semester?: "1" | "2";
   academic_year?: string;
   per_page?: number;

@@ -14,9 +14,18 @@ import type { ApiError } from "@/types";
 import { gradeService } from "../api/grade.service";
 import { classService } from "../api/class.service";
 import { subjectService } from "../api/subject.service";
+import { academicYearService } from "../api/academic-year.service";
+import { semesterService } from "../api/semester.service";
 import { studentService } from "@/features/students/api/student.service";
 import type { Student } from "@/features/students/api/types";
-import type { Grade, GradeType, SchoolClass, Subject } from "../api/types";
+import type {
+  AcademicYear,
+  Grade,
+  GradeType,
+  SchoolClass,
+  Semester,
+  Subject,
+} from "../api/types";
 import GradeForm from "../components/grade/GradeForm";
 import GradeDeleteDialog from "../components/grade/GradeDeleteDialog";
 
@@ -41,6 +50,8 @@ interface QueryState {
   subject_id: number | undefined;
   class_id: number | undefined;
   type: GradeType | undefined;
+  academic_year_id: number | undefined;
+  semester_id: number | undefined;
   page: number;
 }
 
@@ -53,17 +64,23 @@ export default function GradesPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
 
   const [studentFilter, setStudentFilter] = useState<string>("all");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [classFilter, setClassFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [academicYearFilter, setAcademicYearFilter] = useState<string>("all");
+  const [semesterFilter, setSemesterFilter] = useState<string>("all");
 
   const [query, setQuery] = useState<QueryState>({
     student_id: undefined,
     subject_id: undefined,
     class_id: undefined,
     type: undefined,
+    academic_year_id: undefined,
+    semester_id: undefined,
     page: 1,
   });
 
@@ -91,6 +108,18 @@ export default function GradesPage() {
       .catch(() => {
         toast.error("Gagal memuat data kelas");
       });
+    academicYearService
+      .list({ per_page: 100 })
+      .then((res) => setAcademicYears(res.data))
+      .catch(() => {
+        toast.error("Gagal memuat data tahun ajaran");
+      });
+    semesterService
+      .list({ per_page: 100 })
+      .then((res) => setSemesters(res.data))
+      .catch(() => {
+        toast.error("Gagal memuat data semester");
+      });
   }, []);
 
   useEffect(() => {
@@ -102,6 +131,8 @@ export default function GradesPage() {
         subject_id: query.subject_id,
         class_id: query.class_id,
         type: query.type,
+        academic_year_id: query.academic_year_id,
+        semester_id: query.semester_id,
         page: query.page,
         per_page: PER_PAGE,
       })
@@ -167,6 +198,30 @@ export default function GradesPage() {
     setQuery((prev) => ({
       ...prev,
       type: value === "all" ? undefined : value,
+      page: 1,
+    }));
+  }, []);
+
+  const handleAcademicYearChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
+    setAcademicYearFilter(value);
+    setSemesterFilter("all");
+    setQuery((prev) => ({
+      ...prev,
+      academic_year_id: value === "all" ? undefined : Number(value),
+      semester_id: undefined,
+      page: 1,
+    }));
+  }, []);
+
+  const handleSemesterChange = useCallback((value: string) => {
+    setLoading(true);
+    setError(null);
+    setSemesterFilter(value);
+    setQuery((prev) => ({
+      ...prev,
+      semester_id: value === "all" ? undefined : Number(value),
       page: 1,
     }));
   }, []);
@@ -245,6 +300,30 @@ export default function GradesPage() {
     [classMap],
   );
 
+  const semesterDisplay = useCallback(
+    (row: Grade) => {
+      if (row.semester) return `Semester ${row.semester}`;
+      if (row.semester_id != null) {
+        const found = semesters.find((s) => s.id === row.semester_id);
+        return found ? `Semester ${found.name}` : `#${row.semester_id}`;
+      }
+      return "-";
+    },
+    [semesters],
+  );
+
+  const academicYearDisplay = useCallback(
+    (row: Grade) => {
+      if (row.academic_year) return row.academic_year;
+      if (row.academic_year_id != null) {
+        const found = academicYears.find((y) => y.id === row.academic_year_id);
+        return found?.name ?? `#${row.academic_year_id}`;
+      }
+      return "-";
+    },
+    [academicYears],
+  );
+
   const columns = useMemo(() => {
     type Row = Grade;
     return [
@@ -289,16 +368,16 @@ export default function GradesPage() {
       },
       {
         header: "Semester",
-        accessor: "semester" as keyof Row,
+        accessor: "semester_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.semester ? `Semester ${row.semester}` : "-"}</span>
+          <span className="text-slate-700">{semesterDisplay(row)}</span>
         ),
       },
       {
         header: "Tahun Ajaran",
-        accessor: "academic_year" as keyof Row,
+        accessor: "academic_year_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.academic_year || "-"}</span>
+          <span className="text-slate-700">{academicYearDisplay(row)}</span>
         ),
       },
       {
@@ -328,7 +407,7 @@ export default function GradesPage() {
         ),
       },
     ];
-  }, [studentName, subjectName, className, openEdit, openDelete]);
+  }, [studentName, subjectName, className, semesterDisplay, academicYearDisplay, openEdit, openDelete]);
 
 
   const studentFilterOptions = useMemo(
@@ -359,6 +438,22 @@ export default function GradesPage() {
     ],
     [],
   );
+  const academicYearFilterOptions = useMemo(
+    () => [
+      { value: "all", label: "Semua Tahun Ajaran" },
+      ...academicYears.map((y) => ({ value: String(y.id), label: y.name })),
+    ],
+    [academicYears],
+  );
+  const semesterFilterOptions = useMemo(() => {
+    const filtered = academicYearFilter !== "all"
+      ? semesters.filter((s) => s.academic_year_id === Number(academicYearFilter))
+      : semesters;
+    return [
+      { value: "all", label: "Semua Semester" },
+      ...filtered.map((s) => ({ value: String(s.id), label: `Semester ${s.name}` })),
+    ];
+  }, [semesters, academicYearFilter]);
 
   return (
     <PageContainer className="py-6">
@@ -373,7 +468,7 @@ export default function GradesPage() {
       />
 
       <Card>
-        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2 *:md:gap-3">
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3 *:md:gap-3">
           <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
             <span className="whitespace-nowrap">Siswa</span>
             <AppSelect
@@ -409,6 +504,24 @@ export default function GradesPage() {
               onChange={(v) => handleTypeChange((v ?? "all") as TypeFilter)}
               placeholder="Pilih Jenis"
               isSearchable={false}
+            />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Tahun Ajaran</span>
+            <AppSelect
+              options={academicYearFilterOptions}
+              value={academicYearFilter}
+              onChange={(v) => handleAcademicYearChange(v ?? "all")}
+              placeholder="Pilih Tahun Ajaran"
+            />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-sm text-on-surface-variant md:min-w-[160px] md:flex-1">
+            <span className="whitespace-nowrap">Semester</span>
+            <AppSelect
+              options={semesterFilterOptions}
+              value={semesterFilter}
+              onChange={(v) => handleSemesterChange(v ?? "all")}
+              placeholder="Pilih Semester"
             />
           </label>
         </div>
@@ -463,8 +576,8 @@ export default function GradesPage() {
                           <span className="font-semibold text-on-surface">{row.score ?? "-"}</span>
                         </p>
                         <p className="text-xs text-on-surface-variant">
-                          {row.semester ? `Semester ${row.semester}` : "-"} ·{" "}
-                          {row.academic_year || "-"}
+                          {semesterDisplay(row)} ·{" "}
+                          {academicYearDisplay(row)}
                         </p>
                       </div>
                     </div>

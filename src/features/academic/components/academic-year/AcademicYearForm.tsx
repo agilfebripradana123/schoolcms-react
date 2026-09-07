@@ -30,6 +30,8 @@ export default function AcademicYearForm({
     const month = now.getMonth();
     return String(month >= 6 ? year : year - 1);
   });
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const [isActive, setIsActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -57,6 +59,8 @@ export default function AcademicYearForm({
         if (parts.length === 2 && parts[0]) {
           setStartYear(parts[0]);
         }
+        setStartDate(initialData.start_date ?? "");
+        setEndDate(initialData.end_date ?? "");
         setIsActive(initialData.is_active ?? false);
       } else {
         setStartYear(() => {
@@ -65,6 +69,8 @@ export default function AcademicYearForm({
           const month = now.getMonth();
           return String(month >= 6 ? year : year - 1);
         });
+        setStartDate("");
+        setEndDate("");
         setIsActive(false);
       }
     }
@@ -86,6 +92,8 @@ export default function AcademicYearForm({
 
     const payload: CreateAcademicYearPayload = {
       name: `${startYear}/${endYear}`,
+      start_date: startDate || null,
+      end_date: endDate || null,
       is_active: isActive,
     };
 
@@ -93,7 +101,13 @@ export default function AcademicYearForm({
       if (initialData) {
         await academicYearService.update(initialData.id, payload);
         toast.success("Tahun ajaran berhasil diperbarui.");
-        onSaved({ ...initialData, name: payload.name, is_active: isActive });
+        onSaved({
+          ...initialData,
+          name: payload.name,
+          start_date: payload.start_date,
+          end_date: payload.end_date,
+          is_active: isActive,
+        });
       } else {
         const res = await academicYearService.create(payload);
         toast.success("Tahun ajaran berhasil ditambahkan.");
@@ -169,6 +183,32 @@ export default function AcademicYearForm({
               />
             </FormField>
 
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                label="Tanggal Mulai"
+                error={fieldErrors.start_date?.[0]}
+              >
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  disabled={submitting}
+                />
+              </FormField>
+
+              <FormField
+                label="Tanggal Selesai"
+                error={fieldErrors.end_date?.[0]}
+              >
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  disabled={submitting}
+                />
+              </FormField>
+            </div>
+
             <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <input
                 type="checkbox"
@@ -222,6 +262,32 @@ export default function AcademicYearForm({
             <p className="text-xs text-on-surface-variant">
               Tahun selesai otomatis diisi 1 tahun lebih besar dari tahun mulai.
             </p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                label="Tanggal Mulai"
+                error={fieldErrors.start_date?.[0]}
+              >
+                <Input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  disabled={submitting}
+                />
+              </FormField>
+
+              <FormField
+                label="Tanggal Selesai"
+                error={fieldErrors.end_date?.[0]}
+              >
+                <Input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  disabled={submitting}
+                />
+              </FormField>
+            </div>
 
             <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <input

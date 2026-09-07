@@ -11,6 +11,7 @@ import { gradeService } from "../../api/grade.service";
 import { classService } from "../../api/class.service";
 import { subjectService } from "../../api/subject.service";
 import { academicYearService } from "../../api/academic-year.service";
+import { semesterService } from "../../api/semester.service";
 import { studentService } from "@/features/students/api/student.service";
 import type {
   AcademicYear,
@@ -18,6 +19,7 @@ import type {
   Grade,
   GradeType,
   SchoolClass,
+  Semester,
   Subject,
 } from "../../api/types";
 import type { Student } from "@/features/students/api/types";
@@ -35,11 +37,6 @@ const TYPE_OPTIONS: Array<{ value: GradeType; label: string }> = [
   { value: "uas", label: "UAS" },
 ];
 
-const SEMESTER_OPTIONS = [
-  { value: "1", label: "Semester 1" },
-  { value: "2", label: "Semester 2" },
-];
-
 export default function GradeForm({
   open,
   onClose,
@@ -51,8 +48,8 @@ export default function GradeForm({
   const [classId, setClassId] = useState<string>("");
   const [type, setType] = useState<GradeType>("tugas");
   const [score, setScore] = useState("");
-  const [semester, setSemester] = useState("1");
-  const [academicYear, setAcademicYear] = useState("");
+  const [semesterId, setSemesterId] = useState<string>("");
+  const [academicYearId, setAcademicYearId] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -72,6 +69,10 @@ export default function GradeForm({
   const [years, setYears] = useState<AcademicYear[]>([]);
   const [yearsLoading, setYearsLoading] = useState(false);
   const [yearsError, setYearsError] = useState(false);
+
+  const [semesters, setSemesters] = useState<Semester[]>([]);
+  const [semestersLoading, setSemestersLoading] = useState(false);
+  const [semestersError, setSemestersError] = useState(false);
 
   const isEdit = Boolean(initialData);
 
@@ -135,6 +136,23 @@ export default function GradeForm({
       });
   }, []);
 
+  const loadSemesters = useCallback((yearId?: number) => {
+    setSemestersLoading(true);
+    setSemestersError(false);
+    semesterService
+      .list({ per_page: 100, ...(yearId ? { academic_year_id: yearId } : {}) })
+      .then((res) => {
+        setSemesters(res.data);
+        setSemestersError(false);
+      })
+      .catch(() => {
+        setSemestersError(true);
+      })
+      .finally(() => {
+        setSemestersLoading(false);
+      });
+  }, []);
+
   const [previousOpen, setPreviousOpen] = useState(open);
   const [previousInitialData, setPreviousInitialData] = useState(initialData);
 
@@ -160,16 +178,16 @@ export default function GradeForm({
         setClassId(String(initialData.class_id));
         setType(initialData.type);
         setScore(initialData.score != null ? String(initialData.score) : "");
-        setSemester(initialData.semester || "1");
-        setAcademicYear(initialData.academic_year || "");
+        setSemesterId(initialData.semester_id != null ? String(initialData.semester_id) : "");
+        setAcademicYearId(initialData.academic_year_id != null ? String(initialData.academic_year_id) : "");
       } else {
         setStudentId("");
         setSubjectId("");
         setClassId("");
         setType("tugas");
         setScore("");
-        setSemester("1");
-        setAcademicYear("");
+        setSemesterId("");
+        setAcademicYearId("");
       }
     }
   }
@@ -182,6 +200,26 @@ export default function GradeForm({
       loadYears();
     }
   }, [open, loadStudents, loadSubjects, loadClasses, loadYears]);
+
+  useEffect(() => {
+    if (open) {
+      const yearId = academicYearId ? Number(academicYearId) : undefined;
+      loadSemesters(yearId);
+    }
+  }, [open, loadSemesters, academicYearId]);
+
+  const handleAcademicYearChange = useCallback(
+    (value: string) => {
+      setAcademicYearId(value ?? "");
+      setSemesterId("");
+      if (value) {
+        loadSemesters(Number(value));
+      } else {
+        setSemesters([]);
+      }
+    },
+    [loadSemesters],
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,14 +239,19 @@ export default function GradeForm({
       return;
     }
 
+    const selectedYear = years.find((y) => y.id === Number(academicYearId));
+    const selectedSemester = semesters.find((s) => s.id === Number(semesterId));
+
     const payload: CreateGradePayload = {
       student_id: Number(studentId),
       subject_id: Number(subjectId),
       class_id: Number(classId),
       type,
       score: scoreNum,
-      semester,
-      academic_year: academicYear,
+      semester_id: Number(semesterId),
+      academic_year_id: Number(academicYearId),
+      semester: selectedSemester?.name,
+      academic_year: selectedYear?.name,
     };
 
     try {
@@ -237,7 +280,8 @@ export default function GradeForm({
   const studentOptions = students.map((s) => ({ value: String(s.id), label: s.name }));
   const subjectOptions = subjects.map((s) => ({ value: String(s.id), label: s.name }));
   const classOptions = classes.map((c) => ({ value: String(c.id), label: c.name }));
-  const yearOptions = years.map((y) => ({ value: y.name, label: y.name }));
+  const yearOptions = years.map((y) => ({ value: String(y.id), label: y.name }));
+  const semesterOptions = semesters.map((s) => ({ value: String(s.id), label: `Semester ${s.name}` }));
 
   return (
     <Modal
@@ -406,18 +450,43 @@ export default function GradeForm({
             />
           </FormField>
 
-          <FormField label="Semester" required error={fieldErrors.semester?.[0]}>
-            <AppSelect
-              value={semester}
-              onChange={(v) => setSemester(v ?? "1")}
-              options={SEMESTER_OPTIONS}
-              isSearchable={false}
-              isDisabled={submitting}
-            />
+          <FormField label="Semester" required error={fieldErrors.semester_id?.[0] ?? fieldErrors.semester?.[0]}>
+            {semestersLoading ? (
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+                <RefreshCw className="h-4 w-4 animate-spin" />
+                Memuat semester...
+              </div>
+            ) : semestersError ? (
+              <div className="flex w-full flex-col gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
+                <span>Gagal memuat data semester.</span>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => loadSemesters(academicYearId ? Number(academicYearId) : undefined)}
+                  className="self-start"
+                >
+                  Muat Ulang
+                </Button>
+              </div>
+            ) : semesters.length === 0 ? (
+              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+                {academicYearId ? "Tidak ada semester tersedia." : "Pilih tahun ajaran terlebih dahulu."}
+              </p>
+            ) : (
+              <AppSelect
+                value={semesterId}
+                onChange={(v) => setSemesterId(v ?? "")}
+                options={semesterOptions}
+                placeholder="Pilih Semester"
+                isSearchable={false}
+                isDisabled={submitting}
+              />
+            )}
           </FormField>
         </div>
 
-        <FormField label="Tahun Ajaran" required error={fieldErrors.academic_year?.[0]}>
+        <FormField label="Tahun Ajaran" required error={fieldErrors.academic_year_id?.[0] ?? fieldErrors.academic_year?.[0]}>
           {yearsLoading ? (
             <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
@@ -446,8 +515,8 @@ export default function GradeForm({
             </p>
           ) : (
             <AppSelect
-              value={academicYear}
-              onChange={(v) => setAcademicYear(v ?? "")}
+              value={academicYearId}
+              onChange={(v) => handleAcademicYearChange(v ?? "")}
               options={yearOptions}
               placeholder="Pilih Tahun Ajaran"
               isDisabled={submitting}

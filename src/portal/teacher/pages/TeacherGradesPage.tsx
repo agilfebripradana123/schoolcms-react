@@ -12,16 +12,14 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { usePermission } from "@/features/auth/usePermission";
 import { teacherGradeService, myAssignmentService } from "@/features/academic";
+import { semesterService } from "@/features/academic/api/semester.service";
 import type {
   GradeType,
+  Semester,
   TeacherGradeAssignment,
   TeacherGradeStudent,
 } from "@/features/academic/api/types";
-import {
-  GRADE_TYPES,
-  GRADE_TYPE_LABELS,
-  SEMESTER_OPTIONS,
-} from "@/features/academic/api/types";
+import { GRADE_TYPES, GRADE_TYPE_LABELS } from "@/features/academic/api/types";
 import { toApiError } from "@/lib/api";
 import type { SelectOption } from "@/components/ui/Select";
 
@@ -33,8 +31,10 @@ export default function TeacherGradesPage() {
   const [classId, setClassId] = useState<number | null>(null);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [type, setType] = useState<GradeType>("tugas");
-  const [semester, setSemester] = useState<string>("1");
-  const [academicYear, setAcademicYear] = useState<string | null>(null);
+  const [semesterId, setSemesterId] = useState<number | null>(null);
+  const [academicYearId, setAcademicYearId] = useState<number | null>(null);
+
+  const [semesters, setSemesters] = useState<Semester[]>([]);
 
   const [rows, setRows] = useState<TeacherGradeStudent[]>([]);
   const [scoreById, setScoreById] = useState<Record<number, string>>({});
@@ -59,14 +59,22 @@ export default function TeacherGradesPage() {
         const first = data[0];
         if (!first) return;
         setClassId(first.class_id);
-        setAcademicYear(first.academic_year_name ?? null);
+        setAcademicYearId(first.academic_year_id);
       })
       .catch(() => setAssignments([]));
   }, []);
 
+  const loadSemesters = useCallback(() => {
+    semesterService
+      .list({ per_page: 100 })
+      .then((res) => setSemesters(res.data))
+      .catch(() => setSemesters([]));
+  }, []);
+
   useEffect(() => {
     loadAssignments();
-  }, [loadAssignments]);
+    loadSemesters();
+  }, [loadAssignments, loadSemesters]);
 
   const classOptions = useMemo<SelectOption<number>[]>(() => {
     const seen = new Map<number, string>();
@@ -85,23 +93,32 @@ export default function TeacherGradesPage() {
     return Array.from(seen, ([value, label]) => ({ value, label }));
   }, [assignments, classId]);
 
-  const yearOptions = useMemo<SelectOption<string>[]>(() => {
-    const seen = new Set<string>();
+  const yearOptions = useMemo<SelectOption<number>[]>(() => {
+    const seen = new Map<number, string>();
     for (const a of assignments) {
-      if (a.academic_year_name) seen.add(a.academic_year_name);
+      if (a.academic_year_id != null && !seen.has(a.academic_year_id)) {
+        seen.set(a.academic_year_id, a.academic_year_name ?? `Tahun ${a.academic_year_id}`);
+      }
     }
-    return Array.from(seen, (label) => ({ value: label, label }));
+    return Array.from(seen, ([value, label]) => ({ value, label }));
   }, [assignments]);
+
+  const semesterOptions = useMemo<SelectOption<number>[]>(() => {
+    const filtered = academicYearId != null
+      ? semesters.filter((s) => s.academic_year_id === academicYearId)
+      : semesters;
+    return filtered.map((s) => ({ value: s.id, label: `Semester ${s.name}` }));
+  }, [semesters, academicYearId]);
 
   const typeOptions = useMemo<SelectOption<GradeType>[]>(
     () => GRADE_TYPES.map((t) => ({ value: t, label: GRADE_TYPE_LABELS[t] })),
     [],
   );
 
-  const canLoad = classId !== null && subjectId !== null;
+  const canLoad = classId !== null && subjectId !== null && semesterId !== null && academicYearId !== null;
 
   const loadRoster = useCallback(() => {
-    if (classId === null || subjectId === null) return;
+    if (classId === null || subjectId === null || semesterId === null || academicYearId === null) return;
     setStatus("loading");
     setError(null);
     teacherGradeService
@@ -109,8 +126,8 @@ export default function TeacherGradesPage() {
         class_id: classId,
         subject_id: subjectId,
         type,
-        semester,
-        academic_year: academicYear ?? undefined,
+        semester_id: semesterId,
+        academic_year_id: academicYearId,
       })
       .then((res) => {
         const students = res.data?.students ?? [];
@@ -122,10 +139,10 @@ export default function TeacherGradesPage() {
       })
       .catch((err) => setError(toApiError(err).message))
       .finally(() => {});
-  }, [classId, subjectId, type, semester, academicYear]);
+  }, [classId, subjectId, type, semesterId, academicYearId]);
 
   const handleSave = async () => {
-    if (classId === null || subjectId === null) return;
+    if (classId === null || subjectId === null || semesterId === null || academicYearId === null) return;
     const items = rows
       .map((r) => {
         const raw = scoreById[r.student_id]?.trim();
@@ -142,8 +159,8 @@ export default function TeacherGradesPage() {
         class_id: classId,
         subject_id: subjectId,
         type,
-        semester,
-        academic_year: academicYear ?? undefined,
+        semester_id: semesterId,
+        academic_year_id: academicYearId,
         items,
       });
       toast.success("Nilai berhasil disimpan.");
@@ -176,17 +193,13 @@ export default function TeacherGradesPage() {
           <div className="min-w-[150px]">
             <Select<GradeType> options={typeOptions} value={type} onChange={(v) => v && setType(v)} />
           </div>
-          <label className="text-sm font-medium text-slate-700">Semester:</label>
-          <div className="min-w-[150px]">
-            <Select<string>
-              options={Array.from(SEMESTER_OPTIONS, (o) => ({ value: o.value, label: o.label }))}
-              value={semester}
-              onChange={(v) => v && setSemester(v)}
-            />
-          </div>
           <label className="text-sm font-medium text-slate-700">Tahun:</label>
           <div className="min-w-[150px]">
-            <Select<string> options={yearOptions} value={academicYear} onChange={setAcademicYear} placeholder="Tahun" isClearable />
+            <Select<number> options={yearOptions} value={academicYearId} onChange={(v) => { setAcademicYearId(v); setSemesterId(null); }} placeholder="Tahun" isClearable />
+          </div>
+          <label className="text-sm font-medium text-slate-700">Semester:</label>
+          <div className="min-w-[150px]">
+            <Select<number> options={semesterOptions} value={semesterId} onChange={setSemesterId} placeholder="Semester" isClearable />
           </div>
           <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
             Tampilkan
@@ -194,7 +207,7 @@ export default function TeacherGradesPage() {
       </PortalFilterBar>
 
       {!canLoad ? (
-        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Pilih kelas dan mata pelajaran terlebih dahulu." />
+        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Pilih kelas, mata pelajaran, tahun, dan semester terlebih dahulu." />
       ) : error ? (
         <PortalErrorState message={error} />
       ) : status === "loading" ? (
@@ -243,7 +256,7 @@ export default function TeacherGradesPage() {
                     <span className="text-sm text-slate-900">
                       {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
                         ? scoreById[row.student_id]
-                        : "—"}
+                        : "---"}
                     </span>
                   ),
               },

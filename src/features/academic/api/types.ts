@@ -4,6 +4,8 @@ import type { ListParams } from "@/types";
 export interface AcademicYear {
   id: number;
   name: string;
+  start_date?: string | null;
+  end_date?: string | null;
   is_active: boolean;
   created_at?: string;
   updated_at?: string;
@@ -11,6 +13,8 @@ export interface AcademicYear {
 
 export interface CreateAcademicYearPayload {
   name: string;
+  start_date?: string | null;
+  end_date?: string | null;
   is_active?: boolean;
 }
 
@@ -265,8 +269,10 @@ export interface Grade {
   class_id: number;
   type: GradeType;
   score: number;
-  semester: string;
-  academic_year: string;
+  semester_id?: number;
+  academic_year_id?: number;
+  semester?: string;
+  academic_year?: string;
   student?: Student;
   subject?: Subject;
   class?: SchoolClass;
@@ -280,8 +286,10 @@ export interface CreateGradePayload {
   class_id: number;
   type: GradeType;
   score: number;
-  semester: string;
-  academic_year: string;
+  semester_id: number;
+  academic_year_id: number;
+  semester?: string;
+  academic_year?: string;
 }
 
 export interface UpdateGradePayload extends Partial<CreateGradePayload> {}
@@ -504,8 +512,10 @@ export interface TeacherGradeRoster {
   class_id: number;
   subject_id: number;
   type: GradeType;
-  semester: string;
-  academic_year: string;
+  semester_id?: number;
+  academic_year_id?: number;
+  semester?: string;
+  academic_year?: string;
   students: TeacherGradeStudent[];
 }
 
@@ -518,8 +528,9 @@ export interface TeacherGradeBulkPayload {
   class_id: number;
   subject_id: number;
   type: GradeType;
-  semester: string;
+  semester_id: number;
+  academic_year_id: number;
+  semester?: string;
   academic_year?: string;
-  academic_year_id?: number;
   items: TeacherGradeBulkItem[];
 }

@@ -32,18 +32,29 @@ interface SemesterOption {
   name: string;
 }
 
+interface AcademicYearOption {
+  id: number;
+  name: string;
+}
+
 export default function StudentGradesPage() {
   const [grades, setGrades] = useState<GradeRow[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [semesters, setSemesters] = useState<SemesterOption[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYearOption[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadSemesters = useCallback(async () => {
+  const loadFilters = useCallback(async () => {
     try {
-      const res = await api.get<{ success: boolean; data: SemesterOption[] }>("/semesters");
-      if (res.data) setSemesters(res.data);
+      const [semestersRes, yearsRes] = await Promise.all([
+        api.get<{ success: boolean; data: SemesterOption[] }>("/semesters"),
+        api.get<{ success: boolean; data: AcademicYearOption[] }>("/academic-years"),
+      ]);
+      if (semestersRes.data) setSemesters(semestersRes.data);
+      if (yearsRes.data) setAcademicYears(yearsRes.data);
     } catch {
       // optional
     }
@@ -51,13 +62,15 @@ export default function StudentGradesPage() {
 
   const load = useCallback(async () => {
     try {
+      const params: Record<string, number | undefined> = {};
+      if (selectedSemester != null) params.semester_id = selectedSemester;
+      if (selectedAcademicYear != null) params.academic_year_id = selectedAcademicYear;
+
       const [gradesRes, summaryRes] = await Promise.all([
-        api.get<{ success: boolean; data: GradeRow[] }>(STUDENTS.GRADES, {
-          semester_id: selectedSemester ?? undefined,
-        }),
+        api.get<{ success: boolean; data: GradeRow[] }>(STUDENTS.GRADES, params),
         api.get<{ success: boolean; data: Summary }>(
           `${STUDENTS.GRADES}/summary`,
-          { semester_id: selectedSemester ?? undefined },
+          params,
         ),
       ]);
       setGrades(gradesRes.data);
@@ -69,17 +82,32 @@ export default function StudentGradesPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedSemester]);
+  }, [selectedSemester, selectedAcademicYear]);
 
   useEffect(() => {
-    loadSemesters();
-  }, [loadSemesters]);
+    loadFilters();
+  }, [loadFilters]);
 
   useEffect(() => {
     setLoading(true);
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSemester]);
+  }, [selectedSemester, selectedAcademicYear, load]);
+
+  const semesterOptions = useMemo(
+    () => [
+      { value: "", label: "Semua" },
+      ...semesters.map((s) => ({ value: s.id, label: s.name })),
+    ],
+    [semesters],
+  );
+
+  const academicYearOptions = useMemo(
+    () => [
+      { value: "", label: "Semua" },
+      ...academicYears.map((y) => ({ value: y.id, label: y.name })),
+    ],
+    [academicYears],
+  );
 
   const columns = useMemo(
     () => [
@@ -120,13 +148,19 @@ export default function StudentGradesPage() {
       <PageHeader title="Nilai" description="Nilai akademik Anda" />
 
       <PortalFilterBar>
+          <label className="text-sm font-medium text-slate-700">Tahun Ajaran:</label>
+          <div className="min-w-[200px]">
+            <AppSelect<number | string>
+              options={academicYearOptions}
+              value={selectedAcademicYear ?? ""}
+              onChange={(v) => setSelectedAcademicYear(v === "" || v == null ? null : Number(v))}
+              placeholder="Pilih tahun ajaran..."
+            />
+          </div>
           <label className="text-sm font-medium text-slate-700">Semester:</label>
           <div className="min-w-[200px]">
             <AppSelect<number | string>
-              options={[
-                { value: "", label: "Semua" },
-                ...semesters.map((s) => ({ value: s.id, label: s.name })),
-              ]}
+              options={semesterOptions}
               value={selectedSemester ?? ""}
               onChange={(v) => setSelectedSemester(v === "" || v == null ? null : Number(v))}
               placeholder="Pilih semester..."

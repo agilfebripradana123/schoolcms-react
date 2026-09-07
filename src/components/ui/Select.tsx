@@ -97,7 +97,7 @@ function buildStyles(errorFlag?: boolean, size: "default" | "sm" = "default") {
           : "transparent",
       color: state.isSelected ? "#ffffff" : onSurface,
       fontSize,
-      padding: compact ? "4px 8px" : undefined,
+      padding: compact ? "4px 8px" : "6px 10px",
       cursor: "pointer",
       "&:active": {
         backgroundColor: state.isSelected ? primary : primarySofter,
