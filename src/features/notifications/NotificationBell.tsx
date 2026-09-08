@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Bell, CheckCheck, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { toApiError } from "@/lib/api";
 import { notificationService } from "./api/notification.service";
@@ -144,7 +144,10 @@ export default function NotificationBell() {
               onClick={() => {
                 setOpen(false);
 
-                navigate("/admin/communication/notifications");
+                const location = useLocation();
+                const isSiswa = location.pathname.startsWith("/siswa");
+                const path = isSiswa ? "/siswa/notifications" : "/admin/communication/notifications";
+                navigate(path);
 
               }}
               className="text-xs font-medium text-primary-container hover:underline"

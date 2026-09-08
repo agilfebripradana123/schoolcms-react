@@ -38,15 +38,24 @@ export default function StudentSidebar({
     [navigate, onNavigation]
   );
 
-  const isActive = useCallback((path: string) => pathname === path, [pathname]);
+  const isActive = useCallback((path: string) => {
+    const normalized = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+    return normalized === path || normalized === path + "/dashboard";
+  }, [pathname]);
   const isGroupActive = useCallback(
-    (entry: (typeof studentNavigation)[number]) =>
-      "items" in entry &&
-      entry.items?.some((i) => pathname === i.path || pathname.startsWith(i.path + "/")),
+    (entry: (typeof studentNavigation)[number]): boolean =>
+      Boolean(
+        "items" in entry &&
+          entry.items?.some((i) => pathname === i.path || pathname.startsWith(i.path + "/")),
+      ),
     [pathname],
   );
 
-  const navOverlay = studentNavigation.filter((entry) => "items" in entry);
+  function isGroup(
+    entry: (typeof studentNavigation)[number]
+  ): entry is Extract<(typeof studentNavigation)[number], { label: string; items: unknown[] }> {
+    return "items" in entry && Array.isArray((entry as { items?: unknown }).items);
+  }
 
   return (
     <nav className="flex h-full flex-col bg-slate-950 text-white">
@@ -78,7 +87,7 @@ export default function StudentSidebar({
             onClick={() => goTo(studentDashboardItem.path)}
             className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               isActive(studentDashboardItem.path)
-                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
+                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30 hover:bg-primary-container/25 hover:text-white"
                 : "text-slate-300 hover:bg-white/5 hover:text-white"
             } ${collapsed ? "justify-center" : ""}`}
           >
@@ -93,7 +102,7 @@ export default function StudentSidebar({
 
         <div className="mt-4 space-y-1">
           {studentNavigation.map((entry) => {
-            if ("items" in entry) {
+            if (isGroup(entry)) {
               return (
                 <StudentSidebarSection
                   key={entry.label}
@@ -107,12 +116,13 @@ export default function StudentSidebar({
                 />
               );
             }
+            const item = entry as { path: string; label: string; icon?: React.ComponentType<{ className?: string }> };
             return (
               <StudentSidebarItem
-                key={entry.path}
-                item={entry}
+                key={item.path}
+                item={item}
                 collapsed={collapsed}
-                active={isActive(entry.path)}
+                active={isActive(item.path)}
                 onGo={goTo}
               />
             );
