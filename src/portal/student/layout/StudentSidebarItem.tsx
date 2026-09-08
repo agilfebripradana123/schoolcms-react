@@ -1,5 +1,5 @@
 interface StudentSidebarItemProps {
-  item: { path: string; label: string; icon: React.ComponentType<{ className?: string }> };
+  item: { path: string; label: string; icon?: React.ComponentType<{ className?: string }> };
   collapsed: boolean;
   active: boolean;
   onGo: (path: string) => void;
@@ -21,11 +21,19 @@ export default function StudentSidebarItem({
       } ${collapsed ? "justify-center px-2" : ""}`}
       title={collapsed ? item.label : undefined}
     >
-      <item.icon
-        className={`h-5 w-5 shrink-0 ${
-          active ? "text-primary-fixed" : "text-slate-400"
-        }`}
-      />
+      {item.icon ? (
+        <item.icon
+          className={`h-5 w-5 shrink-0 ${
+            active ? "text-primary-fixed" : "text-slate-400"
+          }`}
+        />
+      ) : (
+        <span
+          className={`h-5 w-5 shrink-0 rounded-md ${
+            active ? "bg-primary-fixed/30" : "bg-slate-500/40"
+          }`}
+        />
+      )}
       {!collapsed && <span>{item.label}</span>}
     </button>
   );
