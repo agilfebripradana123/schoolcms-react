@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   FileText,
   ShieldAlert,
+  ArrowRight,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { STUDENTS, COMMUNICATION } from "@/lib/api/endpoints";
@@ -285,9 +286,9 @@ export default function StudentPortalPage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-slate-900">Akademik</h2>
-          <Link to="/siswa/grades" className="text-sm text-indigo-600 hover:underline">
-            Lihat semua →
-          </Link>
+           <Link to="/siswa/grades" className="text-sm text-indigo-600 hover:underline">
+             <ArrowRight className="h-4 w-4" />
+           </Link>
         </div>
 
         {akademikLoading && !akademikError ? (
@@ -394,8 +395,8 @@ export default function StudentPortalPage() {
                 ))
               )}
               <div className="pt-2">
-                <Link to="/siswa/assignments" className="text-sm font-medium text-indigo-600 hover:underline">
-                  Lihat semua tugas →
+                <Link to="/siswa/assignments" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline">
+                  Lihat semua tugas <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </CardBody>
@@ -428,9 +429,9 @@ export default function StudentPortalPage() {
                 ))
               )}
               <div className="pt-2">
-                <Link to="/siswa/exams" className="text-sm font-medium text-indigo-600 hover:underline">
-                  Lihat semua ujian →
-                </Link>
+                 <Link to="/siswa/exams" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline">
+                   Lihat semua ujian <ArrowRight className="h-3.5 w-3.5" />
+                 </Link>
               </div>
             </CardBody>
           </Card>
@@ -466,53 +467,12 @@ export default function StudentPortalPage() {
                 ))
               )}
                             <div className="pt-2">
-                <Link to="/siswa/notifications" className="text-sm font-medium text-indigo-600 hover:underline">
-                  Lihat semua notifikasi →
+                <Link to="/siswa/notifications" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline">
+                  Lihat semua notifikasi <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
             </CardBody>
           </Card>
-
-          {/* Pelanggaran Terbaru hidup */}
-          <Link to="/siswa/violations" className="block">
-            <Card className="transition-shadow hover:shadow-md">
-              <CardHeader title="Pelanggaran Terbaru" />
-              <CardBody className="space-y-3">
-                {aktivitasLoading && !aktivitasError ? (
-                  <div className="flex items-center justify-center py-6">
-                    <Loader2 className="h-5 w-5 animate-spin text-amber-500" />
-                  </div>
-                ) : recentViolations.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <ShieldAlert className="h-10 w-10 text-slate-300" />
-                    <p className="mt-2 text-sm text-slate-500">Tidak ada pelanggaran</p>
-                  </div>
-                ) : (
-                  recentViolations.map((v) => (
-                    <div key={v.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-amber-50">
-                      <div className="flex-shrink-0 mt-0.5">
-                        <ShieldAlert className="h-4 w-4 text-amber-500" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-slate-900">{v.category}</p>
-                        <p className="text-xs text-slate-500">{v.description}</p>
-                        {v.violated_at && (
-                          <p className="mt-0.5 text-[11px] text-slate-400">
-                            {formatDate(v.violated_at)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-                <div className="pt-2">
-                  <Link to="/siswa/violations" className="text-sm font-medium text-amber-600 hover:underline">
-                    Lihat semua pelanggaran →
-                  </Link>
-                </div>
-              </CardBody>
-            </Card>
-          </Link>
         </div>
 
         {aktivitasError && (
