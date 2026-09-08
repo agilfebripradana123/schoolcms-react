@@ -221,7 +221,6 @@ const router = createBrowserRouter([
               { path: "system/settings", element: <SettingsPage /> },
               { path: "system/settings/general", element: <SettingsGeneralPage /> },
                { path: "system/settings/notifications", element: <SettingsNotificationsPage /> },
-               { path: "system/settings/push", element: <SettingsPushPage /> },
                { path: "system/settings/email", element: <SettingsEmailPage /> },
               { path: "system/settings/whatsapp", element: <SettingsWhatsAppPage /> },
               { path: "system/settings/payment", element: <SettingsPaymentPage /> },
