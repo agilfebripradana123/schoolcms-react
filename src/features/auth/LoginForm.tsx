@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, IdCard, Loader2, Lock, Mail, ShieldCheck, User } from "lucide-react";
 import { useAuth } from "@/features/auth/useAuth";
@@ -6,6 +6,7 @@ import loginBg from "@/assets/images/gambar_login.webp";
 import { toast } from "sonner";
 import { toApiError } from "@/lib/api/error";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
+import { LoginPreloader } from "@/components/ui/LoginPreloader";
 
 interface LoginFormProps {
   mode: "siswa" | "guru" | "admin";
@@ -54,13 +55,46 @@ function getRedirectPath(role: string): string {
 export function LoginForm({ mode }: LoginFormProps) {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { heroImage, heroText, heroTextSub, schoolName, schoolAddress, schoolLogo, faviconUrl, appName } = usePublicSettings();
+  const { heroImage, heroText, heroTextSub, schoolName, schoolAddress, schoolLogo, faviconUrl, appName, loading: settingsLoading } = usePublicSettings();
   const [loginValue, setLoginValue] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [minTimeDone, setMinTimeDone] = useState(false);
+  const [assetsReady, setAssetsReady] = useState(false);
   const cfg = configs[mode];
   const Icon = cfg.icon;
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setMinTimeDone(true), 2000);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (settingsLoading) return;
+    let cancelled = false;
+    const urls = [heroImage || loginBg, schoolLogo, faviconUrl].filter(Boolean) as string[];
+    Promise.all(
+      urls.map(
+        (src) =>
+          new Promise<void>((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+            img.src = src;
+          }),
+      ),
+    ).then(() => {
+      if (!cancelled) setAssetsReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [settingsLoading, heroImage, schoolLogo, faviconUrl]);
+
+  if (!minTimeDone || settingsLoading || !assetsReady) {
+    return <LoginPreloader />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,11 +193,11 @@ export function LoginForm({ mode }: LoginFormProps) {
             <div className="max-w-xl">
               {schoolLogo ? (
                 <div className="flex items-center gap-3">
-                  {faviconUrl ? <img src={faviconUrl} alt="" className="h-10 w-10 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" /> : null}
-                  <img src={schoolLogo ?? undefined} alt={appName} className="h-14 w-14 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+                  {faviconUrl ? <img src={faviconUrl!} alt="" className="h-10 w-10 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" /> : null}
+                  <img src={schoolLogo!} alt={appName} className="h-14 w-14 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
                 </div>
               ) : faviconUrl ? (
-                <img src={faviconUrl} alt={appName} className="mb-4 h-14 w-14 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+                <img src={faviconUrl!} alt={appName} className="mb-4 h-14 w-14 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
               ) : (
                 <ShieldCheck className="mb-4 h-8 w-8 text-primary-fixed" />
               )}
@@ -187,10 +221,10 @@ export function LoginForm({ mode }: LoginFormProps) {
             <div className="mb-10 flex justify-center lg:hidden">
               <div className="flex items-center gap-2">
                 {faviconUrl && (
-                  <img src={faviconUrl} alt={appName} className="h-10 w-10 object-contain rounded-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+                  <img src={faviconUrl!} alt={appName} className="h-10 w-10 object-contain rounded-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
                 )}
                 {schoolLogo && (
-                  <img src={schoolLogo ?? undefined} alt={appName} className="h-10 w-10 object-contain rounded-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
+                  <img src={schoolLogo!} alt={appName} className="h-10 w-10 object-contain rounded-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]" />
                 )}
                 {!faviconUrl && !schoolLogo && (
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg">

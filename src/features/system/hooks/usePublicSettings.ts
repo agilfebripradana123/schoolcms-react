@@ -18,7 +18,7 @@ interface PublicSettingsEnvelope {
   data: Record<string, string | null>;
 }
 
-export const DEFAULT_PUBLIC_SETTINGS: Required<Pick<PublicSettings, "hero_text" | "hero_text_sub" | "school_name" | "app_name">> = {
+export const DEFAULT_PUBLIC_SETTINGS: Record<"hero_text" | "hero_text_sub" | "school_name" | "app_name", string> = {
   hero_text: "Kelola sekolah dengan mudah",
   hero_text_sub: "Satu platform untuk mengelola siswa, guru, akademik, keuangan, dll.",
   school_name: "SchoolCMS",
@@ -68,8 +68,8 @@ export function usePublicSettings() {
     };
   }, []);
 
-  const schoolLogo = settings.school_logo ?? undefined;
-  const faviconUrl = settings.favicon ?? undefined;
+  const schoolLogo: string | undefined = settings.school_logo ?? undefined;
+  const faviconUrl: string | undefined = settings.favicon ?? undefined;
   const appName = settings.app_name || DEFAULT_PUBLIC_SETTINGS.app_name;
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export function usePublicSettings() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const title = settings.app_name ?? DEFAULT_PUBLIC_SETTINGS.app_name;
+    const title = (settings.app_name ?? DEFAULT_PUBLIC_SETTINGS.app_name) as string;
     document.title = title;
   }, [settings.app_name]);
 
