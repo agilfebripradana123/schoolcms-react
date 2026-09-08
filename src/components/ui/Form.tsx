@@ -6,16 +6,18 @@ import {
 } from "react";
 import AppSelect from "./Select";
 
-export type SelectOption = { value: string; label: string };
-
-// ponytail: komponen form minimal — tambah date picker / file upload saat modul butuh
+export type SelectOption = {
+  value: string;
+  label: string;
+};
 
 const baseInput =
-  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30 disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full rounded-2xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm text-on-surface placeholder:text-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30 disabled:cursor-not-allowed disabled:opacity-50";
 
 /* ── FormField wrapper ── */
+
 interface FormFieldProps {
-  label?: string; 
+  label?: string;
   error?: string;
   hint?: string;
   required?: boolean;
@@ -36,40 +38,64 @@ export function FormField({
       {label && (
         <label className="mb-1.5 block text-sm text-on-surface">
           {label}
-          {required && <span className="ml-0.5 text-error">*</span>}
+
+          {required && (
+            <span className="ml-0.5 text-error">
+              *
+            </span>
+          )}
         </label>
       )}
+
       {children}
-      {error && <p className="mt-1 text-xs text-error">{error}</p>}
-      {!error && hint && <p className="mt-1 text-xs text-outline">{hint}</p>}
+
+      {error && (
+        <p className="mt-1 text-xs text-error">
+          {error}
+        </p>
+      )}
+
+      {!error && hint && (
+        <p className="mt-1 text-xs text-outline">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
 
 /* ── Input ── */
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+
+interface InputProps
+  extends InputHTMLAttributes<HTMLInputElement> {
   icon?: ReactNode;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className = "", icon, ...props }, ref) => (
-    <div className="relative">
-      {icon && (
-        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline">
-          {icon}
-        </span>
-      )}
-      <input
-        ref={ref}
-        className={`${baseInput} ${icon ? "pl-10" : ""} ${className}`}
-        {...props}
-      />
-    </div>
-  ),
-);
+export const Input = forwardRef<
+  HTMLInputElement,
+  InputProps
+>(({ className = "", icon, ...props }, ref) => (
+  <div className="relative">
+    {icon && (
+      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-outline">
+        {icon}
+      </span>
+    )}
+
+    <input
+      ref={ref}
+      className={`${baseInput} ${
+        icon ? "pl-10" : ""
+      } ${className}`}
+      {...props}
+    />
+  </div>
+));
+
 Input.displayName = "Input";
 
 /* ── Textarea ── */
+
 export const Textarea = forwardRef<
   HTMLTextAreaElement,
   TextareaHTMLAttributes<HTMLTextAreaElement>
@@ -80,29 +106,62 @@ export const Textarea = forwardRef<
     {...props}
   />
 ));
+
 Textarea.displayName = "Textarea";
 
-/* ── Select (react-select via AppSelect, drop-in API) ── */
+/* ── Select ── */
+
 interface SelectProps {
   options: SelectOption[];
   value?: string | number;
-  onChange?: (event: { target: { value: string } }) => void;
+  onChange?: (event: {
+    target: {
+      value: string;
+    };
+  }) => void;
   placeholder?: string;
   disabled?: boolean;
   className?: string;
   id?: string;
 }
 
-export const Select = forwardRef<HTMLDivElement, SelectProps>(
-  ({ className = "", options, value, onChange, placeholder, disabled, id }, ref) => {
-    const strValue = value === undefined || value === null ? "" : String(value);
+export const Select = forwardRef<
+  HTMLDivElement,
+  SelectProps
+>(
+  (
+    {
+      className = "",
+      options,
+      value,
+      onChange,
+      placeholder,
+      disabled,
+      id,
+    },
+    ref,
+  ) => {
+    const strValue =
+      value === undefined || value === null
+        ? ""
+        : String(value);
+
     return (
-      <div ref={ref} className={className}>
+      <div
+        ref={ref}
+        className={className}
+      >
         <AppSelect
           id={id}
           options={options}
           value={strValue}
-          onChange={(v) => onChange?.({ target: { value: String(v ?? "") } })}
+          onChange={(v) =>
+            onChange?.({
+              target: {
+                value: String(v ?? ""),
+              },
+            })
+          }
           placeholder={placeholder}
           isDisabled={disabled}
           isSearchable={options.length > 8}
@@ -111,4 +170,5 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(
     );
   },
 );
+
 Select.displayName = "Select";

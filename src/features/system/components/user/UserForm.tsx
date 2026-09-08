@@ -44,7 +44,9 @@ export default function UserForm({
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Record<string, string[]>
+  >({});
 
   const loadRoles = useCallback(() => {
     roleService
@@ -62,9 +64,13 @@ export default function UserForm({
   }, []);
 
   const [previousOpen, setPreviousOpen] = useState(open);
-  const [previousInitialData, setPreviousInitialData] = useState(initialData);
+  const [previousInitialData, setPreviousInitialData] =
+    useState(initialData);
 
-  if (open !== previousOpen || initialData !== previousInitialData) {
+  if (
+    open !== previousOpen ||
+    initialData !== previousInitialData
+  ) {
     setPreviousOpen(open);
     setPreviousInitialData(initialData);
 
@@ -100,18 +106,23 @@ export default function UserForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setSubmitting(true);
     setError(null);
     setFieldErrors({});
 
     if (!roleId) {
-      setError({ message: "Silakan pilih role." });
+      setError({
+        message: "Silakan pilih role.",
+      });
       setSubmitting(false);
       return;
     }
 
     if (!isEdit && !password) {
-      setError({ message: "Password wajib diisi." });
+      setError({
+        message: "Password wajib diisi.",
+      });
       setSubmitting(false);
       return;
     }
@@ -125,7 +136,9 @@ export default function UserForm({
       is_active: isActive,
     };
 
-    const payload: CreateUserPayload | UpdateUserPayload = isEdit
+    const payload:
+      | CreateUserPayload
+      | UpdateUserPayload = isEdit
       ? {
           role_id: Number(roleId),
           name,
@@ -138,8 +151,15 @@ export default function UserForm({
 
     try {
       if (initialData) {
-        await userManagementService.update(initialData.id, payload);
-        toast.success("Pengguna berhasil diperbarui.");
+        await userManagementService.update(
+          initialData.id,
+          payload,
+        );
+
+        toast.success(
+          "Pengguna berhasil diperbarui.",
+        );
+
         onSaved({
           ...initialData,
           role_id: Number(roleId),
@@ -149,57 +169,117 @@ export default function UserForm({
           is_active: isActive,
         });
       } else {
-        const res = await userManagementService.create(payload as CreateUserPayload);
-        toast.success("Pengguna berhasil ditambahkan.");
+        const res =
+          await userManagementService.create(
+            payload as CreateUserPayload,
+          );
+
+        toast.success(
+          "Pengguna berhasil ditambahkan.",
+        );
+
         onSaved(res.data);
       }
     } catch (err) {
       const apiError = toApiError(err);
+
       setError(apiError);
+
       if (apiError.errors) {
         setFieldErrors(apiError.errors);
       }
-      toast.error("Gagal menyimpan pengguna", {
-        description: apiError.message,
-      });
+
+      toast.error(
+        "Gagal menyimpan pengguna",
+        {
+          description: apiError.message,
+        },
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-  const roleOptions = roles.map((r) => ({ value: String(r.id), label: r.name }));
+  const roleOptions = roles.map((r) => ({
+    value: String(r.id),
+    label: r.name,
+  }));
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? "Edit Pengguna" : "Tambah Pengguna"}
+      title={
+        isEdit
+          ? "Edit Pengguna"
+          : "Tambah Pengguna"
+      }
       size="md"
       footer={
         <>
-          <Button variant="ghost" onClick={onClose} disabled={submitting}>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            disabled={submitting}
+          >
             Batal
           </Button>
-          <Button type="submit" form="user-form" loading={submitting}>
+
+          <Button
+            type="submit"
+            form="user-form"
+            loading={submitting}
+          >
             Simpan
           </Button>
         </>
       }
     >
-      <form id="user-form" onSubmit={handleSubmit} className="space-y-6" noValidate>
+      <form
+        id="user-form"
+        onSubmit={handleSubmit}
+        className="space-y-6"
+        noValidate
+      >
         <FormField
           label="Role"
           required
-          error={fieldErrors.role_id?.[0] ?? (error && !roleId ? error.message : undefined)}
+          error={
+            fieldErrors.role_id?.[0] ??
+            (error && !roleId
+              ? error.message
+              : undefined)
+          }
         >
           {rolesLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div
+              className="
+                flex w-full items-center gap-2
+                rounded-2xl
+                border border-outline-variant
+                bg-surface-container-low
+                px-4 py-3
+                text-sm text-on-surface-variant
+              "
+            >
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat role...
             </div>
           ) : rolesError ? (
-            <div className="flex w-full flex-col gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
-              <span>Gagal memuat role.</span>
+            <div
+              className="
+                flex w-full flex-col gap-2
+                rounded-2xl
+                border border-error/30
+                bg-error-container
+                px-4 py-3
+                text-sm text-error
+              "
+            >
+              <span>
+                Gagal memuat role.
+              </span>
+
               <Button
                 type="button"
                 variant="secondary"
@@ -215,16 +295,31 @@ export default function UserForm({
               </Button>
             </div>
           ) : roles.length === 0 ? (
-            <div className="flex w-full flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
-              <span>Tidak ada role tersedia.</span>
-              <span className="text-xs">
-                Tambahkan role terlebih dahulu melalui menu Peran.
+            <div
+              className="
+                flex w-full flex-col gap-2
+                rounded-2xl
+                border border-outline-variant
+                bg-surface-container-low
+                px-4 py-3
+                text-sm text-on-surface-variant
+              "
+            >
+              <span>
+                Tidak ada role tersedia.
+              </span>
+
+              <span className="text-xs text-outline">
+                Tambahkan role terlebih dahulu
+                melalui menu Peran.
               </span>
             </div>
           ) : (
             <AppSelect
               value={roleId}
-              onChange={(v) => setRoleId(v ?? "")}
+              onChange={(v) =>
+                setRoleId(v ?? "")
+              }
               options={roleOptions}
               placeholder="Pilih Role"
               isDisabled={submitting}
@@ -232,72 +327,147 @@ export default function UserForm({
           )}
         </FormField>
 
-        <FormField label="Nama" required error={fieldErrors.name?.[0]}>
+        <FormField
+          label="Nama"
+          required
+          error={fieldErrors.name?.[0]}
+        >
           <Input
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) =>
+              setName(e.target.value)
+            }
             placeholder="Nama lengkap"
             disabled={submitting}
           />
         </FormField>
 
-        <FormField label="Username" error={fieldErrors.username?.[0]}>
+        <FormField
+          label="Username"
+          error={fieldErrors.username?.[0]}
+        >
           <Input
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) =>
+              setUsername(e.target.value)
+            }
             placeholder="Nama pengguna (opsional)"
             disabled={submitting}
           />
         </FormField>
 
-        <FormField label="Email" required error={fieldErrors.email?.[0]}>
+        <FormField
+          label="Email"
+          required
+          error={fieldErrors.email?.[0]}
+        >
           <Input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) =>
+              setEmail(e.target.value)
+            }
             placeholder="nama@sekolah.sch.id"
             disabled={submitting}
           />
         </FormField>
 
         <FormField
-          label={isEdit ? "Password (kosongkan jika tidak diubah)" : "Password"}
+          label={
+            isEdit
+              ? "Password (kosongkan jika tidak diubah)"
+              : "Password"
+          }
           required={!isEdit}
           error={fieldErrors.password?.[0]}
         >
           <Input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={isEdit ? "Kosongkan jika tidak diubah" : "Minimal 6 karakter"}
+            onChange={(e) =>
+              setPassword(e.target.value)
+            }
+            placeholder={
+              isEdit
+                ? "Kosongkan jika tidak diubah"
+                : "Minimal 6 karakter"
+            }
             disabled={submitting}
             autoComplete="new-password"
           />
         </FormField>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+        {/* Status Akun */}
+        <label
+          className="
+            flex cursor-pointer items-center gap-3
+            rounded-2xl
+            border border-outline-variant
+            bg-surface-container-low
+            px-4 py-3
+            transition-colors
+            hover:bg-surface-container
+          "
+        >
           <input
             type="checkbox"
             checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
+            onChange={(e) =>
+              setIsActive(e.target.checked)
+            }
             disabled={submitting}
-            className="h-4 w-4 rounded border-slate-300 text-primary-container focus:ring-primary-container"
+            className="
+              h-4 w-4
+              rounded
+              border-outline
+              accent-[var(--primary)]
+              focus:ring-2
+              focus:ring-primary-container
+              focus:ring-offset-0
+            "
           />
+
           <div>
-            <span className="block text-sm font-semibold text-on-surface">
+            <span
+              className="
+                block
+                text-sm
+                font-semibold
+                text-on-surface
+              "
+            >
               Akun aktif
             </span>
-            <span className="block text-xs text-on-surface-variant">
-              Nonaktifkan untuk menonaktifkan akses pengguna ini.
+
+            <span
+              className="
+                block
+                text-xs
+                text-on-surface-variant
+              "
+            >
+              Nonaktifkan untuk menonaktifkan
+              akses pengguna ini.
             </span>
           </div>
         </label>
 
-        {error && !error.errors && roleId && (isEdit || password) && (
-          <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">
-            {error.message}
-          </p>
-        )}
+        {error &&
+          !error.errors &&
+          roleId &&
+          (isEdit || password) && (
+            <p
+              className="
+                rounded-xl
+                bg-error-container
+                px-3 py-2
+                text-sm
+                text-error
+              "
+            >
+              {error.message}
+            </p>
+          )}
       </form>
     </Modal>
   );

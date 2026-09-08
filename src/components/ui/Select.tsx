@@ -22,82 +22,182 @@ interface AppSelectProps<T = string | number> {
   className?: string;
 }
 
-const primary = "#7c3aed";
-const primarySoft = "rgba(124, 58, 237, 0.08)";
-const primarySofter = "rgba(124, 58, 237, 0.15)";
-const borderDefault = "#e2e8f0";
-const borderHover = "#cbd5e1";
-const onSurface = "#191c1e";
-const outline = "#7b7487";
-const error = "#ba1a1a";
-
 function buildStyles(errorFlag?: boolean) {
+  const primary = "var(--primary)";
+  const primaryContainer = "var(--primary-container)";
+  const primarySoft =
+    "color-mix(in srgb, var(--primary) 8%, transparent)";
+  const primarySofter =
+    "color-mix(in srgb, var(--primary) 15%, transparent)";
+
+  const surface = "var(--surface-container-lowest)";
+  const surfaceContainer = "var(--surface-container)";
+  const surfaceHigh = "var(--surface-container-high)";
+  const onSurface = "var(--on-surface)";
+  const onSurfaceVariant = "var(--on-surface-variant)";
+  const outline = "var(--outline)";
+  const outlineVariant = "var(--outline-variant)";
+  const error = "var(--error)";
+  const onPrimary = "var(--on-primary)";
+
   return {
-    control: (base: object, state: { isFocused: boolean }) => ({
+    control: (
+      base: object,
+      state: { isFocused: boolean; isDisabled: boolean },
+    ) => ({
       ...base,
+
       minHeight: 46,
       borderRadius: "1rem",
+
       borderColor: errorFlag
         ? error
         : state.isFocused
           ? primary
-          : borderDefault,
-      boxShadow: state.isFocused ? "0 0 0 2px rgba(124, 58, 237, 0.3)" : "0 0 0 0",
+          : outlineVariant,
+
+      boxShadow: state.isFocused
+        ? `0 0 0 2px color-mix(in srgb, ${primary} 30%, transparent)`
+        : "0 0 0 0",
+
       "&:hover": {
-        borderColor: state.isFocused ? primary : borderHover,
+        borderColor: errorFlag
+          ? error
+          : state.isFocused
+            ? primary
+            : outline,
       },
-      backgroundColor: "#ffffff",
+
+      backgroundColor: state.isDisabled
+        ? surfaceContainer
+        : surface,
+
       padding: "2px 4px",
-      cursor: "pointer",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+      opacity: state.isDisabled ? 0.6 : 1,
     }),
+
     valueContainer: (base: object) => ({
       ...base,
       padding: "0 8px",
     }),
+
     placeholder: (base: object) => ({
       ...base,
       color: outline,
       fontSize: "0.875rem",
     }),
+
     singleValue: (base: object) => ({
       ...base,
       color: onSurface,
       fontSize: "0.875rem",
     }),
+
     input: (base: object) => ({
       ...base,
       fontSize: "0.875rem",
       color: onSurface,
     }),
+
     menu: (base: object) => ({
       ...base,
+      marginTop: 6,
       borderRadius: "1rem",
-      border: `1px solid ${borderDefault}`,
-      boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
+      border: `1px solid ${outlineVariant}`,
+      backgroundColor: surface,
+      boxShadow:
+        "0 12px 32px rgba(0, 0, 0, 0.20)",
       overflow: "hidden",
       zIndex: 60,
     }),
+
     menuList: (base: object) => ({
       ...base,
       maxHeight: 240,
+      padding: "6px",
+      backgroundColor: surface,
     }),
+
     menuPortal: (base: object) => ({
       ...base,
       zIndex: 60,
     }),
-    option: (base: object, state: { isFocused: boolean; isSelected: boolean }) => ({
+
+    option: (
+      base: object,
+      state: {
+        isFocused: boolean;
+        isSelected: boolean;
+        isDisabled: boolean;
+      },
+    ) => ({
       ...base,
+
+      borderRadius: "0.75rem",
       backgroundColor: state.isSelected
-        ? primary
+        ? primaryContainer
         : state.isFocused
           ? primarySoft
           : "transparent",
-      color: state.isSelected ? "#ffffff" : onSurface,
+
+      color: state.isSelected
+        ? onPrimary
+        : state.isDisabled
+          ? outline
+          : onSurface,
+
       fontSize: "0.875rem",
-      cursor: "pointer",
+      cursor: state.isDisabled ? "not-allowed" : "pointer",
+
       "&:active": {
-        backgroundColor: state.isSelected ? primary : primarySofter,
+        backgroundColor: state.isSelected
+          ? primary
+          : primarySofter,
       },
+    }),
+
+    indicatorSeparator: (base: object) => ({
+      ...base,
+      backgroundColor: outlineVariant,
+    }),
+
+    dropdownIndicator: (
+      base: object,
+      state: { isFocused: boolean },
+    ) => ({
+      ...base,
+      color: state.isFocused ? primary : outline,
+
+      "&:hover": {
+        color: primary,
+      },
+    }),
+
+    clearIndicator: (base: object) => ({
+      ...base,
+      color: outline,
+
+      "&:hover": {
+        color: error,
+      },
+    }),
+
+    loadingIndicator: (base: object) => ({
+      ...base,
+      color: primary,
+    }),
+
+    noOptionsMessage: (base: object) => ({
+      ...base,
+      color: onSurfaceVariant,
+      fontSize: "0.875rem",
+    }),
+
+    loadingMessage: (base: object) => ({
+      ...base,
+      color: onSurfaceVariant,
+      fontSize: "0.875rem",
     }),
   };
 }
@@ -116,21 +216,35 @@ export default function AppSelect<T = string | number>({
   id,
   className = "",
 }: AppSelectProps<T>) {
-  const styles = useMemo(() => buildStyles(error), [error]);
+  const styles = useMemo(
+    () => buildStyles(error),
+    [error],
+  );
 
   const selectedOption = useMemo(
-    () => options.find((o) => String(o.value) === String(value)) ?? null,
+    () =>
+      options.find(
+        (o) => String(o.value) === String(value),
+      ) ?? null,
     [options, value],
   );
 
   return (
-    <Select<SelectOption<T>, false, GroupBase<SelectOption<T>>>
+    <Select<
+      SelectOption<T>,
+      false,
+      GroupBase<SelectOption<T>>
+    >
       id={id}
       inputId={id}
       options={options}
       value={selectedOption}
       onChange={(opt) => {
-        onChange(opt == null ? null : (opt.value as T));
+        onChange(
+          opt == null
+            ? null
+            : (opt.value as T),
+        );
       }}
       placeholder={placeholder}
       isSearchable={isSearchable}
@@ -140,7 +254,11 @@ export default function AppSelect<T = string | number>({
       noOptionsMessage={() => noOptionsMessage}
       loadingMessage={() => "Memuat data..."}
       styles={styles}
-      menuPortalTarget={typeof document !== "undefined" ? document.body : undefined}
+      menuPortalTarget={
+        typeof document !== "undefined"
+          ? document.body
+          : undefined
+      }
       menuPosition="fixed"
       className={`w-full text-sm ${className}`}
     />

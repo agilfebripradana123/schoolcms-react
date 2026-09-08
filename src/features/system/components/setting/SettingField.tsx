@@ -9,6 +9,7 @@ interface SettingFieldProps {
   disabled?: boolean;
   isSecretEdit?: boolean;
   placeholder?: string;
+  options?: { value: string; label: string }[];
 }
 
 const BOOLEAN_OPTIONS = [
@@ -17,8 +18,21 @@ const BOOLEAN_OPTIONS = [
 ];
 
 /**
- * Type-aware input for a configuration value. `type` controls which control is
- * rendered. Secrets (password) are never prefilled from the masked API value.
+ * Type-aware input for a configuration value.
+ *
+ * - text       → Textarea
+ * - integer    → Number input
+ * - boolean    → Select Ya/Tidak
+ * - email      → Email input
+ * - url        → URL input
+ * - password   → Password input
+ * - timezone   → Timezone select
+ * - time       → Time input
+ * - color      → Color picker
+ * - select     → Select berdasarkan options
+ * - file/string → Text input
+ *
+ * Secrets (password) are never prefilled from the masked API value.
  */
 export default function SettingField({
   type,
@@ -27,11 +41,13 @@ export default function SettingField({
   disabled = false,
   isSecretEdit = false,
   placeholder,
+  options,
 }: SettingFieldProps) {
   const common = {
     value,
     disabled,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+      onChange(e.target.value),
   };
 
   switch (type) {
@@ -44,6 +60,7 @@ export default function SettingField({
           disabled={disabled}
         />
       );
+
     case "integer":
       return (
         <Input
@@ -53,6 +70,7 @@ export default function SettingField({
           onChange={(e) => onChange(e.target.value)}
         />
       );
+
     case "boolean":
       return (
         <AppSelect
@@ -63,21 +81,39 @@ export default function SettingField({
           isDisabled={disabled}
         />
       );
+
     case "email":
       return (
-        <Input type="email" placeholder={placeholder ?? "nama@sekolah.sch.id"} {...common} />
+        <Input
+          type="email"
+          placeholder={placeholder ?? "nama@sekolah.sch.id"}
+          {...common}
+        />
       );
+
     case "url":
-      return <Input type="url" placeholder={placeholder ?? "https://..."} {...common} />;
+      return (
+        <Input
+          type="url"
+          placeholder={placeholder ?? "https://..."}
+          {...common}
+        />
+      );
+
     case "password":
       return (
         <Input
           type="password"
-          placeholder={isSecretEdit ? "Kosongkan jika tidak diubah" : "Masukkan nilai rahasia"}
+          placeholder={
+            isSecretEdit
+              ? "Kosongkan jika tidak diubah"
+              : "Masukkan nilai rahasia"
+          }
           autoComplete="new-password"
           {...common}
         />
       );
+
     case "timezone":
       return (
         <AppSelect
@@ -89,23 +125,48 @@ export default function SettingField({
             "Asia/Pontianak",
             "Asia/Jayapura",
             "UTC",
-          ].map((tz) => ({ value: tz, label: tz }))}
+          ].map((tz) => ({
+            value: tz,
+            label: tz,
+          }))}
           placeholder="Pilih zona waktu"
           isDisabled={disabled}
         />
       );
+
     case "time":
       return <Input type="time" {...common} />;
+
     case "color":
-      return <Input type="color" {...common} className="h-12 w-full p-1" />;
+      return (
+        <Input
+          type="color"
+          {...common}
+          className="h-12 w-full p-1"
+        />
+      );
+
     case "select":
+      return (
+        <AppSelect
+          value={value}
+          onChange={(v) => onChange(v ?? "")}
+          options={options ?? []}
+          placeholder={placeholder ?? "Pilih nilai"}
+          isDisabled={disabled}
+        />
+      );
+
     case "file":
     case "string":
     default:
       return (
         <Input
           type="text"
-          placeholder={placeholder ?? (type === "file" ? "Nilai file / path" : "Nilai")}
+          placeholder={
+            placeholder ??
+            (type === "file" ? "Nilai file / path" : "Nilai")
+          }
           {...common}
         />
       );

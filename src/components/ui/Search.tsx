@@ -1,7 +1,12 @@
-import { useState, useCallback, useRef } from "react";
-import { Search as SearchIcon, X } from "lucide-react";
-
-// ponytail: search lokal saja — tambah debounced API search saat data besar
+import {
+  useState,
+  useCallback,
+  useRef,
+} from "react";
+import {
+  Search as SearchIcon,
+  X,
+} from "lucide-react";
 
 interface SearchProps {
   value?: string;
@@ -18,19 +23,28 @@ export default function Search({
   className = "",
   autoFocus = false,
 }: SearchProps) {
-  const [internalValue, setInternalValue] = useState(controlledValue ?? "");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [internalValue, setInternalValue] =
+    useState(controlledValue ?? "");
 
-  const currentValue = controlledValue ?? internalValue;
+  const inputRef =
+    useRef<HTMLInputElement>(null);
 
+  const currentValue =
+    controlledValue ?? internalValue;
 
-  if (controlledValue !== undefined && controlledValue !== internalValue) {
+  if (
+    controlledValue !== undefined &&
+    controlledValue !== internalValue
+  ) {
     setInternalValue(controlledValue);
   }
 
   const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (
+      e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
       const v = e.target.value;
+
       setInternalValue(v);
       onChange(v);
     },
@@ -44,11 +58,20 @@ export default function Search({
   }, [onChange]);
 
   return (
-    <div className={`relative ${className}`}>
+    <div
+      className={`relative ${className}`}
+    >
       <SearchIcon
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline"
+        className="
+          pointer-events-none
+          absolute left-3 top-1/2
+          h-4 w-4
+          -translate-y-1/2
+          text-outline
+        "
         aria-hidden="true"
       />
+
       <input
         ref={inputRef}
         type="text"
@@ -56,13 +79,45 @@ export default function Search({
         onChange={handleChange}
         placeholder={placeholder}
         autoFocus={autoFocus}
-        className="w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-9 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
+        className="
+          w-full
+          rounded-2xl
+          border border-outline-variant
+          bg-surface-container-lowest
+          py-2.5
+          pl-10
+          pr-9
+          text-sm
+          text-on-surface
+          placeholder:text-outline
+          transition-colors
+          hover:border-outline
+          focus:border-primary
+          focus:outline-none
+          focus:ring-2
+          focus:ring-primary/30
+        "
       />
+
       {currentValue && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-outline hover:text-on-surface"
+          className="
+            absolute
+            right-2.5
+            top-1/2
+            -translate-y-1/2
+            rounded-full
+            p-0.5
+            text-outline
+            transition-colors
+            hover:bg-surface-container-high
+            hover:text-on-surface
+            focus:outline-none
+            focus:ring-2
+            focus:ring-primary
+          "
           aria-label="Hapus pencarian"
         >
           <X className="h-4 w-4" />
