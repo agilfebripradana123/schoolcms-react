@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, Search as SearchIcon } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
+import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import Modal from "@/components/ui/Modal";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
+import Search from "@/components/ui/Search";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import Pagination from "../../../components/ui/Pagination";
 import { usePermission } from "@/features/auth/usePermission";
 import { myAssignmentService } from "@/features/academic";
 import type { Assignment } from "@/features/academic/api/types";
@@ -203,56 +208,61 @@ export default function TeacherAssignmentsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Tugas</h1>
-          <p className="mt-1 text-sm text-on-surface-variant">
-            Tugas pada kelas & mata pelajaran yang menjadi scope mengajar Anda.
-          </p>
-        </div>
-        {canManage && (
-          <Button onClick={openCreate} leftIcon={<Plus className="h-4 w-4" />}>
-            Tambah Tugas
-          </Button>
-        )}
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Tugas"
+        description="Tugas pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
+        actions={
+          canManage ? (
+            <Button onClick={openCreate} leftIcon={<Plus className="h-4 w-4" />}>
+              Tambah Tugas
+            </Button>
+          ) : undefined
+        }
+      />
 
       <Card>
-        <CardHeader
-          title="Daftar Tugas"
-          description={meta ? `${meta.total} tugas` : undefined}
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
-                <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari judul..."
-                  className="w-48 rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-primary-container focus:outline-none"
-                />
-              </div>
-              <Select<number> options={classOptions} value={classFilter} onChange={setClassFilter} placeholder="Kelas" isClearable className="w-32" />
-              <Select<number> options={subjectOptions} value={subjectFilter} onChange={setSubjectFilter} placeholder="Mapel" isClearable className="w-32" />
-              <Select<number> options={yearOptions} value={yearFilter} onChange={setYearFilter} placeholder="Tahun" isClearable className="w-32" />
-              <Button size="sm" onClick={applyFilters} disabled={loading}>
-                Cari
-              </Button>
-            </div>
-          }
-        />
-        <CardBody>
-          {error ? (
-            <p className="text-sm text-error">Gagal memuat tugas: {error}</p>
-          ) : (
+        <div className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Cari Judul
+            </label>
+            <Search value={search} onChange={setSearch} placeholder="Cari judul..." />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Kelas
+            </label>
+            <Select<number> options={classOptions} value={classFilter} onChange={setClassFilter} placeholder="Semua kelas" isClearable />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Mata Pelajaran
+            </label>
+            <Select<number> options={subjectOptions} value={subjectFilter} onChange={setSubjectFilter} placeholder="Semua mapel" isClearable />
+          </div>
+        </div>
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+          <div className="w-full sm:w-64">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Tahun Ajaran
+            </label>
+            <Select<number> options={yearOptions} value={yearFilter} onChange={setYearFilter} placeholder="Semua tahun" isClearable />
+          </div>
+          <Button onClick={applyFilters} disabled={loading}>
+            Tampilkan
+          </Button>
+        </div>
+
+        {error ? (
+          <PortalErrorState message={error} onRetry={applyFilters} />
+        ) : (
             <DataTable<Assignment>
               loading={loading}
               emptyMessage="Belum ada tugas."
               columns={[
                 { header: "No", accessor: "id", render: (_v, row) => assignments.findIndex((a) => a.id === row.id) + 1 },
-                { header: "Judul", accessor: "title", render: (v) => <span className="font-semibold text-on-surface">{String(v ?? "-")}</span> },
+                { header: "Judul", accessor: "title", render: (v) => <span className="font-semibold text-slate-900">{String(v ?? "-")}</span> },
                 { header: "Mata Pelajaran", accessor: "id", render: (_v, row) => row.subject?.name ?? "-" },
                 { header: "Kelas", accessor: "id", render: (_v, row) => row.class?.name ?? "-" },
                 {
@@ -270,36 +280,28 @@ export default function TeacherAssignmentsPage() {
                   render: (_v, row) =>
                     canManage ? (
                       <div className="flex items-center gap-2">
-                        <button type="button" onClick={() => openEdit(row)} className="rounded-xl p-2 text-on-surface-variant hover:bg-surface-container-high" aria-label="Edit">
+                        <button type="button" onClick={() => openEdit(row)} className="rounded-xl p-2 text-slate-500 hover:bg-slate-50" aria-label="Edit">
                           <Pencil className="h-4 w-4" />
                         </button>
-                        <button type="button" onClick={() => setToDelete(row)} className="rounded-xl p-2 text-error hover:bg-error-container/60" aria-label="Hapus">
+                        <button type="button" onClick={() => setToDelete(row)} className="rounded-xl p-2 text-red-600 hover:bg-red-50/60" aria-label="Hapus">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     ) : (
-                      <span className="text-xs text-on-surface-variant">—</span>
+                      <span className="text-xs text-slate-500">—</span>
                     ),
                 },
               ]}
               data={assignments}
             />
-          )}
-        </CardBody>
-        {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-on-surface-variant">
-              Halaman {meta.current_page} dari {meta.last_page}
-            </p>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="sm" disabled={page <= 1 || loading} onClick={() => { const n = page - 1; setPage(n); load(n, search, classFilter, subjectFilter, yearFilter); }}>
-                Sebelumnya
-              </Button>
-              <Button variant="secondary" size="sm" disabled={page >= (meta.last_page ?? 1) || loading} onClick={() => { const n = page + 1; setPage(n); load(n, search, classFilter, subjectFilter, yearFilter); }}>
-                Berikutnya
-              </Button>
-            </div>
-          </div>
+        )}
+        {meta && (
+          <Pagination
+            meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 15, total: meta.total }}
+            onPageChange={(n) => { setPage(n); load(n, search, classFilter, subjectFilter, yearFilter); }}
+            loading={loading}
+            error={error}
+          />
         )}
       </Card>
 
@@ -332,28 +334,28 @@ export default function TeacherAssignmentsPage() {
       >
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">Judul</label>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Judul</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-primary-container focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-indigo-300 focus:outline-none"
               placeholder="Judul tugas"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">Deskripsi</label>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Deskripsi</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               rows={3}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-primary-container focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-indigo-300 focus:outline-none"
               placeholder="Deskripsi opsional"
             />
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">Kelas</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Kelas</label>
               <Select<number>
                 options={classOptions}
                 value={form.class_id}
@@ -362,7 +364,7 @@ export default function TeacherAssignmentsPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">Mata Pelajaran</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Mata Pelajaran</label>
               <Select<number>
                 options={subjectOptions}
                 value={form.subject_id}
@@ -372,7 +374,7 @@ export default function TeacherAssignmentsPage() {
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">Tahun Ajaran</label>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Tahun Ajaran</label>
             <Select<number>
               options={yearOptions}
               value={form.academic_year_id}
@@ -382,16 +384,16 @@ export default function TeacherAssignmentsPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">Deadline</label>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Deadline</label>
             <input
               type="date"
               value={form.due_date}
               onChange={(e) => setForm({ ...form, due_date: e.target.value })}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-primary-container focus:outline-none"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-indigo-300 focus:outline-none"
             />
           </div>
         </div>
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

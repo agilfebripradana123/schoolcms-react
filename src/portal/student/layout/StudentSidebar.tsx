@@ -3,11 +3,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { studentNavigation, studentDashboardItem } from "@/config/navigation";
 import StudentSidebarSection from "./StudentSidebarSection";
 import StudentSidebarItem from "./StudentSidebarItem";
+import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 
 export default function StudentSidebar({
   collapsed = false,
   onNavigation,
 }: { collapsed?: boolean; onNavigation?: () => void }) {
+  const { appName, faviconUrl } = usePublicSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
@@ -36,15 +38,24 @@ export default function StudentSidebar({
     [navigate, onNavigation]
   );
 
-  const isActive = useCallback((path: string) => pathname === path, [pathname]);
+  const isActive = useCallback((path: string) => {
+    const normalized = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+    return normalized === path || normalized === path + "/dashboard";
+  }, [pathname]);
   const isGroupActive = useCallback(
-    (entry: (typeof studentNavigation)[number]) =>
-      "items" in entry &&
-      entry.items?.some((i) => pathname === i.path || pathname.startsWith(i.path + "/")),
+    (entry: (typeof studentNavigation)[number]): boolean =>
+      Boolean(
+        "items" in entry &&
+          entry.items?.some((i) => pathname === i.path || pathname.startsWith(i.path + "/")),
+      ),
     [pathname],
   );
 
-  const navOverlay = studentNavigation.filter((entry) => "items" in entry);
+  function isGroup(
+    entry: (typeof studentNavigation)[number]
+  ): entry is Extract<(typeof studentNavigation)[number], { label: string; items: unknown[] }> {
+    return "items" in entry && Array.isArray((entry as { items?: unknown }).items);
+  }
 
   return (
     <nav className="flex h-full flex-col bg-slate-950 text-white">
@@ -54,12 +65,16 @@ export default function StudentSidebar({
         }`}
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
-            <span className="text-base font-bold">S</span>
-          </div>
+          {faviconUrl ? (
+            <img src={faviconUrl} alt={appName ?? "SchoolCMS"} className="h-10 w-10 rounded-2xl object-cover shadow-lg shadow-primary-container/30" />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
+              <span className="text-base font-bold">S</span>
+            </div>
+          )}
           {!collapsed && (
             <div>
-              <div className="font-display text-base font-bold leading-none">SchoolCMS</div>
+              <div className="font-display text-base font-bold leading-none">{appName}</div>
               <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Portal Siswa</div>
             </div>
           )}
@@ -72,7 +87,7 @@ export default function StudentSidebar({
             onClick={() => goTo(studentDashboardItem.path)}
             className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               isActive(studentDashboardItem.path)
-                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
+                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30 hover:bg-primary-container/25 hover:text-white"
                 : "text-slate-300 hover:bg-white/5 hover:text-white"
             } ${collapsed ? "justify-center" : ""}`}
           >
@@ -87,7 +102,7 @@ export default function StudentSidebar({
 
         <div className="mt-4 space-y-1">
           {studentNavigation.map((entry) => {
-            if ("items" in entry) {
+            if (isGroup(entry)) {
               return (
                 <StudentSidebarSection
                   key={entry.label}
@@ -101,12 +116,13 @@ export default function StudentSidebar({
                 />
               );
             }
+            const item = entry as { path: string; label: string; icon?: React.ComponentType<{ className?: string }> };
             return (
               <StudentSidebarItem
-                key={entry.path}
-                item={entry}
+                key={item.path}
+                item={item}
                 collapsed={collapsed}
-                active={isActive(entry.path)}
+                active={isActive(item.path)}
                 onGo={goTo}
               />
             );

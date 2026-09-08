@@ -1,8 +1,14 @@
+import { useRef, useState } from "react";
+import { Image as ImageIcon, Upload, X } from "lucide-react";
+import { toast } from "sonner";
 import { Input, Textarea } from "@/components/ui/Form";
 import AppSelect from "@/components/ui/Select";
+import Button from "@/components/ui/Button";
+import { settingService } from "../../api/setting.service";
 import type { SettingType } from "../../api/types";
 
 interface SettingFieldProps {
+  settingKey?: string;
   type: SettingType;
   value: string;
   onChange: (value: string) => void;
@@ -35,6 +41,7 @@ const BOOLEAN_OPTIONS = [
  * Secrets (password) are never prefilled from the masked API value.
  */
 export default function SettingField({
+  settingKey,
   type,
   value,
   onChange,
@@ -49,6 +56,7 @@ export default function SettingField({
     onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
       onChange(e.target.value),
   };
+  const inputKey = settingKey ? `${settingKey}-input` : undefined;
 
   switch (type) {
     case "text":
@@ -74,8 +82,8 @@ export default function SettingField({
     case "boolean":
       return (
         <AppSelect
-          value={value || "1"}
-          onChange={(v) => onChange(v ?? "1")}
+          value={value}
+          onChange={(v) => onChange(v ?? "")}
           options={BOOLEAN_OPTIONS}
           placeholder="Pilih Ya / Tidak"
           isDisabled={disabled}
@@ -103,6 +111,7 @@ export default function SettingField({
     case "password":
       return (
         <Input
+          key={inputKey}
           type="password"
           placeholder={
             isSecretEdit
@@ -117,6 +126,7 @@ export default function SettingField({
     case "timezone":
       return (
         <AppSelect
+          key={inputKey}
           value={value}
           onChange={(v) => onChange(v ?? "")}
           options={[
@@ -158,10 +168,20 @@ export default function SettingField({
       );
 
     case "file":
+      return (
+        <FileField
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          placeholder={placeholder}
+        />
+      );
+    case "select":
     case "string":
     default:
       return (
         <Input
+          key={inputKey}
           type="text"
           placeholder={
             placeholder ??

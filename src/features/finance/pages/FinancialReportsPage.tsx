@@ -15,6 +15,7 @@ import { financialReportService } from "../api/financial-report.service";
 import type { FinancialReport, FinancialReportType } from "../api/types";
 import FinancialReportForm from "../components/financial-report/FinancialReportForm";
 import FinancialReportDeleteDialog from "../components/financial-report/FinancialReportDeleteDialog";
+import Pagination from "../../../components/ui/Pagination";
 
 const PER_PAGE = 10;
 
@@ -249,10 +250,6 @@ export default function FinancialReportsPage() {
     ];
   }, [periodLabel, openEdit, openDelete]);
 
-  const isFirstPage = meta.current_page <= 1;
-  const isLastPage = meta.current_page >= meta.last_page;
-  const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
-  const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
   const typeFilterOptions = useMemo(
     () => [{ value: "all", label: "Semua Jenis" }, ...TYPE_OPTIONS],
@@ -385,34 +382,7 @@ export default function FinancialReportsPage() {
           </>
         )}
 
-        {!error && !loading && meta.total > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan {from}-{to} dari {meta.total} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={isFirstPage}
-                onClick={() => goToPage(meta.current_page - 1)}
-              >
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {meta.current_page} dari {meta.last_page}
-              </span>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={isLastPage}
-                onClick={() => goToPage(meta.current_page + 1)}
-              >
-                Berikutnya
-              </Button>
-            </div>
-          </div>
-        )}
+        <Pagination meta={meta} onPageChange={goToPage} loading={loading} error={error} />
       </Card>
 
       <FinancialReportForm

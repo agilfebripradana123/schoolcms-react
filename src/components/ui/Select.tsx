@@ -20,6 +20,7 @@ interface AppSelectProps<T = string | number> {
   error?: boolean;
   id?: string;
   className?: string;
+  size?: "default" | "sm";
 }
 
 function buildStyles(errorFlag?: boolean) {
@@ -79,24 +80,24 @@ function buildStyles(errorFlag?: boolean) {
 
     valueContainer: (base: object) => ({
       ...base,
-      padding: "0 8px",
+      padding: compact ? "0 4px" : "0 8px",
     }),
 
     placeholder: (base: object) => ({
       ...base,
       color: outline,
-      fontSize: "0.875rem",
+      fontSize,
     }),
 
     singleValue: (base: object) => ({
       ...base,
       color: onSurface,
-      fontSize: "0.875rem",
+      fontSize,
     }),
 
     input: (base: object) => ({
       ...base,
-      fontSize: "0.875rem",
+      fontSize,
       color: onSurface,
     }),
 
@@ -215,6 +216,7 @@ export default function AppSelect<T = string | number>({
   error = false,
   id,
   className = "",
+  size = "default",
 }: AppSelectProps<T>) {
   const styles = useMemo(
     () => buildStyles(error),

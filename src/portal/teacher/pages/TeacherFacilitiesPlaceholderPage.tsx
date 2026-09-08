@@ -1,4 +1,4 @@
-import TeacherPlaceholder from "@/portal/teacher/components/TeacherPlaceholder";
+import PortalPlaceholder from "@/portal/components/PortalPlaceholder";
 
 /**
  * Scaffold placeholder untuk modul tambahan Sarana & Prasarana pada Portal Guru.
@@ -7,7 +7,7 @@ import TeacherPlaceholder from "@/portal/teacher/components/TeacherPlaceholder";
  */
 export default function TeacherFacilitiesPlaceholderPage() {
   return (
-    <TeacherPlaceholder
+    <PortalPlaceholder
       title="Sarana & Prasarana"
       description="Modul Sarana & Prasarana untuk Portal Guru sedang dalam persiapan. Akses halaman ini dibatasi oleh permission tambahan."
     />

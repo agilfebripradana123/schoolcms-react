@@ -18,7 +18,7 @@ export default function TeacherLayout() {
   const toggleMobileSidebar = useCallback(() => setMobileSidebarOpen((open) => !open), []);
   const closeMobileSidebar = useCallback(() => setMobileSidebarOpen(false), []);
 
-  // Auto-close mobile sidebar on route change
+  // Auto-close mobile sidebar on route change (same as Student MobileSidebar)
   useEffect(() => {
     closeMobileSidebar();
   }, [location.pathname, closeMobileSidebar]);

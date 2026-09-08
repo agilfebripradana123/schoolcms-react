@@ -34,4 +34,15 @@ export const settingService = {
   async remove(id: number | string): Promise<ApiMessage> {
     return api.delete<ApiMessage>(`${SYSTEM.SETTINGS}/${id}`);
   },
+
+  async upload(file: File): Promise<{ path: string; url: string }> {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await api.post<{
+      success: boolean;
+      message: string;
+      data: { path: string; url: string };
+    }>(`${SYSTEM.SETTINGS}/upload`, form);
+    return res.data;
+  },
 };

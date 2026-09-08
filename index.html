@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SchoolCMS</title>
+    <title></title>
+    <script>
+      try {
+        var c = JSON.parse(localStorage.getItem("schoolcms_public_settings") || "{}");
+        if (c.app_name) document.title = c.app_name;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

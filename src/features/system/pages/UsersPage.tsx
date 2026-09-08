@@ -31,6 +31,7 @@ import type {
 import UserForm from "../components/user/UserForm";
 import UserPermissionForm from "../components/user/UserPermissionForm";
 import UserDeleteDialog from "../components/user/UserDeleteDialog";
+import Pagination from "../../../components/ui/Pagination";
 
 const PER_PAGE = 10;
 

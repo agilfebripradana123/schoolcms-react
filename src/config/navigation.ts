@@ -45,7 +45,6 @@
   Dumbbell,
   Clock,
   ShieldCheck,
-  User,
 } from "lucide-react";
 import type { NavigationGroup } from "@/types";
 
@@ -219,26 +218,10 @@ export const teacherNavigation = [
     ],
   },
   {
-    label: "Kesiswaan",
-    items: [
-      { label: "Siswa", path: "/guru/students", icon: Users },
-      { label: "Prestasi", path: "/guru/achievements", icon: Trophy },
-      { label: "Pelanggaran", path: "/guru/violations", icon: ShieldAlert },
-      { label: "Ekstrakurikuler", path: "/guru/extracurricular", icon: Dumbbell },
-    ],
-  },
-  {
     label: "Sarana & Prasarana",
     permission: "manage-facilities",
     items: [
       { label: "Sarana & Prasarana", path: "/guru/facilities", icon: Building2 },
-    ],
-  },
-  {
-    label: "Akun",
-    items: [
-      { label: "Profil", path: "/guru/profile", icon: User },
-      { label: "Notifikasi", path: "/guru/notifications", icon: Bell },
     ],
   },
 ];

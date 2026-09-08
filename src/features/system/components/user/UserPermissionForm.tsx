@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RefreshCw, Search as SearchIcon, X } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
+import Search from "@/components/ui/Search";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import { permissionService } from "../../api/permission.service";
@@ -191,27 +192,12 @@ export default function UserPermissionForm({
           </p>
         ) : (
           <>
-            <div className="relative mb-3">
-              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline" aria-hidden="true" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cari permission..."
-                className="w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-9 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-                aria-label="Cari permission"
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-outline hover:text-on-surface"
-                  aria-label="Hapus pencarian"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
+            <Search
+              value={search}
+              onChange={setSearch}
+              placeholder="Cari permission..."
+              className="mb-3"
+            />
 
             <div className="overflow-hidden rounded-2xl border border-slate-200">
               <button

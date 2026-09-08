@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Search as SearchIcon } from "lucide-react";
 import Button from "@/components/ui/Button";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import Search from "@/components/ui/Search";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import Pagination from "../../../components/ui/Pagination";
 import { myExamService } from "@/features/examinations";
 import type { Exam, ExamStatus } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
@@ -38,7 +42,6 @@ export default function TeacherExamsPage() {
   const [status, setStatus] = useState<ExamStatus | null>(null);
   const [page, setPage] = useState(1);
 
-  // Scope options (mata pelajaran mengajar guru) dari salah satu hasil.
   const [subjectOptions, setSubjectOptions] = useState<SelectOption<number>[]>([]);
 
   const load = useCallback(
@@ -94,95 +97,77 @@ export default function TeacherExamsPage() {
   const [detail, setDetail] = useState<Exam | null>(null);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-on-surface">Ujian</h1>
-          <p className="mt-1 text-sm text-on-surface-variant">
-            Ujian pada mata pelajaran yang menjadi scope mengajar Anda.
-          </p>
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Ujian"
+        description="Ujian pada mata pelajaran yang menjadi scope mengajar Anda."
+      />
 
-      <Card>
-        <CardHeader
-          title="Daftar Ujian"
-          description={meta ? `${meta.total} ujian` : undefined}
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="relative">
-                <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari judul..."
-                  className="w-48 rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-primary-container focus:outline-none"
-                />
-              </div>
-              <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Mapel" isClearable className="w-32" />
-              <Select<ExamStatus> options={statusOptions} value={status} onChange={setStatus} placeholder="Status" isClearable className="w-32" />
-              <Button size="sm" onClick={applyFilters} disabled={loading}>
-                Cari
-              </Button>
-            </div>
-          }
-        />
-        <CardBody>
-          {error ? (
-            <p className="text-sm text-error">Gagal memuat ujian: {error}</p>
-          ) : (
-            <DataTable<Exam>
-              loading={loading}
-              emptyMessage="Belum ada ujian pada scope mengajar Anda."
-              columns={[
-                { header: "No", accessor: "id", render: (_v, row) => exams.findIndex((e) => e.id === row.id) + 1 },
-                {
-                  header: "Judul",
-                  accessor: "title",
-                  render: (v, row) => (
-                    <button
-                      type="button"
-                      onClick={() => setDetail(row)}
-                      className="font-semibold text-primary hover:underline"
-                    >
-                      {String(v ?? "-")}
-                    </button>
-                  ),
-                },
-                { header: "Mata Pelajaran", accessor: "id", render: (_v, row) => row.subject?.name ?? "-" },
-                { header: "Durasi", accessor: "duration_minutes", render: (v) => `${String(v ?? "-")} menit` },
-                { header: "Soal", accessor: "total_questions", render: (v) => String(v ?? "-") },
-                { header: "KKM", accessor: "passing_score", render: (v) => String(v ?? "-") },
-                {
-                  header: "Status",
-                  accessor: "status",
-                  render: (v) => {
-                    const st = v as ExamStatus;
-                    return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
-                  },
-                },
-              ]}
-              data={exams}
-            />
-          )}
-        </CardBody>
-        {meta && meta.last_page > 1 && (
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-on-surface-variant">
-              Halaman {meta.current_page} dari {meta.last_page}
-            </p>
-            <div className="flex gap-2">
-              <Button variant="secondary" size="sm" disabled={page <= 1 || loading} onClick={() => { const n = page - 1; setPage(n); load(n, search, subjectId, status); }}>
-                Sebelumnya
-              </Button>
-              <Button variant="secondary" size="sm" disabled={page >= (meta.last_page ?? 1) || loading} onClick={() => { const n = page + 1; setPage(n); load(n, search, subjectId, status); }}>
-                Berikutnya
-              </Button>
-            </div>
+      <PortalFilterBar className="mb-6">
+          <label className="text-sm font-medium text-slate-700">Cari:</label>
+          <div className="min-w-[200px]">
+            <Search value={search} onChange={setSearch} placeholder="Cari judul..." />
           </div>
-        )}
-      </Card>
+          <label className="text-sm font-medium text-slate-700">Mapel:</label>
+          <div className="min-w-[180px]">
+            <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Semua mapel" isClearable />
+          </div>
+          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <div className="min-w-[180px]">
+            <Select<ExamStatus> options={statusOptions} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
+          </div>
+          <Button onClick={applyFilters} disabled={loading}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
+
+      {error ? (
+        <PortalErrorState message={error} />
+      ) : (
+        <DataTable<Exam>
+          loading={loading}
+          emptyMessage="Belum ada ujian pada scope mengajar Anda."
+          columns={[
+            { header: "No", accessor: "id", render: (_v, row) => exams.findIndex((e) => e.id === row.id) + 1 },
+            {
+              header: "Judul",
+              accessor: "title",
+              render: (v, row) => (
+                <button
+                  type="button"
+                  onClick={() => setDetail(row)}
+                  className="font-semibold text-indigo-600 hover:underline"
+                >
+                  {String(v ?? "-")}
+                </button>
+              ),
+            },
+            { header: "Mata Pelajaran", accessor: "id", render: (_v, row) => row.subject?.name ?? "-" },
+            { header: "Durasi", accessor: "duration_minutes", render: (v) => `${String(v ?? "-")} menit` },
+            { header: "Soal", accessor: "total_questions", render: (v) => String(v ?? "-") },
+            { header: "KKM", accessor: "passing_score", render: (v) => String(v ?? "-") },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (v) => {
+                const st = v as ExamStatus;
+                return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
+              },
+            },
+          ]}
+          data={exams}
+        />
+      )}
+      {meta && !error && (
+        <div className="mt-4">
+          <Pagination
+            meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 15, total: meta.total }}
+            onPageChange={(n) => { setPage(n); load(n, search, subjectId, status); }}
+            loading={loading}
+            error={error}
+          />
+        </div>
+      )}
 
       <Modal
         open={!!detail}
@@ -198,25 +183,25 @@ export default function TeacherExamsPage() {
         {detail && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-on-surface">{detail.title}</h3>
-              <p className="mt-1 text-sm text-on-surface-variant">{detail.subject?.name ?? "-"}</p>
+              <h3 className="text-lg font-bold text-slate-900">{detail.title}</h3>
+              <p className="mt-1 text-sm text-slate-500">{detail.subject?.name ?? "-"}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Durasi</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.duration_minutes} menit</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Durasi</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.duration_minutes} menit</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Jumlah Soal</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.total_questions}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Jumlah Soal</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.total_questions}</p>
               </div>
-              <div className="rounded-xl bg-surface-container-high p-3">
-                <p className="text-xs text-on-surface-variant">Maks. Percobaan</p>
-                <p className="mt-1 text-sm font-semibold text-on-surface">{detail.max_attempts}</p>
+              <div className="rounded-xl bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Maks. Percobaan</p>
+                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.max_attempts}</p>
               </div>
             </div>
             {detail.description && (
-              <p className="text-sm text-on-surface-variant">{detail.description}</p>
+              <p className="text-sm text-slate-500">{detail.description}</p>
             )}
             <div className="flex flex-wrap gap-2">
               <Badge variant={STATUS_VARIANTS[detail.status] ?? "neutral"}>{STATUS_LABELS[detail.status]}</Badge>
@@ -227,6 +212,6 @@ export default function TeacherExamsPage() {
           </div>
         )}
       </Modal>
-    </div>
+    </PageContainer>
   );
 }

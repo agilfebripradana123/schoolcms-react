@@ -10,6 +10,7 @@ import Badge from "@/components/ui/Badge";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import { studentExamAttemptService } from "@/features/examinations/api/student-exam-attempt.service";
 
 interface LobbyExam {
@@ -86,7 +87,7 @@ export default function StudentExamLobbyPage() {
     return (
       <PageContainer>
         <PageHeader title="Ujian" description="Mulai ujian" />
-        <Card><CardBody><p className="text-sm text-slate-500">Memuat...</p></CardBody></Card>
+        <PortalLoadingState message="Memuat..." />
       </PageContainer>
     );
   }

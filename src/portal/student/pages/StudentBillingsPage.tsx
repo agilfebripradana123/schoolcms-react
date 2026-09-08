@@ -5,10 +5,11 @@ import { toApiError } from "@/lib/api/error";
 import { formatDate, formatRupiah } from "@/lib/format";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import Card, { CardBody } from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import PortalDetailRows from "@/portal/components/PortalDetailRows";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import Button from "@/components/ui/Button";
 
 interface BillingRow {
@@ -53,51 +54,30 @@ function BillingDetailDialog({
 }) {
   const badge = statusBadge(billing.status);
   return (
-    <Modal open onOpenChange={onClose} title={billingTitle(billing)}>
-      <dl className="space-y-3 text-sm">
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Nominal</dt>
-          <dd className="font-semibold text-slate-900">{formatRupiah(billing.amount)}</dd>
-        </div>
-        {billing.paid != null && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Telah dibayar</dt>
-            <dd className="font-medium text-emerald-600">{formatRupiah(billing.paid)}</dd>
-          </div>
-        )}
-        {billing.outstanding != null && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Sisa</dt>
-            <dd className="font-medium text-rose-600">{formatRupiah(billing.outstanding)}</dd>
-          </div>
-        )}
-        <div className="flex justify-between">
-          <dt className="text-slate-500">Jatuh tempo</dt>
-          <dd className="font-medium text-slate-700">{formatDate(billing.due_date)}</dd>
-        </div>
-        {billing.academic_year?.name && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Tahun ajaran</dt>
-            <dd className="font-medium text-slate-700">{billing.academic_year.name}</dd>
-          </div>
-        )}
-        {billing.semester?.name && (
-          <div className="flex justify-between">
-            <dt className="text-slate-500">Semester</dt>
-            <dd className="font-medium text-slate-700">{billing.semester.name}</dd>
-          </div>
-        )}
-        <div className="flex justify-between items-center">
-          <dt className="text-slate-500">Status</dt>
-          <dd><Badge variant={badge.variant}>{badge.label}</Badge></dd>
-        </div>
-        {billing.notes && (
-          <div>
-            <dt className="text-slate-500">Catatan</dt>
-            <dd className="mt-1 text-slate-700">{billing.notes}</dd>
-          </div>
-        )}
-      </dl>
+    <Modal open onClose={onClose} title={billingTitle(billing)}>
+      <PortalDetailRows
+        rows={[
+          { label: "Nominal", value: formatRupiah(billing.amount) },
+          ...(billing.paid != null
+            ? [{ label: "Telah dibayar", value: formatRupiah(billing.paid) }]
+            : []),
+          ...(billing.outstanding != null
+            ? [{ label: "Sisa", value: formatRupiah(billing.outstanding) }]
+            : []),
+          { label: "Jatuh tempo", value: formatDate(billing.due_date) },
+          ...(billing.academic_year?.name
+            ? [{ label: "Tahun ajaran", value: billing.academic_year.name }]
+            : []),
+          ...(billing.semester?.name
+            ? [{ label: "Semester", value: billing.semester.name }]
+            : []),
+          {
+            label: "Status",
+            value: <Badge variant={badge.variant}>{badge.label}</Badge>,
+          },
+          ...(billing.notes ? [{ label: "Catatan", value: billing.notes }] : []),
+        ]}
+      />
       <div className="mt-6 flex justify-end">
         <Button variant="ghost" onClick={onClose}>Tutup</Button>
       </div>
@@ -182,9 +162,7 @@ export default function StudentBillingsPage() {
       <PageHeader title="Tagihan" description="Daftar tagihan keuangan Anda" />
 
       {error ? (
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error} onRetry={load} />
       ) : (
         <DataTable columns={columns} data={tableData} loading={loading} emptyMessage="Belum ada tagihan." />
       )}

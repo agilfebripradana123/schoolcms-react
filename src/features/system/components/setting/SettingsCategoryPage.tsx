@@ -29,6 +29,7 @@ const SECRET_MASK = "********";
 
 interface SettingsCategoryPageProps {
   group: string;
+  noContainer?: boolean;
 }
 
 const loadGroup = async (group: string) =>
@@ -178,7 +179,7 @@ export default function SettingsCategoryPage({
             value: raw,
             description: field.description,
             is_encrypted: false,
-            is_public: false,
+            is_public: field.isPublic ?? false,
             sort_order: category.fields.indexOf(field),
           };
 
@@ -224,8 +225,8 @@ export default function SettingsCategoryPage({
     }
   };
 
-  return (
-    <PageContainer className="py-6">
+  const content = (
+    <>
       <Link
         to="/admin/system/settings"
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-on-surface-variant hover:text-on-surface"
@@ -300,6 +301,7 @@ export default function SettingsCategoryPage({
 
                     <div className="w-full sm:w-64">
                       <SettingField
+                        settingKey={field.key}
                         type={field.type}
                         value={values[field.key] ?? ""}
                         onChange={(v) =>
@@ -337,6 +339,6 @@ export default function SettingsCategoryPage({
           )}
         </Card>
       </form>
-    </PageContainer>
+    </>
   );
 }

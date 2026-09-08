@@ -9,6 +9,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { FormField, Input } from "@/components/ui/Form";
 
 interface ProfileData {
   id: number;
@@ -197,9 +198,15 @@ export default function ProfilePage() {
         </div>
         {showPasswordForm ? (
           <form onSubmit={handlePasswordChange} className="space-y-4">
-            <label className="flex flex-col gap-1"><span className="text-xs font-medium text-on-surface-variant">Password Saat Ini</span><input type="password" required value={passwordForm.current_password} onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })} className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary" /></label>
-            <label className="flex flex-col gap-1"><span className="text-xs font-medium text-on-surface-variant">Password Baru</span><input type="password" required minLength={6} value={passwordForm.password} onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })} className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary" /></label>
-            <label className="flex flex-col gap-1"><span className="text-xs font-medium text-on-surface-variant">Konfirmasi Password Baru</span><input type="password" required minLength={6} value={passwordForm.password_confirmation} onChange={(e) => setPasswordForm({ ...passwordForm, password_confirmation: e.target.value })} className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary" /></label>
+            <FormField label="Password Saat Ini" required>
+              <Input type="password" required value={passwordForm.current_password} onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })} placeholder="Masukkan password saat ini" />
+            </FormField>
+            <FormField label="Password Baru" required>
+              <Input type="password" required minLength={6} value={passwordForm.password} onChange={(e) => setPasswordForm({ ...passwordForm, password: e.target.value })} placeholder="Minimal 6 karakter" />
+            </FormField>
+            <FormField label="Konfirmasi Password Baru" required>
+              <Input type="password" required minLength={6} value={passwordForm.password_confirmation} onChange={(e) => setPasswordForm({ ...passwordForm, password_confirmation: e.target.value })} placeholder="Ulangi password baru" />
+            </FormField>
             <div className="flex gap-2">
               <Button type="submit" disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null} Simpan</Button>
               <Button type="button" variant="ghost" onClick={() => { setShowPasswordForm(false); setPasswordForm({ current_password: "", password: "", password_confirmation: "" }); }}>Batal</Button>

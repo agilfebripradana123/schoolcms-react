@@ -11,9 +11,10 @@ export interface TeacherGradeRosterParams extends ListParams {
   class_id: number;
   subject_id: number;
   type: GradeType;
-  semester: string;
+  semester_id: number;
+  academic_year_id: number;
+  semester?: string;
   academic_year?: string;
-  academic_year_id?: number;
 }
 
 /**

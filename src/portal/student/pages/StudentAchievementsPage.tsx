@@ -9,6 +9,9 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 
 interface AchievementRow {
   id: number;
@@ -49,7 +52,7 @@ export default function StudentAchievementsPage() {
     return (
       <PageContainer>
         <PageHeader title="Prestasi" description="Prestasi yang Anda raih" />
-        <Card><CardBody><p className="text-sm text-slate-500">Memuat...</p></CardBody></Card>
+        <PortalLoadingState message="Memuat..." />
       </PageContainer>
     );
   }
@@ -58,7 +61,7 @@ export default function StudentAchievementsPage() {
     return (
       <PageContainer>
         <PageHeader title="Prestasi" description="Prestasi yang Anda raih" />
-        <Card><CardBody className="text-sm text-red-600">{error}</CardBody></Card>
+        <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
@@ -67,12 +70,7 @@ export default function StudentAchievementsPage() {
     return (
       <PageContainer>
         <PageHeader title="Prestasi" description="Prestasi yang Anda raih" />
-        <Card>
-          <CardBody className="p-12 text-center">
-            <Award className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm text-slate-400">Belum ada prestasi.</p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState icon={<Award />} description="Belum ada prestasi." />
       </PageContainer>
     );
   }

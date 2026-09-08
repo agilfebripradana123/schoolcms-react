@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { teacherNavigation, teacherDashboardItem } from "@/config/navigation";
 import { usePermission } from "@/features/auth/usePermission";
 import TeacherSidebarSection from "./TeacherSidebarSection";
+import TeacherSidebarItem from "./TeacherSidebarItem";
+import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 
 export default function TeacherSidebar({
   collapsed = false,
@@ -11,6 +13,7 @@ export default function TeacherSidebar({
   collapsed?: boolean;
   onNavigation?: () => void;
 }) {
+  const { appName, faviconUrl } = usePublicSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
@@ -62,12 +65,16 @@ export default function TeacherSidebar({
         }`}
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
-            <span className="text-base font-bold">G</span>
-          </div>
+          {faviconUrl ? (
+            <img src={faviconUrl} alt={appName ?? "SchoolCMS"} className="h-10 w-10 rounded-2xl object-cover shadow-lg shadow-primary-container/30" />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
+              <span className="text-base font-bold">G</span>
+            </div>
+          )}
           {!collapsed && (
             <div>
-              <div className="font-display text-base font-bold leading-none">SchoolCMS</div>
+              <div className="font-display text-base font-bold leading-none">{appName}</div>
               <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Portal Guru</div>
             </div>
           )}
@@ -110,7 +117,16 @@ export default function TeacherSidebar({
                 />
               );
             }
-            return null;
+            const solo = entry as unknown as { path: string; label: string; icon: React.ComponentType<{ className?: string }> };
+            return (
+              <TeacherSidebarItem
+                key={solo.path}
+                item={solo}
+                collapsed={collapsed}
+                active={isActive(solo.path)}
+                onGo={goTo}
+              />
+            );
           })}
         </div>
       </div>

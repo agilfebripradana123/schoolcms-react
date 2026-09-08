@@ -17,6 +17,7 @@ import type { Subject } from "@/features/academic/api/types";
 import type { Exam, ExamStatus } from "../api/types";
 import ExamForm from "../components/exam/ExamForm";
 import ExamDeleteDialog from "../components/exam/ExamDeleteDialog";
+import Pagination from "../../../components/ui/Pagination";
 
 const PER_PAGE = 10;
 
@@ -314,10 +315,6 @@ export default function ExamsPage() {
     ];
   }, [subjectName, openEdit, openDelete]);
 
-  const isFirstPage = meta.current_page <= 1;
-  const isLastPage = meta.current_page >= meta.last_page;
-  const from = meta.total === 0 ? 0 : (meta.current_page - 1) * meta.per_page + 1;
-  const to = Math.min(meta.current_page * meta.per_page, meta.total);
 
   const subjectFilterOptions = useMemo(
     () => [
@@ -459,34 +456,7 @@ export default function ExamsPage() {
           </>
         )}
 
-        {!error && !loading && meta.total > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-on-surface-variant">
-              Menampilkan {from}-{to} dari {meta.total} data
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={isFirstPage}
-                onClick={() => goToPage(meta.current_page - 1)}
-              >
-                Sebelumnya
-              </Button>
-              <span className="text-sm text-on-surface-variant">
-                Halaman {meta.current_page} dari {meta.last_page}
-              </span>
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={isLastPage}
-                onClick={() => goToPage(meta.current_page + 1)}
-              >
-                Berikutnya
-              </Button>
-            </div>
-          </div>
-        )}
+        <Pagination meta={meta} onPageChange={goToPage} loading={loading} error={error} />
       </Card>
 
       <ExamForm

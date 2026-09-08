@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link, useParams, useLocation } from "react-router-dom";
-import { ArrowLeft, Search as SearchIcon } from "lucide-react";
+import { useParams, useLocation } from "react-router-dom";
 import { teacherClassService } from "@/features/academic";
 import type { TeacherClassStudent } from "@/features/academic";
 import { toApiError } from "@/lib/api";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import DataTable from "@/components/ui/DataTable";
-import Button from "@/components/ui/Button";
+import Search from "@/components/ui/Search";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import Pagination from "../../../components/ui/Pagination";
 
 interface NavState {
   className?: string;
@@ -57,137 +60,83 @@ export default function TeacherClassDetailPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <Link
-            to="/guru/academic/classes"
-            className="mb-1 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary-container"
-          >
-            <ArrowLeft className="h-4 w-4" /> Kembali
-          </Link>
-          <h1 className="text-2xl font-bold text-on-surface">
-            Siswa Kelas {className ?? id}
-          </h1>
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={`Siswa Kelas ${className ?? id}`}
+        description="Daftar siswa pada kelas yang menjadi scope mengajar Anda."
+      />
+
+      <PortalFilterBar className="mb-6">
+        <form onSubmit={handleSearch} className="min-w-[240px] flex-1 max-w-xs">
+          <Search value={search} onChange={setSearch} placeholder="Cari nama / NIS / NISN" />
+        </form>
+        {meta && <span className="text-sm text-slate-500">{meta.total} siswa aktif</span>}
+      </PortalFilterBar>
 
       {error ? (
-        <Card>
-          <CardBody>
-            <p className="text-sm text-error">Gagal memuat data siswa: {error}</p>
-          </CardBody>
-        </Card>
+        <PortalErrorState message={error} />
       ) : (
-        <Card>
-          <CardHeader
-            title="Daftar Siswa"
-            description={
-              meta ? `${meta.total} siswa aktif` : undefined
-            }
-            actions={
-              <form onSubmit={handleSearch} className="flex items-center gap-2">
-                <div className="relative">
-                  <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-outline" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Cari nama / NIS / NISN"
-                    className="w-56 rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-                  />
-                </div>
-                <Button type="submit" size="sm">Cari</Button>
-              </form>
-            }
-          />
-          <CardBody>
-            <DataTable<TeacherClassStudent>
-              loading={loading}
-              emptyMessage={search ? "Tidak ada siswa yang cocok" : "Belum ada siswa di kelas ini"}
-              columns={[
-                {
-                  header: "No",
-                  accessor: "id",
-                  render: (_v, row) => {
-                    const index = students.findIndex((s) => s.id === row.id);
-                    return (meta?.current_page && page ? (page - 1) * 20 : 0) + index + 1;
-                  },
-                },
-                {
-                  header: "Nama",
-                  accessor: "id",
-                  render: (_v, row) => (
-                    <span className="font-semibold text-on-surface">
-                      {row.student?.name ?? "-"}
-                    </span>
-                  ),
-                },
-                {
-                  header: "NIS",
-                  accessor: "id",
-                  render: (_v, row) => row.student?.nis ?? "-",
-                },
-                {
-                  header: "NISN",
-                  accessor: "id",
-                  render: (_v, row) => row.student?.nisn ?? "-",
-                },
-                {
-                  header: "Jenis Kelamin",
-                  accessor: "id",
-                  render: (_v, row) =>
-                    row.student?.gender === "L" ? "Laki-laki" : row.student?.gender === "P" ? "Perempuan" : "-",
-                },
-                {
-                  header: "Status",
-                  accessor: "status",
-                  render: (value) => {
-                    const status = String(value);
-                    const variant =
-                      status === "active" ? "success" : status === "moved" ? "warning" : "neutral";
-                    return <Badge variant={variant as "success" | "warning" | "neutral"}>{status}</Badge>;
-                  },
-                },
-              ]}
-              data={students}
-            />
-          </CardBody>
-          {meta && meta.last_page > 1 && (
-            <div className="mt-4 flex items-center justify-between">
-              <p className="text-xs text-on-surface-variant">
-                Halaman {meta.current_page} dari {meta.last_page}
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={page <= 1 || loading}
-                  onClick={() => {
-                    const next = page - 1;
-                    setPage(next);
-                    load(next, search);
-                  }}
-                >
-                  Sebelumnya
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={page >= (meta.last_page ?? 1) || loading}
-                  onClick={() => {
-                    const next = page + 1;
-                    setPage(next);
-                    load(next, search);
-                  }}
-                >
-                  Berikutnya
-                </Button>
-              </div>
-            </div>
-          )}
-        </Card>
+        <DataTable<TeacherClassStudent>
+          loading={loading}
+          emptyMessage={search ? "Tidak ada siswa yang cocok" : "Belum ada siswa di kelas ini"}
+          columns={[
+            {
+              header: "No",
+              accessor: "id",
+              render: (_v, row) => {
+                const index = students.findIndex((s) => s.id === row.id);
+                return (meta?.current_page && page ? (page - 1) * 20 : 0) + index + 1;
+              },
+            },
+            {
+              header: "Nama",
+              accessor: "id",
+              render: (_v, row) => (
+                <span className="font-medium text-slate-900">
+                  {row.student?.name ?? "-"}
+                </span>
+              ),
+            },
+            {
+              header: "NIS",
+              accessor: "id",
+              render: (_v, row) => row.student?.nis ?? "-",
+            },
+            {
+              header: "NISN",
+              accessor: "id",
+              render: (_v, row) => row.student?.nisn ?? "-",
+            },
+            {
+              header: "Jenis Kelamin",
+              accessor: "id",
+              render: (_v, row) =>
+                row.student?.gender === "L" ? "Laki-laki" : row.student?.gender === "P" ? "Perempuan" : "-",
+            },
+            {
+              header: "Status",
+              accessor: "status",
+              render: (value) => {
+                const status = String(value);
+                const variant =
+                  status === "active" ? "success" : status === "moved" ? "warning" : "neutral";
+                return <Badge variant={variant as "success" | "warning" | "neutral"}>{status}</Badge>;
+              },
+            },
+          ]}
+          data={students}
+        />
       )}
-    </div>
+      {meta && !error && (
+        <div className="mt-4">
+          <Pagination
+            meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 20, total: meta.total }}
+            onPageChange={(n) => { setPage(n); load(n, search); }}
+            loading={loading}
+            error={error}
+          />
+        </div>
+      )}
+    </PageContainer>
   );
 }

@@ -10,8 +10,10 @@ export interface StudentGrade {
   uts: number | null;
   uas: number | null;
   final_score: number | null;
-  semester: string;
-  academic_year: string;
+  semester_id?: number;
+  academic_year_id?: number;
+  semester?: string;
+  academic_year?: string;
 }
 
 export interface StudentGradeSummary {

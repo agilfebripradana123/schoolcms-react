@@ -6,8 +6,12 @@ import { STUDENTS } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import Card, { CardBody } from "@/components/ui/Card";
+import PortalStatCard from "@/portal/components/PortalStatCard";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import DataTable from "@/components/ui/DataTable";
+import AppSelect from "../../../components/ui/Select";
 
 interface GradeRow {
   subject_name: string;
@@ -28,18 +32,29 @@ interface SemesterOption {
   name: string;
 }
 
+interface AcademicYearOption {
+  id: number;
+  name: string;
+}
+
 export default function StudentGradesPage() {
   const [grades, setGrades] = useState<GradeRow[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [semesters, setSemesters] = useState<SemesterOption[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYearOption[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | null>(null);
+  const [selectedAcademicYear, setSelectedAcademicYear] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadSemesters = useCallback(async () => {
+  const loadFilters = useCallback(async () => {
     try {
-      const res = await api.get<{ success: boolean; data: SemesterOption[] }>("/semesters");
-      if (res.data) setSemesters(res.data);
+      const [semestersRes, yearsRes] = await Promise.all([
+        api.get<{ success: boolean; data: SemesterOption[] }>("/semesters"),
+        api.get<{ success: boolean; data: AcademicYearOption[] }>("/academic-years"),
+      ]);
+      if (semestersRes.data) setSemesters(semestersRes.data);
+      if (yearsRes.data) setAcademicYears(yearsRes.data);
     } catch {
       // optional
     }
@@ -47,13 +62,15 @@ export default function StudentGradesPage() {
 
   const load = useCallback(async () => {
     try {
+      const params: Record<string, number | undefined> = {};
+      if (selectedSemester != null) params.semester_id = selectedSemester;
+      if (selectedAcademicYear != null) params.academic_year_id = selectedAcademicYear;
+
       const [gradesRes, summaryRes] = await Promise.all([
-        api.get<{ success: boolean; data: GradeRow[] }>(STUDENTS.GRADES, {
-          semester_id: selectedSemester ?? undefined,
-        }),
+        api.get<{ success: boolean; data: GradeRow[] }>(STUDENTS.GRADES, params),
         api.get<{ success: boolean; data: Summary }>(
           `${STUDENTS.GRADES}/summary`,
-          { semester_id: selectedSemester ?? undefined },
+          params,
         ),
       ]);
       setGrades(gradesRes.data);
@@ -65,17 +82,32 @@ export default function StudentGradesPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedSemester]);
+  }, [selectedSemester, selectedAcademicYear]);
 
   useEffect(() => {
-    loadSemesters();
-  }, [loadSemesters]);
+    loadFilters();
+  }, [loadFilters]);
 
   useEffect(() => {
     setLoading(true);
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSemester]);
+  }, [selectedSemester, selectedAcademicYear, load]);
+
+  const semesterOptions = useMemo(
+    () => [
+      { value: "", label: "Semua" },
+      ...semesters.map((s) => ({ value: s.id, label: s.name })),
+    ],
+    [semesters],
+  );
+
+  const academicYearOptions = useMemo(
+    () => [
+      { value: "", label: "Semua" },
+      ...academicYears.map((y) => ({ value: y.id, label: y.name })),
+    ],
+    [academicYears],
+  );
 
   const columns = useMemo(
     () => [
@@ -97,9 +129,7 @@ export default function StudentGradesPage() {
     return (
       <PageContainer>
         <PageHeader title="Nilai" description="Nilai akademik Anda" />
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error ?? ""} onRetry={load} />
       </PageContainer>
     );
   }
@@ -108,12 +138,7 @@ export default function StudentGradesPage() {
     return (
       <PageContainer>
         <PageHeader title="Nilai" description="Nilai akademik Anda" />
-        <Card>
-          <CardBody className="p-12 text-center">
-            <BookOpen className="mx-auto h-10 w-10 text-slate-300" />
-            <p className="mt-3 text-sm text-slate-400">Belum ada nilai.</p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState icon={<BookOpen />} description="Belum ada nilai." />
       </PageContainer>
     );
   }
@@ -122,56 +147,43 @@ export default function StudentGradesPage() {
     <PageContainer>
       <PageHeader title="Nilai" description="Nilai akademik Anda" />
 
-      <Card className="mb-6">
-        <CardBody className="flex flex-wrap items-center gap-3">
+      <PortalFilterBar>
+          <label className="text-sm font-medium text-slate-700">Tahun Ajaran:</label>
+          <div className="min-w-[200px]">
+            <AppSelect<number | string>
+              options={academicYearOptions}
+              value={selectedAcademicYear ?? ""}
+              onChange={(v) => setSelectedAcademicYear(v === "" || v == null ? null : Number(v))}
+              placeholder="Pilih tahun ajaran..."
+            />
+          </div>
           <label className="text-sm font-medium text-slate-700">Semester:</label>
-          <select
-            value={selectedSemester ?? ""}
-            onChange={(e) => setSelectedSemester(e.target.value ? Number(e.target.value) : null)}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="">Semua</option>
-            {semesters.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </CardBody>
-      </Card>
+          <div className="min-w-[200px]">
+            <AppSelect<number | string>
+              options={semesterOptions}
+              value={selectedSemester ?? ""}
+              onChange={(v) => setSelectedSemester(v === "" || v == null ? null : Number(v))}
+              placeholder="Pilih semester..."
+            />
+          </div>
+        </PortalFilterBar>
 
       <div className="mb-6 grid grid-cols-3 gap-4">
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-indigo-500" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Rata-rata</p>
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              {summary?.average.toFixed(1) ?? "-"}
-            </p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-amber-500" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Tertinggi</p>
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">{summary?.highest ?? "-"}</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-emerald-500" />
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Mata Pelajaran</p>
-            </div>
-            <p className="mt-2 text-2xl font-bold text-slate-900">
-              {summary?.total_subjects ?? "-"}
-            </p>
-          </CardBody>
-        </Card>
+        <PortalStatCard
+          icon={<TrendingUp />}
+          label="Rata-rata"
+          value={summary?.average.toFixed(1) ?? "-"}
+        />
+        <PortalStatCard
+          icon={<Award />}
+          label="Tertinggi"
+          value={summary?.highest ?? "-"}
+        />
+        <PortalStatCard
+          icon={<BookOpen />}
+          label="Mata Pelajaran"
+          value={summary?.total_subjects ?? "-"}
+        />
       </div>
 
       <DataTable

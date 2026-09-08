@@ -4,7 +4,8 @@ import { Loader2, Bell } from "lucide-react";
 import { notificationService } from "@/features/notifications";
 import type { UserNotification } from "@/features/notifications";
 import { toApiError } from "@/lib/api/error";
-import TeacherEmptyData from "./TeacherEmptyData";
+import PortalEmptyState from "./PortalEmptyState";
+import { Inbox } from "lucide-react";
 
 function formatRelative(dateIso?: string): string {
   if (!dateIso) return "";
@@ -60,7 +61,7 @@ export default function TeacherNotificationsWidget() {
   }
 
   if (items.length === 0) {
-    return <TeacherEmptyData title="Tidak ada notifikasi" />;
+    return <PortalEmptyState icon={<Inbox />} title="Tidak ada notifikasi" description="Belum ada notifikasi untuk Anda." />;
   }
 
   return (

@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useState } from "react";
-import { Clock, Calendar, Filter } from "lucide-react";
+import { Calendar, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { STUDENTS } from "@/lib/api/endpoints";
@@ -7,8 +7,13 @@ import { toApiError } from "@/lib/api/error";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card, { CardBody } from "@/components/ui/Card";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
+import AppSelect from "../../../components/ui/Select";
+import type { SelectOption } from "../../../components/ui/Select";
 
 interface AttendanceRecord {
   id: number;
@@ -109,9 +114,7 @@ export default function StudentAttendancePage() {
     return (
       <PageContainer>
         <PageHeader title="Kehadiran" description="Rekap kehadiran Anda" />
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
@@ -184,36 +187,36 @@ export default function StudentAttendancePage() {
         </Card>
       </div>
 
-      <Card className="mb-6">
-        <CardBody className="flex flex-wrap items-center gap-3">
+      <PortalFilterBar>
           <Filter className="h-4 w-4 text-slate-500" />
           <label className="text-sm font-medium text-slate-700">Status:</label>
-          <select
-            value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              setPage(1);
-            }}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="semua">Semua Status</option>
-            <option value="hadir">Hadir</option>
-            <option value="sakit">Sakit</option>
-            <option value="izin">Izin</option>
-            <option value="alpa">Alpa</option>
-          </select>
-        </CardBody>
-      </Card>
+          <div className="min-w-[200px]">
+            <AppSelect
+              options={
+                [
+                  { value: "semua", label: "Semua Status" },
+                  { value: "hadir", label: "Hadir" },
+                  { value: "sakit", label: "Sakit" },
+                  { value: "izin", label: "Izin" },
+                  { value: "alpa", label: "Alpa" },
+                ] satisfies SelectOption<string>[]
+              }
+              value={filterStatus}
+              onChange={(v) => {
+                setFilterStatus(v ?? "semua");
+                setPage(1);
+              }}
+              placeholder="Pilih status..."
+              isSearchable={false}
+            />
+          </div>
+        </PortalFilterBar>
 
       {records.length === 0 && !loading ? (
-        <Card>
-          <CardBody className="p-6 text-center">
-            <Calendar className="mx-auto h-8 w-8 text-slate-300" />
-            <p className="mt-2 text-sm text-slate-400">
-              Tidak ada data kehadiran untuk filter yang dipilih.
-            </p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState
+          icon={<Calendar />}
+          description="Tidak ada data kehadiran untuk filter yang dipilih."
+        />
       ) : (
         <DataTable
           columns={columns}

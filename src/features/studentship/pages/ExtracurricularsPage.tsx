@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import Search from "@/components/ui/Search";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
@@ -145,14 +146,13 @@ export default function ExtracurricularsPage() {
         description="Kelola data ekstrakurikuler sekolah."
         actions={
           <>
-            <input
-              type="text"
-              placeholder="Cari ekstrakurikuler..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-64 rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:border-primary-container"
-              style={{ marginRight: 12 }}
-            />
+            <div className="w-64" style={{ marginRight: 12 }}>
+              <Search
+                value={search}
+                onChange={setSearch}
+                placeholder="Cari ekstrakurikuler..."
+              />
+            </div>
             <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
               Tambah
             </Button>

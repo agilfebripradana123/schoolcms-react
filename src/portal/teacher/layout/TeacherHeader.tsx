@@ -16,6 +16,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [imgFailed, setImgFailed] = useState(false);
 
   const toggleUserMenu = useCallback(() => {
     setUserMenuOpen((prev) => !prev);
@@ -58,7 +59,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
         onConfirm={handleLogout}
       />
 
-      <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
+      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
@@ -96,11 +97,20 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
               aria-label="Menu pengguna"
               aria-expanded={userMenuOpen}
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
-                <span className="text-sm font-bold">
-                  {userDisplayName.charAt(0).toUpperCase()}
-                </span>
-              </div>
+              {user?.photo && !imgFailed ? (
+                <img
+                  src={user.photo as string}
+                  alt={userDisplayName}
+                  className="h-9 w-9 rounded-full object-cover border border-slate-200"
+                  onError={() => setImgFailed(true)}
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed">
+                  <span className="text-sm font-bold">
+                    {userDisplayName.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
               <span className="hidden text-sm font-semibold md:block">
                 {userDisplayName}
               </span>
@@ -120,7 +130,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-2xl border border-slate-200 bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
+              <div className="absolute right-0 top-full z-[61] mt-2 w-56 rounded-2xl border border-slate-200 bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
                 <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">
                   Akun
                 </div>

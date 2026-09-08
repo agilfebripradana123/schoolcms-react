@@ -1,22 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Save, Award } from "lucide-react";
+import { Save, Award, Filter } from "lucide-react";
 import { toast } from "sonner";
 import Select from "@/components/ui/Select";
-import Card, { CardHeader, CardBody } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
+import PortalEmptyState from "@/portal/components/PortalEmptyState";
+import PortalErrorState from "@/portal/components/PortalErrorState";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalLoadingState from "@/portal/components/PortalLoadingState";
+import PageContainer from "@/components/layout/PageContainer";
+import PageHeader from "@/components/layout/PageHeader";
 import { usePermission } from "@/features/auth/usePermission";
 import { teacherGradeService, myAssignmentService } from "@/features/academic";
+import { semesterService } from "@/features/academic/api/semester.service";
 import type {
   GradeType,
+  Semester,
   TeacherGradeAssignment,
   TeacherGradeStudent,
 } from "@/features/academic/api/types";
-import {
-  GRADE_TYPES,
-  GRADE_TYPE_LABELS,
-  SEMESTER_OPTIONS,
-} from "@/features/academic/api/types";
+import { GRADE_TYPES, GRADE_TYPE_LABELS } from "@/features/academic/api/types";
 import { toApiError } from "@/lib/api";
 import type { SelectOption } from "@/components/ui/Select";
 
@@ -28,8 +31,10 @@ export default function TeacherGradesPage() {
   const [classId, setClassId] = useState<number | null>(null);
   const [subjectId, setSubjectId] = useState<number | null>(null);
   const [type, setType] = useState<GradeType>("tugas");
-  const [semester, setSemester] = useState<string>("1");
-  const [academicYear, setAcademicYear] = useState<string | null>(null);
+  const [semesterId, setSemesterId] = useState<number | null>(null);
+  const [academicYearId, setAcademicYearId] = useState<number | null>(null);
+
+  const [semesters, setSemesters] = useState<Semester[]>([]);
 
   const [rows, setRows] = useState<TeacherGradeStudent[]>([]);
   const [scoreById, setScoreById] = useState<Record<number, string>>({});
@@ -54,14 +59,22 @@ export default function TeacherGradesPage() {
         const first = data[0];
         if (!first) return;
         setClassId(first.class_id);
-        setAcademicYear(first.academic_year_name ?? null);
+        setAcademicYearId(first.academic_year_id);
       })
       .catch(() => setAssignments([]));
   }, []);
 
+  const loadSemesters = useCallback(() => {
+    semesterService
+      .list({ per_page: 100 })
+      .then((res) => setSemesters(res.data))
+      .catch(() => setSemesters([]));
+  }, []);
+
   useEffect(() => {
     loadAssignments();
-  }, [loadAssignments]);
+    loadSemesters();
+  }, [loadAssignments, loadSemesters]);
 
   const classOptions = useMemo<SelectOption<number>[]>(() => {
     const seen = new Map<number, string>();
@@ -80,23 +93,32 @@ export default function TeacherGradesPage() {
     return Array.from(seen, ([value, label]) => ({ value, label }));
   }, [assignments, classId]);
 
-  const yearOptions = useMemo<SelectOption<string>[]>(() => {
-    const seen = new Set<string>();
+  const yearOptions = useMemo<SelectOption<number>[]>(() => {
+    const seen = new Map<number, string>();
     for (const a of assignments) {
-      if (a.academic_year_name) seen.add(a.academic_year_name);
+      if (a.academic_year_id != null && !seen.has(a.academic_year_id)) {
+        seen.set(a.academic_year_id, a.academic_year_name ?? `Tahun ${a.academic_year_id}`);
+      }
     }
-    return Array.from(seen, (label) => ({ value: label, label }));
+    return Array.from(seen, ([value, label]) => ({ value, label }));
   }, [assignments]);
+
+  const semesterOptions = useMemo<SelectOption<number>[]>(() => {
+    const filtered = academicYearId != null
+      ? semesters.filter((s) => s.academic_year_id === academicYearId)
+      : semesters;
+    return filtered.map((s) => ({ value: s.id, label: `Semester ${s.name}` }));
+  }, [semesters, academicYearId]);
 
   const typeOptions = useMemo<SelectOption<GradeType>[]>(
     () => GRADE_TYPES.map((t) => ({ value: t, label: GRADE_TYPE_LABELS[t] })),
     [],
   );
 
-  const canLoad = classId !== null && subjectId !== null;
+  const canLoad = classId !== null && subjectId !== null && semesterId !== null && academicYearId !== null;
 
   const loadRoster = useCallback(() => {
-    if (classId === null || subjectId === null) return;
+    if (classId === null || subjectId === null || semesterId === null || academicYearId === null) return;
     setStatus("loading");
     setError(null);
     teacherGradeService
@@ -104,8 +126,8 @@ export default function TeacherGradesPage() {
         class_id: classId,
         subject_id: subjectId,
         type,
-        semester,
-        academic_year: academicYear ?? undefined,
+        semester_id: semesterId,
+        academic_year_id: academicYearId,
       })
       .then((res) => {
         const students = res.data?.students ?? [];
@@ -117,10 +139,10 @@ export default function TeacherGradesPage() {
       })
       .catch((err) => setError(toApiError(err).message))
       .finally(() => {});
-  }, [classId, subjectId, type, semester, academicYear]);
+  }, [classId, subjectId, type, semesterId, academicYearId]);
 
   const handleSave = async () => {
-    if (classId === null || subjectId === null) return;
+    if (classId === null || subjectId === null || semesterId === null || academicYearId === null) return;
     const items = rows
       .map((r) => {
         const raw = scoreById[r.student_id]?.trim();
@@ -137,8 +159,8 @@ export default function TeacherGradesPage() {
         class_id: classId,
         subject_id: subjectId,
         type,
-        semester,
-        academic_year: academicYear ?? undefined,
+        semester_id: semesterId,
+        academic_year_id: academicYearId,
         items,
       });
       toast.success("Nilai berhasil disimpan.");
@@ -151,143 +173,98 @@ export default function TeacherGradesPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-on-surface">Nilai</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          Input nilai siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda.
-        </p>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title="Nilai"
+        description="Input nilai siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
+      />
 
-      <Card>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Kelas
-            </label>
+      <PortalFilterBar className="mb-6">
+          <Filter className="h-4 w-4 text-slate-500" />
+          <label className="text-sm font-medium text-slate-700">Kelas:</label>
+          <div className="min-w-[180px]">
             <Select<number> options={classOptions} value={classId} onChange={setClassId} placeholder="Pilih kelas" />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Mata Pelajaran
-            </label>
+          <label className="text-sm font-medium text-slate-700">Mapel:</label>
+          <div className="min-w-[180px]">
             <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Pilih mapel" />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Komponen
-            </label>
+          <label className="text-sm font-medium text-slate-700">Komponen:</label>
+          <div className="min-w-[150px]">
             <Select<GradeType> options={typeOptions} value={type} onChange={(v) => v && setType(v)} />
           </div>
-          <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-              Semester
-            </label>
-            <Select<string>
-              options={Array.from(SEMESTER_OPTIONS, (o) => ({ value: o.value, label: o.label }))}
-              value={semester}
-              onChange={(v) => v && setSemester(v)}
-            />
+          <label className="text-sm font-medium text-slate-700">Tahun:</label>
+          <div className="min-w-[150px]">
+            <Select<number> options={yearOptions} value={academicYearId} onChange={(v) => { setAcademicYearId(v); setSemesterId(null); }} placeholder="Tahun" isClearable />
           </div>
-          <div className="flex items-end gap-2">
-            <div className="flex-1">
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-outline">
-                Tahun Ajaran
-              </label>
-              <Select<string> options={yearOptions} value={academicYear} onChange={setAcademicYear} placeholder="Tahun" isClearable />
-            </div>
-            <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
-              Tampilkan
-            </Button>
+          <label className="text-sm font-medium text-slate-700">Semester:</label>
+          <div className="min-w-[150px]">
+            <Select<number> options={semesterOptions} value={semesterId} onChange={setSemesterId} placeholder="Semester" isClearable />
           </div>
-        </div>
-      </Card>
+          <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
+            Tampilkan
+          </Button>
+      </PortalFilterBar>
 
       {!canLoad ? (
-        <Card>
-          <CardBody>
-            <p className="text-center text-sm text-on-surface-variant">
-              Pilih kelas dan mata pelajaran terlebih dahulu.
-            </p>
-          </CardBody>
-        </Card>
+        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Pilih kelas, mata pelajaran, tahun, dan semester terlebih dahulu." />
       ) : error ? (
-        <Card>
-          <CardBody>
-            <p className="text-sm text-error">Gagal memuat nilai: {error}</p>
-          </CardBody>
-        </Card>
+        <PortalErrorState message={error} />
       ) : status === "loading" ? (
-        <Card>
-          <CardBody>
-            <p className="text-center text-sm text-on-surface-variant">Memuat nilai...</p>
-          </CardBody>
-        </Card>
+        <PortalLoadingState />
       ) : status === "empty" ? (
-        <Card>
-          <CardBody>
-            <div className="text-center">
-              <Award className="mx-auto h-8 w-8 text-slate-300" />
-              <p className="mt-2 text-sm font-semibold text-on-surface">Belum ada data nilai.</p>
-            </div>
-          </CardBody>
-        </Card>
+        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Belum ada data nilai." />
       ) : (
-        <Card>
-          <CardHeader
-            title="Daftar Nilai"
-            description={`${rows.length} siswa`}
-            actions={
-              canManage ? (
-                <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
-                  Simpan Nilai
-                </Button>
-              ) : undefined
-            }
+        <>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">{rows.length} siswa</p>
+            {canManage && (
+              <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
+                Simpan Nilai
+              </Button>
+            )}
+          </div>
+          <DataTable<TeacherGradeStudent>
+            loading={false}
+            emptyMessage="Belum ada data nilai."
+            columns={[
+              {
+                header: "No",
+                accessor: "student_id",
+                render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
+              },
+              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-slate-900">{String(v ?? "-")}</span> },
+              { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
+              { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
+              {
+                header: "Nilai",
+                accessor: "student_id",
+                render: (_v, row) =>
+                  canManage ? (
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step="0.01"
+                      value={scoreById[row.student_id] ?? ""}
+                      onChange={(e) =>
+                        setScoreById((prev) => ({ ...prev, [row.student_id]: e.target.value }))
+                      }
+                      className="w-24 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-indigo-300 focus:outline-none"
+                    />
+                  ) : (
+                    <span className="text-sm text-slate-900">
+                      {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
+                        ? scoreById[row.student_id]
+                        : "---"}
+                    </span>
+                  ),
+              },
+            ]}
+            data={rows}
           />
-          <CardBody>
-            <DataTable<TeacherGradeStudent>
-              loading={false}
-              emptyMessage="Belum ada data nilai."
-              columns={[
-                {
-                  header: "No",
-                  accessor: "student_id",
-                  render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
-                },
-                { header: "Nama", accessor: "name", render: (v) => <span className="font-semibold text-on-surface">{String(v ?? "-")}</span> },
-                { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
-                { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
-                {
-                  header: "Nilai",
-                  accessor: "student_id",
-                  render: (_v, row) =>
-                    canManage ? (
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        step="0.01"
-                        value={scoreById[row.student_id] ?? ""}
-                        onChange={(e) =>
-                          setScoreById((prev) => ({ ...prev, [row.student_id]: e.target.value }))
-                        }
-                        className="w-24 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-on-surface focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
-                      />
-                    ) : (
-                      <span className="text-sm text-on-surface">
-                        {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
-                          ? scoreById[row.student_id]
-                          : "—"}
-                      </span>
-                    ),
-                },
-              ]}
-              data={rows}
-            />
-          </CardBody>
-        </Card>
+        </>
       )}
-    </div>
+    </PageContainer>
   );
 }

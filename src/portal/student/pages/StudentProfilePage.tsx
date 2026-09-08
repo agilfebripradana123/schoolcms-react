@@ -8,6 +8,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import AppSelect from "../../../components/ui/Select";
 
 type Student = Record<string, unknown> & {
   name: string;
@@ -227,11 +228,7 @@ export default function StudentProfilePage() {
     setEditing(title);
   };
 
-  const saveGroup = async (
-    title: string,
-    fields: Field[],
-    isParent = false,
-  ) => {
+  const saveGroup = async (_title: string, fields: Field[], isParent = false) => {
     // frontend NIK 16 digit validation
     if (!isParent && draft["nik"] !== undefined) {
       const nik = (draft["nik"] ?? "").trim();
@@ -486,20 +483,18 @@ export default function StudentProfilePage() {
                       {f.label}
                     </span>
                     {f.options ? (
-                      <select
+                      <AppSelect
+                        options={[
+                          { value: "", label: "— Pilih —" },
+                          ...f.options.map((o) => ({ value: o.value, label: o.label })),
+                        ]}
                         value={draft[f.key] ?? ""}
-                        onChange={(e) =>
-                          setDraft((d) => ({ ...d, [f.key]: e.target.value }))
+                        onChange={(v) =>
+                          setDraft((d) => ({ ...d, [f.key]: v ?? "" }))
                         }
-                        className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary"
-                      >
-                        <option value="">— Pilih —</option>
-                        {f.options.map((o) => (
-                          <option key={o.value} value={o.value}>
-                            {o.label}
-                          </option>
-                        ))}
-                      </select>
+                        placeholder="— Pilih —"
+                        isSearchable={false}
+                      />
                     ) : (
                       <input
                         type={f.type ?? "text"}

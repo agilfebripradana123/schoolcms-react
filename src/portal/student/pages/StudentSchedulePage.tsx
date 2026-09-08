@@ -6,9 +6,11 @@ import { STUDENTS } from "@/lib/api/endpoints";
 import { toApiError } from "@/lib/api/error";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
-import Card, { CardBody } from "@/components/ui/Card";
+import PortalFilterBar from "@/portal/components/PortalFilterBar";
+import PortalErrorState from "@/portal/components/PortalErrorState";
 import DataTable from "@/components/ui/DataTable";
 import Badge from "@/components/ui/Badge";
+import AppSelect from "../../../components/ui/Select";
 
 interface Schedule {
   id: number;
@@ -83,29 +85,25 @@ export default function StudentSchedulePage() {
     <PageContainer>
       <PageHeader title="Jadwal" description="Jadwal pelajaran berdasarkan kelas Anda" />
 
-      <Card className="mb-6">
-        <CardBody className="flex flex-wrap items-center gap-3">
+      <PortalFilterBar>
           <Calendar className="h-4 w-4 text-slate-500" />
           <label className="text-sm font-medium text-slate-700">Hari:</label>
-          <select
-            value={selectedDay}
-            onChange={(e) => setSelectedDay(e.target.value)}
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="semua">Semua Hari</option>
-            {dayOptions.map((d) => (
-              <option key={d} value={d}>
-                {DAY_LABELS[d]}
-              </option>
-            ))}
-          </select>
-        </CardBody>
-      </Card>
+          <div className="min-w-[200px]">
+            <AppSelect
+              options={[
+                { value: "semua", label: "Semua Hari" },
+                ...dayOptions.map((d) => ({ value: d, label: DAY_LABELS[d] ?? d })),
+              ]}
+              value={selectedDay}
+              onChange={(v) => setSelectedDay(v ?? "semua")}
+              placeholder="Pilih hari..."
+              isSearchable={false}
+            />
+          </div>
+        </PortalFilterBar>
 
       {error ? (
-        <Card>
-          <CardBody className="text-sm text-red-600">{error}</CardBody>
-        </Card>
+        <PortalErrorState message={error} onRetry={load} />
       ) : (
         <DataTable
           columns={columns}
