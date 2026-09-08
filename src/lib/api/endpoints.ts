@@ -18,7 +18,7 @@ export const ACADEMIC = {
   CLASS_SUBJECTS: "/class-subjects",
   CLASS_STUDENTS: "/class-students",
   TEACHER_ASSIGNMENTS: "/teacher-assignments",
-  SCHEDULES: "/schedules",
+  SCHEDULES: "/sche dules",
   PERIODS: "/periods",
   ASSIGNMENTS: "/assignments",
   GRADES: "/grades",

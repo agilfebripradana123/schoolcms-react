@@ -136,6 +136,18 @@ export const settingsCategories: SettingsCategoryConfig[] = [
     ],
   },
   {
+    group: "push",
+    label: "Push",
+    description: "Konfigurasi notifikasi push (FCM).",
+    route: "/admin/system/settings/push",
+    icon: Bell,
+    fields: [
+      { key: "push_notification", label: "Push notification", type: "boolean" },
+      { key: "fcm_server_key", label: "FCM Server Key", type: "password" },
+      { key: "fcm_sender_id", label: "FCM Sender ID", type: "string" },
+    ],
+  },
+  {
     group: "appearance",
     label: "Tampilan",
     description: "Pengaturan tema dan tampilan aplikasi.",

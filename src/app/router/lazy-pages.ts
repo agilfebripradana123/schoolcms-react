@@ -99,6 +99,7 @@ export const SettingsWhatsAppPage = lazy(() => import("@/features/system/pages/s
 export const SettingsPaymentPage = lazy(() => import("@/features/system/pages/settings/SettingsPaymentPage"));
 export const SettingsSecurityPage = lazy(() => import("@/features/system/pages/settings/SettingsSecurityPage"));
 export const SettingsBackupPage = lazy(() => import("@/features/system/pages/settings/SettingsBackupPage"));
+export const SettingsPushPage = lazy(() => import("@/features/system/pages/settings/SettingsPushPage"));
 export const SettingsAppearancePage = lazy(() => import("@/features/system/pages/settings/SettingsAppearancePage"));
 
 export const AcademicReportsPage = lazy(() => import("@/features/reports/pages/AcademicReportsPage"));
