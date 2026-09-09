@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -237,17 +237,17 @@ const columns = useMemo(() => {
       {
         header: "Aksi",
         accessor: "id" as const,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_v: unknown, row: Row) => (
           <div className="flex items-center justify-center gap-2">
-            <button type="button" onClick={() => openDetail(row)} className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container" aria-label="Detail">
+            <button type="button" onClick={() => openDetail(row)} className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container" aria-label="Detail">
               <Eye className="h-4 w-4" />
             </button>
-            <button type="button" onClick={() => openEdit(row)} className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container" aria-label="Edit">
+            <button type="button" onClick={() => openEdit(row)} className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container" aria-label="Edit">
               <Pencil className="h-4 w-4" />
             </button>
-            <button type="button" onClick={() => openDelete(row)} className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error" aria-label="Hapus">
+            <button type="button" onClick={() => openDelete(row)} className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error" aria-label="Hapus">
               <Trash2 className="h-4 w-4" />
             </button>
           </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input } from "@/components/ui/Form";
@@ -179,7 +179,7 @@ export default function AcademicYearForm({
               <Input
                 value={`${startYear}/${endYear}`}
                 readOnly
-                className="bg-slate-50"
+                className="bg-surface-container-low"
               />
             </FormField>
 
@@ -209,7 +209,7 @@ export default function AcademicYearForm({
               </FormField>
             </div>
 
-            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
               <input
                 type="checkbox"
                 checked={isActive}
@@ -254,7 +254,7 @@ export default function AcademicYearForm({
                   value={endYear}
                   readOnly
                   placeholder="2032"
-                  className="bg-slate-50"
+                  className="bg-surface-container-low"
                 />
               </FormField>
             </div>
@@ -289,7 +289,7 @@ export default function AcademicYearForm({
               </FormField>
             </div>
 
-            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
               <input
                 type="checkbox"
                 checked={isActive}

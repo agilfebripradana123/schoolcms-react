@@ -86,9 +86,9 @@ export default function StudentAssignmentsPage() {
             <CardBody>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-slate-900 truncate">{a.title}</h3>
-                  <p className="mt-1 text-sm text-slate-600 line-clamp-2">{a.description ?? "Tidak ada deskripsi"}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                  <h3 className="font-semibold text-primary truncate">{a.title}</h3>
+                  <p className="mt-1 text-sm text-secondary line-clamp-2">{a.description ?? "Tidak ada deskripsi"}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-secondary">
                     <Badge variant="secondary">
                       <Calendar className="h-3 w-3" />
                       {a.subject?.name ?? `Mata pelajaran #${a.subject_id}`}

@@ -1,9 +1,10 @@
-import { useState, useCallback, Suspense } from "react";
+import { useState, useCallback, Suspense, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import MobileSidebar from "./MobileSidebar";
+import { useAppearance } from "@/features/system/hooks/useAppearance";
 
 function PageLoadingFallback() {
   return (
@@ -14,8 +15,13 @@ function PageLoadingFallback() {
 }
 
 export default function AppLayout() {
+  const { sidebarBehavior } = useAppearance();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => sidebarBehavior === "collapse");
+
+  useEffect(() => {
+    setCollapsed(sidebarBehavior === "collapse");
+  }, [sidebarBehavior]);
 
   const toggleSidebar = useCallback(() => setSidebarOpen((p) => !p), []);
   const toggleCollapse = useCallback(() => setCollapsed((p) => !p), []);

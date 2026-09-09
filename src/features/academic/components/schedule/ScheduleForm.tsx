@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -307,7 +307,7 @@ export default function ScheduleForm({
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <FormField label="Kelas" required error={fieldErrors.class_id?.[0]}>
             {classesLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat kelas...
               </div>
@@ -329,7 +329,7 @@ export default function ScheduleForm({
                 </Button>
               </div>
             ) : classes.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada kelas tersedia.
               </p>
             ) : (
@@ -345,7 +345,7 @@ export default function ScheduleForm({
 
           <FormField label="Mata Pelajaran" required error={fieldErrors.subject_id?.[0]}>
             {subjectsLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat mata pelajaran...
               </div>
@@ -367,7 +367,7 @@ export default function ScheduleForm({
                 </Button>
               </div>
             ) : subjects.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada mata pelajaran tersedia.
               </p>
             ) : (
@@ -383,7 +383,7 @@ export default function ScheduleForm({
 
           <FormField label="Guru" hint="Opsional." error={fieldErrors.teacher_id?.[0]}>
             {teachersLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat guru...
               </div>
@@ -405,7 +405,7 @@ export default function ScheduleForm({
                 </Button>
               </div>
             ) : teachers.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada guru tersedia.
               </p>
             ) : (
@@ -432,7 +432,7 @@ export default function ScheduleForm({
 
           <FormField label="Jam Pelajaran" required error={fieldErrors.period_id?.[0]}>
             {periodsLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat jam pelajaran...
               </div>
@@ -454,7 +454,7 @@ export default function ScheduleForm({
                 </Button>
               </div>
             ) : periods.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada jam pelajaran tersedia.
               </p>
             ) : (
@@ -470,7 +470,7 @@ export default function ScheduleForm({
 
           <FormField label="Tahun Ajaran" required error={fieldErrors.academic_year_id?.[0]}>
             {yearsLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat tahun ajaran...
               </div>
@@ -492,7 +492,7 @@ export default function ScheduleForm({
                 </Button>
               </div>
             ) : years.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada tahun ajaran tersedia.
               </p>
             ) : (
@@ -508,7 +508,7 @@ export default function ScheduleForm({
 
           <FormField label="Semester" hint="Opsional." error={fieldErrors.semester_id?.[0]}>
             {semestersLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat semester...
               </div>
@@ -530,7 +530,7 @@ export default function ScheduleForm({
                 </Button>
               </div>
             ) : semesters.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada semester tersedia.
               </p>
             ) : (

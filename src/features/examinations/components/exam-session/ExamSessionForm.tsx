@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -126,7 +126,7 @@ export default function ExamSessionForm({
               required
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="w-full rounded-xl border border-on-surface-variant/30 bg-white px-3 py-2 text-sm text-on-surface shadow-sm transition focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-xl border border-on-surface-variant/30 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface shadow-sm transition focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </FormField>
 
@@ -138,7 +138,7 @@ export default function ExamSessionForm({
               value={endTime}
               min={startTime || undefined}
               onChange={(e) => setEndTime(e.target.value)}
-              className="w-full rounded-xl border border-on-surface-variant/30 bg-white px-3 py-2 text-sm text-on-surface shadow-sm transition focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-xl border border-on-surface-variant/30 bg-surface-container-lowest px-3 py-2 text-sm text-on-surface shadow-sm transition focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </FormField>
         </div>

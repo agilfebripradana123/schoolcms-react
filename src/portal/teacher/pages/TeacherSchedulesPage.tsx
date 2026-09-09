@@ -119,9 +119,9 @@ export default function TeacherSchedulesPage() {
         description="Jadwal mengajar Anda, scoped dari identitas login."
       />
 
-      <PortalFilterBar className="mb-6">
-          <Calendar className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Hari:</label>
+      <PortalFilterBar>
+          <Calendar className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Hari:</label>
           <div className="min-w-[200px]">
             <Select<string>
               options={dayOptions}
@@ -131,7 +131,7 @@ export default function TeacherSchedulesPage() {
               isClearable
             />
           </div>
-          <label className="text-sm font-medium text-slate-700">Tahun:</label>
+          <label className="text-sm font-medium text-secondary">Tahun:</label>
           <div className="min-w-[180px]">
             <Select<number>
               options={yearOptions}
@@ -142,7 +142,7 @@ export default function TeacherSchedulesPage() {
               isLoading={yearsLoading}
             />
           </div>
-          <label className="text-sm font-medium text-slate-700">Semester:</label>
+          <label className="text-sm font-medium text-secondary">Semester:</label>
           <div className="min-w-[180px]">
             <Select<number>
               options={semesterOptions}
@@ -173,21 +173,21 @@ export default function TeacherSchedulesPage() {
               <Card key={d}>
                 <CardBody>
                   <div className="flex items-center gap-2 mb-4">
-                    <Clock className="h-5 w-5 text-indigo-500" />
-                    <h2 className="text-sm font-semibold text-slate-700">{SCHEDULE_DAY_LABELS[d]}</h2>
+                    <Clock className="h-5 w-5 text-primary" />
+                    <h2 className="text-sm font-semibold text-secondary">{SCHEDULE_DAY_LABELS[d]}</h2>
                   </div>
                   <div className="space-y-3">
                     {items.map((s) => (
-                      <Card key={s.id} className="bg-slate-50">
+                      <Card key={s.id} className="bg-surface-container">
                         <CardBody>
                           <div className="flex flex-wrap items-center gap-4">
                             <div className="flex w-28 shrink-0 flex-col">
-                              <span className="text-sm font-semibold text-slate-900">{formatTime(s.period?.start_time)}</span>
-                              <span className="text-xs text-slate-500">{formatTime(s.period?.end_time)}</span>
+                              <span className="text-sm font-semibold text-primary">{formatTime(s.period?.start_time)}</span>
+                              <span className="text-xs text-secondary">{formatTime(s.period?.end_time)}</span>
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-slate-900">{s.subject?.name ?? "—"}</p>
-                              <p className="text-xs text-slate-500">Kelas {s.class?.name ?? "—"}</p>
+                              <p className="text-sm font-semibold text-primary">{s.subject?.name ?? "—"}</p>
+                              <p className="text-xs text-secondary">Kelas {s.class?.name ?? "—"}</p>
                             </div>
                             <div className="flex flex-wrap items-center gap-2">
                               {s.academic_year?.name && <Badge variant="neutral">{s.academic_year.name}</Badge>}

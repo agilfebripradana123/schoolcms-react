@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -93,7 +93,7 @@ export default function PermissionsPage() {
         header: "Deskripsi",
         accessor: "description" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.description ?? "-"}</span>
+          <span className="text-on-surface">{row.description ?? "-"}</span>
         ),
       },
     ];
@@ -130,18 +130,18 @@ export default function PermissionsPage() {
             {/* Kartu untuk mobile */}
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Tidak ada hak akses.
                 </div>
               ) : (
                 data.map((row) => (
                   <div
                     key={row.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                   >
                     <p className="font-medium text-on-surface">{row.name}</p>
                     <p className="mt-0.5 text-xs text-on-surface-variant">

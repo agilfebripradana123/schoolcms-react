@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+﻿import { useRef, useState } from "react";
 import { Image as ImageIcon, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { Input, Textarea } from "@/components/ui/Form";
@@ -15,6 +15,7 @@ interface SettingFieldProps {
   disabled?: boolean;
   isSecretEdit?: boolean;
   placeholder?: string;
+  options?: { value: string; label: string }[];
 }
 
 const BOOLEAN_OPTIONS = [
@@ -34,6 +35,7 @@ export default function SettingField({
   disabled = false,
   isSecretEdit = false,
   placeholder,
+  options,
 }: SettingFieldProps) {
   const common = {
     value,
@@ -118,6 +120,16 @@ export default function SettingField({
         />
       );
     case "select":
+      return (
+        <AppSelect
+          key={inputKey}
+          value={value}
+          onChange={(v) => onChange(v ?? "")}
+          options={options ?? []}
+          placeholder="Pilih nilai"
+          isDisabled={disabled}
+        />
+      );
     case "string":
     default:
       return (
@@ -165,7 +177,7 @@ function FileField({
   return (
     <div className="space-y-2">
       {value ? (
-        <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+        <div className="relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-low">
           <img
             src={value}
             alt="Pratinjau"
@@ -185,7 +197,7 @@ function FileField({
           </button>
         </div>
       ) : (
-        <div className="flex h-24 flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-400">
+        <div className="flex h-24 flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-slate-300 bg-surface-container-low text-outline">
           <ImageIcon className="h-5 w-5" />
           <span className="text-xs">Belum ada gambar</span>
         </div>

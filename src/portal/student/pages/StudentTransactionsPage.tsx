@@ -124,10 +124,10 @@ export default function StudentTransactionsPage() {
   }));
 
   const columns = [
-    { header: "Kode", accessor: "transaction_code" as const, render: (v: unknown) => <span className="font-mono text-sm text-slate-700">{String(v)}</span> },
+    { header: "Kode", accessor: "transaction_code" as const, render: (v: unknown) => <span className="font-mono text-sm text-secondary">{String(v)}</span> },
     { header: "Jenis", accessor: "type" as const, render: (v: unknown, row: (typeof tableData)[number]) => <Badge variant={row.typeVariant as never}>{String(v)}</Badge> },
     { header: "Status", accessor: "status" as const, render: (v: unknown, row: (typeof tableData)[number]) => <Badge variant={row.statusVariant as never}>{String(v)}</Badge> },
-    { header: "Nominal", accessor: "amount" as const, render: (v: unknown) => <span className="font-semibold text-slate-900">{String(v)}</span> },
+    { header: "Nominal", accessor: "amount" as const, render: (v: unknown) => <span className="font-semibold text-primary">{String(v)}</span> },
     { header: "Tanggal", accessor: "transaction_date" as const },
     {
       header: "Aksi",
@@ -136,7 +136,7 @@ export default function StudentTransactionsPage() {
         <Button variant="ghost" size="sm" onClick={() => fetchDetail(row.id)}>Detail</Button>
       ),
       className: "px-6 py-4 text-right",
-      headerClassName: "px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+      headerClassName: "px-6 py-3 text-right text-xs font-semibold text-secondary uppercase tracking-wider",
     },
   ];
 

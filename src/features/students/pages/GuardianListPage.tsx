@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -179,14 +179,14 @@ export default function GuardianListPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_val: unknown, row: Row) => (
           <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label={`Edit ${row.name ?? ""}`}
             >
               <Pencil className="h-4 w-4" strokeWidth={2} />
@@ -194,7 +194,7 @@ export default function GuardianListPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label={`Hapus ${row.name ?? ""}`}
             >
               <Trash2 className="h-4 w-4" strokeWidth={2} />
@@ -242,16 +242,16 @@ export default function GuardianListPage() {
             {/* Kartu untuk mobile */}
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-slate-500">Memuat data...</div>
+                <div className="py-10 text-center text-outline">Memuat data...</div>
               ) : pageData.length === 0 ? (
-                <div className="py-10 text-center text-slate-500">
+                <div className="py-10 text-center text-outline">
                   {search ? "Tidak ada wali yang cocok." : "Belum ada data wali siswa."}
                 </div>
               ) : (
                 pageData.map((row) => (
                   <div
                     key={row.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                   >
                     <p className="font-semibold text-on-surface">{row.name ?? "-"}</p>
                     <p className="mt-0.5 text-xs text-on-surface-variant">{row.relation ?? ""}</p>
@@ -260,7 +260,7 @@ export default function GuardianListPage() {
                       <p>{row.occupation ?? "-"}</p>
                       <p>{row.phone ?? "-"}</p>
                     </div>
-                    <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                    <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                       <Button variant="secondary" size="sm" onClick={() => openEdit(row)}>
                         <Pencil className="h-4 w-4" /> Edit
                       </Button>

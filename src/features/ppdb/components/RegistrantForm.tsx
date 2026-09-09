@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Select, Textarea } from "@/components/ui/Form";
@@ -288,7 +288,7 @@ export default function RegistrantForm({
         </div>
 
         {/* Alamat */}
-        <div className="border-t border-slate-200 pt-5">
+        <div className="border-t border-outline-variant pt-5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
             Alamat
           </h3>
@@ -321,7 +321,7 @@ export default function RegistrantForm({
         </div>
 
         {/* Asal sekolah & PPDB */}
-        <div className="border-t border-slate-200 pt-5">
+        <div className="border-t border-outline-variant pt-5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
             Asal Sekolah & PPDB
           </h3>
@@ -345,7 +345,7 @@ export default function RegistrantForm({
         </div>
 
         {/* Orang tua & wali */}
-        <div className="border-t border-slate-200 pt-5">
+        <div className="border-t border-outline-variant pt-5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
             Orang Tua & Wali
           </h3>

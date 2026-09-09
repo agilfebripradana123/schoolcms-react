@@ -59,11 +59,11 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
         onConfirm={handleLogout}
       />
 
-      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
+      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-outline bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
-            className="rounded-2xl border border-slate-200 bg-white p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container lg:hidden"
+            className="rounded-2xl border border-outline bg-surface p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container lg:hidden"
             aria-label="Alihkan sidebar"
           >
             <svg
@@ -93,7 +93,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
           <div className="relative" ref={menuRef}>
             <button
               onClick={toggleUserMenu}
-              className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-1.5 text-slate-700 shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
+              className="flex items-center gap-2 rounded-2xl border border-outline bg-surface px-2 py-1.5 text-secondary shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
               aria-label="Menu pengguna"
               aria-expanded={userMenuOpen}
             >
@@ -101,7 +101,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
                 <img
                   src={user.photo as string}
                   alt={userDisplayName}
-                  className="h-9 w-9 rounded-full object-cover border border-slate-200"
+                  className="h-9 w-9 rounded-full object-cover border border-outline"
                   onError={() => setImgFailed(true)}
                 />
               ) : (
@@ -130,7 +130,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 top-full z-[61] mt-2 w-56 rounded-2xl border border-slate-200 bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
+              <div className="absolute right-0 top-full z-[61] mt-2 w-56 rounded-2xl border border-outline bg-surface-container-lowest p-2 shadow-[0_10px_30px_rgba(0,0,0,0.1)]">
                 <div className="px-3 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-outline">
                   Akun
                 </div>

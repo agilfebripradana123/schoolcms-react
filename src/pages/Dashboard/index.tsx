@@ -91,7 +91,7 @@ export default function Dashboard() {
           <Link
             key={stat.label}
             to={stat.to}
-            className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]"
+            className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm transition-shadow hover:shadow-md"
           >
             <div className="flex items-center gap-2 text-on-surface-variant">
               <stat.icon className="h-4 w-4" />
@@ -141,7 +141,7 @@ export default function Dashboard() {
               <Link
                 key={action.label}
                 to={action.to}
-                className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-semibold text-on-surface shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
+                className="flex items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-left text-sm font-semibold text-on-surface shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
               >
                 <action.icon className="h-4 w-4" /> {action.label}
               </Link>
@@ -156,7 +156,7 @@ export default function Dashboard() {
           <p className="mt-2 text-sm text-on-surface-variant">Data kalender dan pengumuman terbaru dari database. Buka modul komunikasi untuk detail.</p>
           <div className="mt-4 flex gap-2">
             <Link to="/admin/communication/calendar" className="text-xs font-semibold text-primary-container hover:underline">Kalender</Link>
-            <span className="text-slate-300">·</span>
+            <span className="text-outline">·</span>
             <Link to="/admin/communication/announcements" className="text-xs font-semibold text-primary-container hover:underline">Pengumuman</Link>
           </div>
         </Card>

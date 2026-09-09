@@ -58,7 +58,7 @@ export default function TeacherSidebar({
   );
 
   return (
-    <nav className="flex h-full flex-col bg-slate-950 text-white">
+    <nav className="flex h-full flex-col bg-[var(--sidebar-bg)] text-white">
       <div
         className={`flex h-16 items-center border-b border-white/10 px-4 ${
           collapsed ? "justify-center" : ""

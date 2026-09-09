@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -177,7 +177,7 @@ export default function ExamScheduleForm({
       >
         <FormField label="Ujian" required error={fieldErrors.exam_id?.[0]}>
           {examsLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat ujian...
             </div>
@@ -195,7 +195,7 @@ export default function ExamScheduleForm({
               </Button>
             </div>
           ) : exams.length === 0 ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada ujian tersedia.
             </p>
           ) : (
@@ -212,7 +212,7 @@ export default function ExamScheduleForm({
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <FormField label="Ruangan" required error={fieldErrors.room_id?.[0]}>
             {roomsLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat ruangan...
               </div>
@@ -230,7 +230,7 @@ export default function ExamScheduleForm({
                 </Button>
               </div>
             ) : rooms.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada ruangan tersedia.
               </p>
             ) : (
@@ -249,7 +249,7 @@ export default function ExamScheduleForm({
 
           <FormField label="Sesi" required error={fieldErrors.session_id?.[0]}>
             {sessionsLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat sesi...
               </div>
@@ -267,7 +267,7 @@ export default function ExamScheduleForm({
                 </Button>
               </div>
             ) : sessions.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada sesi tersedia.
               </p>
             ) : (

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { Bell, CheckCheck, Loader2 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -123,7 +123,7 @@ export default function NotificationBell() {
           }
           setOpen(next);
         }}
-        className="relative rounded-2xl border border-slate-200 bg-white p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
+        className="relative rounded-2xl border border-outline-variant bg-surface-container-lowest p-2 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
         aria-label="Notifikasi"
         aria-expanded={open}
       >
@@ -136,8 +136,8 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="fixed left-1/2 top-[4.5rem] z-50 w-[22rem] max-w-[calc(100vw-1rem)] -translate-x-1/2 overflow-hidden rounded-2xl border border-slate-200 bg-surface-container-lowest shadow-[0_10px_30px_rgba(0,0,0,0.12)] md:absolute md:left-auto md:right-0 md:top-full md:mt-2 md:w-80 md:max-w-none md:translate-x-0">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+        <div className="fixed left-1/2 top-[4.5rem] z-50 w-[22rem] max-w-[calc(100vw-1rem)] -translate-x-1/2 overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest shadow-[0_10px_30px_rgba(0,0,0,0.12)] md:absolute md:left-auto md:right-0 md:top-full md:mt-2 md:w-80 md:max-w-none md:translate-x-0">
+          <div className="flex items-center justify-between border-b border-outline-variant px-4 py-3">
             <span className="text-sm font-semibold text-on-surface">Notifikasi</span>
             <button
               type="button"
@@ -180,7 +180,7 @@ export default function NotificationBell() {
                   onClick={() => {
                     if (!n.is_read) handleMarkAsRead(n.id);
                   }}
-                  className={`flex w-full items-start gap-3 border-b border-slate-100 px-4 py-3 text-left transition-colors hover:bg-surface-container-low ${
+                  className={`flex w-full items-start gap-3 border-b border-outline-variant px-4 py-3 text-left transition-colors hover:bg-surface-container-low ${
                     n.is_read ? "opacity-70" : "bg-surface-container-lowest"
                   }`}
                 >
@@ -210,7 +210,7 @@ export default function NotificationBell() {
             type="button"
             onClick={handleMarkAll}
             disabled={items.length === 0 || unreadCount === 0}
-            className="flex w-full items-center justify-center gap-2 border-t border-slate-100 px-4 py-3 text-sm font-medium text-primary-container hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 border-t border-outline-variant px-4 py-3 text-sm font-medium text-primary-container hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-50"
           >
             <CheckCheck className="h-4 w-4" /> Tandai semua dibaca
           </button>

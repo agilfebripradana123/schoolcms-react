@@ -56,7 +56,7 @@ export default function Search({
         onChange={handleChange}
         placeholder={placeholder}
         autoFocus={autoFocus}
-        className="w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-10 pr-9 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
+        className="w-full rounded-2xl border border-outline-variant bg-surface-container-lowest py-2.5 pl-10 pr-9 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30"
       />
       {currentValue && (
         <button

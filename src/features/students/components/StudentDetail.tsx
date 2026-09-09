@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import Modal from "@/components/ui/Modal";
 import { parentService } from "../api/parent.service";
 import { guardianService } from "../api/guardian.service";
@@ -89,20 +89,20 @@ export default function StudentDetail({ open, onClose, student }: StudentDetailP
         <button
           type="button"
           onClick={onClose}
-          className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200"
+          className="rounded-xl bg-surface-container-low px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200"
         >
           Tutup
         </button>
       }
     >
       {loading ? (
-        <p className="py-8 text-center text-sm text-slate-500">Memuat data lengkap...</p>
+        <p className="py-8 text-center text-sm text-outline">Memuat data lengkap...</p>
       ) : (
         <div className="space-y-6">
           {/* Data Siswa */}
           <section>
             <SectionTitle>Data Siswa</SectionTitle>
-            <div className="rounded-2xl border border-slate-200 p-5">
+            <div className="rounded-2xl border border-outline-variant p-5">
               <FieldGrid>
                 <Field label="NISN" value={student?.nisn} />
                 <Field label="NIS" value={student?.nis} />
@@ -119,7 +119,7 @@ export default function StudentDetail({ open, onClose, student }: StudentDetailP
           {/* Orang Tua */}
           <section>
             <SectionTitle>Orang Tua</SectionTitle>
-            <div className="rounded-2xl border border-slate-200 p-5">
+            <div className="rounded-2xl border border-outline-variant p-5">
               {parent ? (
                 <FieldGrid>
                   <Field label="Ayah" value={parent.father_name} />
@@ -138,7 +138,7 @@ export default function StudentDetail({ open, onClose, student }: StudentDetailP
           {/* Wali */}
           <section>
             <SectionTitle>Wali</SectionTitle>
-            <div className="rounded-2xl border border-slate-200 p-5">
+            <div className="rounded-2xl border border-outline-variant p-5">
               {guardian ? (
                 <FieldGrid>
                   <Field label="Nama" value={guardian.name} />

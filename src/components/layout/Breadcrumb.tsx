@@ -56,7 +56,7 @@ export default function Breadcrumb() {
           <li key={segment.path + index} className="flex items-center gap-1">
             {index > 0 && (
               <svg
-                className="h-4 w-4 text-slate-300"
+                className="h-4 w-4 text-outline"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -70,11 +70,11 @@ export default function Breadcrumb() {
               </svg>
             )}
             {segment.isLast ? (
-              <span className="font-medium text-slate-700">{segment.label}</span>
+              <span className="font-medium text-on-surface">{segment.label}</span>
             ) : (
               <Link
                 to={segment.path}
-                className="text-slate-500 hover:text-slate-700"
+                className="text-outline hover:text-on-surface"
               >
                 {segment.label}
               </Link>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Select, Textarea } from "@/components/ui/Form";
@@ -161,7 +161,7 @@ export default function ParentForm({
     >
       <form id="parent-form" onSubmit={handleSubmit} className="space-y-4" noValidate>
         {initialData?.student ? (
-          <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+          <div className="rounded-2xl bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
             Siswa: <span className="font-semibold text-on-surface">{initialData.student.name}</span>
             {" · "}
             {initialData.student.nisn}

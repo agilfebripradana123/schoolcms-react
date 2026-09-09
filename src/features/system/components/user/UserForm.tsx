@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -193,7 +193,7 @@ export default function UserForm({
           error={fieldErrors.role_id?.[0] ?? (error && !roleId ? error.message : undefined)}
         >
           {rolesLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat role...
             </div>
@@ -215,7 +215,7 @@ export default function UserForm({
               </Button>
             </div>
           ) : roles.length === 0 ? (
-            <div className="flex w-full flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full flex-col gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <span>Tidak ada role tersedia.</span>
               <span className="text-xs">
                 Tambahkan role terlebih dahulu melalui menu Peran.
@@ -275,7 +275,7 @@ export default function UserForm({
           />
         </FormField>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
           <input
             type="checkbox"
             checked={isActive}

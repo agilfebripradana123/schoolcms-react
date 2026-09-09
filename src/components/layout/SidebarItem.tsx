@@ -7,22 +7,30 @@ interface SidebarItemProps {
   active: boolean;
 }
 
+const activeStyle: React.CSSProperties = {
+  backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)",
+  color: "var(--sidebar-text)",
+  border: "1px solid color-mix(in srgb, var(--sidebar-accent) 30%, transparent)",
+};
+const inactiveStyle: React.CSSProperties = {
+  color: "var(--sidebar-text-muted)",
+};
+const iconActiveStyle: React.CSSProperties = { color: "var(--sidebar-accent)" };
+const iconInactiveStyle: React.CSSProperties = { color: "var(--sidebar-text-muted)" };
+
 export default function SidebarItem({ item, collapsed, active }: SidebarItemProps) {
   return (
     <Link
       to={item.path}
-      className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
-        active
-          ? "bg-primary-container/20 font-semibold text-white ring-1 ring-primary-fixed/30"
-          : "text-slate-300 hover:bg-white/5 hover:text-white"
+      className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+        active ? "" : "hover:bg-white/5 hover:text-white"
       } ${collapsed ? "justify-center px-2" : ""}`}
+      style={active ? activeStyle : inactiveStyle}
       title={collapsed ? item.label : undefined}
     >
-      <item.icon
-        className={`h-4 w-4 shrink-0 ${
-          active ? "text-primary-fixed" : "text-slate-400 group-hover:text-slate-200"
-        }`}
-      />
+      <span className="flex shrink-0" style={active ? iconActiveStyle : iconInactiveStyle}>
+        <item.icon className="h-4 w-4" />
+      </span>
       {!collapsed && <span>{item.label}</span>}
     </Link>
   );

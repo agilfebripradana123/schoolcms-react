@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RefreshCw, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -254,7 +254,7 @@ export default function RoleForm({
             </p>
           )}
           {isLoadingPermissions ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat hak akses...
             </div>
@@ -272,7 +272,7 @@ export default function RoleForm({
               </Button>
             </div>
           ) : permissions.length === 0 ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada hak akses yang tersedia di dalam sistem.
             </p>
           ) : (
@@ -283,11 +283,11 @@ export default function RoleForm({
                 placeholder="Cari hak akses..."
                 className="mb-3"
               />
-              <div className="overflow-hidden rounded-2xl border border-slate-200">
+              <div className="overflow-hidden rounded-2xl border border-outline-variant">
                 <button
                   type="button"
                   onClick={toggleAll}
-                  className="flex w-full items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-on-surface hover:bg-slate-100"
+                  className="flex w-full items-center justify-between gap-2 border-b border-outline-variant bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low"
                 >
                   <span>
                     Pilih Hak Akses ({selectedIds.length}/{permissions.length})
@@ -301,13 +301,13 @@ export default function RoleForm({
                     Tidak ada hak akses yang cocok dengan pencarian.
                   </p>
                 ) : (
-                  <div className="max-h-[320px] divide-y divide-slate-100 overflow-y-auto">
+                  <div className="max-h-[320px] divide-y divide-outline-variant overflow-y-auto">
                     {filteredPermissions.map((perm) => {
                       const checked = selectedIds.includes(perm.id);
                       return (
                         <label
                           key={perm.id}
-                          className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-slate-50"
+                          className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-surface-container-low"
                         >
                           <input
                             type="checkbox"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -206,30 +206,30 @@ export default function AttendanceReportsPage() {
     {
       header: "Hadir",
       accessor: "hadir" as keyof AttendanceDailyReport["per_class"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Sakit",
       accessor: "sakit" as keyof AttendanceDailyReport["per_class"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Izin",
       accessor: "izin" as keyof AttendanceDailyReport["per_class"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Alfa",
       accessor: "alfa" as keyof AttendanceDailyReport["per_class"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
   ];
 
@@ -244,46 +244,46 @@ export default function AttendanceReportsPage() {
     {
       header: "Hari",
       accessor: "total_days" as keyof AttendanceStudentSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Hadir",
       accessor: "hadir" as keyof AttendanceStudentSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Sakit",
       accessor: "sakit" as keyof AttendanceStudentSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Izin",
       accessor: "izin" as keyof AttendanceStudentSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Alfa",
       accessor: "alfa" as keyof AttendanceStudentSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Kehadiran",
       accessor: "attendance_percentage" as keyof AttendanceStudentSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
       render: (_value: unknown, row: AttendanceStudentSummaryRow) => (
-        <span className="whitespace-nowrap text-sm text-slate-700">
+        <span className="whitespace-nowrap text-sm text-on-surface">
           {row.attendance_percentage}%
         </span>
       ),
@@ -357,29 +357,29 @@ export default function AttendanceReportsPage() {
                 </Button>
               </div>
             ) : dailyLoading || !daily ? (
-              <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
+              <div className="py-10 text-center text-sm text-outline">Memuat data...</div>
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                  <div className="flex h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                  <div className="flex h-[100px] flex-col justify-center rounded-2xl border border-outline-variant bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Hadir</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.hadir}
                     </p>
                   </div>
-                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-outline-variant bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Sakit</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.sakit}
                     </p>
                   </div>
-                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-outline-variant bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Izin</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.izin}
                     </p>
                   </div>
-                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-slate-200 bg-surface-container-low p-4">
+                  <div className="flex min-h-[100px] flex-col justify-center rounded-2xl border border-outline-variant bg-surface-container-low p-4">
                     <p className="text-xs font-medium text-on-surface-variant">Alfa</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">
                       {daily.totals.alfa}
@@ -457,18 +457,18 @@ export default function AttendanceReportsPage() {
               <>
                 <div className="space-y-3 sm:hidden">
                   {studentLoading ? (
-                    <div className="py-10 text-center text-sm text-slate-500">
+                    <div className="py-10 text-center text-sm text-outline">
                       Memuat data...
                     </div>
                   ) : studentRows.length === 0 ? (
-                    <div className="py-10 text-center text-sm text-slate-500">
+                    <div className="py-10 text-center text-sm text-outline">
                       Belum ada data kehadiran siswa.
                     </div>
                   ) : (
                     studentRows.map((row) => (
                       <div
                         key={row.student_id}
-                        className="rounded-2xl border border-slate-200 bg-white p-4"
+                        className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                       >
                         <p className="font-semibold text-on-surface">{row.student_name}</p>
                         <p className="mt-0.5 text-xs text-on-surface-variant">

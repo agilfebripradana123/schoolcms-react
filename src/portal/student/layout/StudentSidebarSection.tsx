@@ -40,15 +40,15 @@ export default function StudentSidebarSection({
       <button
         onClick={onToggle}
         className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors ${
-          active
-            ? "bg-primary-container/15 text-white"
-            : "text-slate-300 hover:bg-white/5 hover:text-white"
+          active ? "" : "hover:bg-white/5 hover:text-white"
         }`}
+        style={active ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 15%, transparent)", color: "var(--sidebar-text)" } : { color: "var(--sidebar-text-muted)" }}
         aria-expanded={expanded}
       >
         <span>{entry.label}</span>
         <svg
-          className={`h-4 w-4 text-slate-400 transition-transform ${expanded ? "rotate-90" : ""}`}
+          className={`h-4 w-4 transition-transform ${expanded ? "rotate-90" : ""}`}
+          style={{ color: "var(--sidebar-text-muted)" }}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

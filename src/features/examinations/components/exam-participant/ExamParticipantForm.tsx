@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Textarea } from "@/components/ui/Form";
@@ -186,7 +186,7 @@ export default function ExamParticipantForm({
                 </Button>
               </div>
             ) : exams.length === 0 && !examsError ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Memuat data...
               </p>
             ) : (
@@ -214,7 +214,7 @@ export default function ExamParticipantForm({
                 </Button>
               </div>
             ) : students.length === 0 && !studentsError ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Memuat data...
               </p>
             ) : (
@@ -256,7 +256,7 @@ export default function ExamParticipantForm({
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
             <input
               type="checkbox"
               checked={isBlocked}
@@ -267,7 +267,7 @@ export default function ExamParticipantForm({
             <span className="text-sm font-semibold text-on-surface">Diblokir</span>
           </label>
 
-          <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
             <input
               type="checkbox"
               checked={loginAllowed}

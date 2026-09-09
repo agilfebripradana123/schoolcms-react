@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -264,15 +264,15 @@ export default function QuestionsPage() {
         header: "Mata Pelajaran",
         accessor: "subject_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-sm text-slate-700">{subjectName(row)}</span>
+          <span className="text-sm text-on-surface">{subjectName(row)}</span>
         ),
       },
       {
         header: "Tipe",
         accessor: "type" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge
             variant={TYPE_BADGE[row.type] as "primary" | "secondary" | "neutral"}
@@ -286,8 +286,8 @@ export default function QuestionsPage() {
         header: "Kesulitan",
         accessor: "difficulty" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <Badge
             variant={
@@ -303,20 +303,20 @@ export default function QuestionsPage() {
         header: "Bobot",
         accessor: "points" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-sm text-slate-700">{row.points}</span>
+          <span className="text-sm text-on-surface">{row.points}</span>
         ),
       },
       {
         header: "Pilihan",
         accessor: "type" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-sm text-slate-700">
+          <span className="text-sm text-on-surface">
             {row.type === "essay" ? "-" : `${row.options?.length ?? 0} pilihan`}
           </span>
         ),
@@ -325,14 +325,14 @@ export default function QuestionsPage() {
         header: "Aksi",
         accessor: "id" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label={`Edit soal ${row.id}`}
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
@@ -340,7 +340,7 @@ export default function QuestionsPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label={`Hapus soal ${row.id}`}
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
@@ -429,18 +429,18 @@ export default function QuestionsPage() {
             {/* Kartu untuk mobile */}
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Belum ada soal.
                 </div>
               ) : (
                 data.map((row) => (
                   <div
                     key={row.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
@@ -481,7 +481,7 @@ export default function QuestionsPage() {
                         </span>
                       )}
                     </div>
-                    <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                    <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                       <Button
                         variant="secondary"
                         size="sm"

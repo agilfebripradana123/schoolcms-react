@@ -44,7 +44,7 @@ function ScholarshipDetailDialog({
     <Modal open onClose={onClose} title={scholarship.name}>
       <div className="flex items-center gap-3 mb-4">
         <Award className="h-8 w-8 text-amber-500" />
-        <span className="text-sm text-slate-500">{scholarship.provider ?? "Sekolah"}</span>
+        <span className="text-sm text-secondary">{scholarship.provider ?? "Sekolah"}</span>
       </div>
       <PortalDetailRows
         rows={[
@@ -150,19 +150,19 @@ export default function StudentScholarshipsPage() {
                     <Award className="h-6 w-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-slate-900 truncate">{row.name}</h3>
-                    <p className="text-xs text-slate-500 truncate">{row.provider ?? "Sekolah"}</p>
+                    <h3 className="text-sm font-semibold text-primary truncate">{row.name}</h3>
+                    <p className="text-xs text-secondary truncate">{row.provider ?? "Sekolah"}</p>
                   </div>
                   <Badge variant={badge.variant}>{badge.label}</Badge>
                 </div>
                 {row.amount != null && (
                   <div className="mt-3 flex items-baseline justify-between">
-                    <span className="text-sm text-slate-400">Nominal</span>
-                    <span className="text-lg font-bold text-slate-900">{formatRupiah(row.amount)}</span>
+                    <span className="text-sm text-secondary">Nominal</span>
+                    <span className="text-lg font-bold text-primary">{formatRupiah(row.amount)}</span>
                   </div>
                 )}
                 {(row.start_date || row.end_date) && (
-                  <div className="mt-3 text-[11px] text-slate-400">
+                  <div className="mt-3 text-[11px] text-secondary">
                     {row.start_date && <>Mulai: {formatDate(row.start_date)}{row.end_date && " · "}</>}
                     {row.end_date && <span>Berakhir: {formatDate(row.end_date)}</span>}
                   </div>

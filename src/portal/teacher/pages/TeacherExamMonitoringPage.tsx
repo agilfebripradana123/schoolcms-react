@@ -97,8 +97,8 @@ export default function TeacherExamMonitoringPage() {
       accessor: "student" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="font-medium text-slate-900">{row.student.name}</div>
-          <div className="text-xs text-slate-500">{row.student.nis}</div>
+          <div className="font-medium text-primary">{row.student.name}</div>
+          <div className="text-xs text-secondary">{row.student.nis}</div>
         </div>
       ),
     },
@@ -107,8 +107,8 @@ export default function TeacherExamMonitoringPage() {
       accessor: "exam" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="font-medium text-slate-900">{row.exam.title}</div>
-          <div className="text-xs text-slate-500">{row.exam.subject.name}</div>
+          <div className="font-medium text-primary">{row.exam.title}</div>
+          <div className="text-xs text-secondary">{row.exam.subject.name}</div>
         </div>
       ),
     },
@@ -131,10 +131,10 @@ export default function TeacherExamMonitoringPage() {
       accessor: "progress" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
         <div>
-          <div className="text-sm text-slate-900">
+          <div className="text-sm text-primary">
             {row.progress.answered}/{row.progress.total_questions}
           </div>
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-secondary">
             {row.progress.percentage.toFixed(0)}%
           </div>
         </div>
@@ -188,9 +188,9 @@ export default function TeacherExamMonitoringPage() {
         }
       />
 
-      <PortalFilterBar className="mb-6">
-          <BarChart3 className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Cari:</label>
+      <PortalFilterBar>
+          <BarChart3 className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Cari:</label>
           <div className="min-w-[200px]">
             <Search
               value={searchQuery}
@@ -199,7 +199,7 @@ export default function TeacherExamMonitoringPage() {
               autoFocus={false}
             />
           </div>
-          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <label className="text-sm font-medium text-secondary">Status:</label>
           <div className="min-w-[180px]">
             <Select<ExamAttemptStatus | "">
               options={statusOptions}

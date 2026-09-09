@@ -258,7 +258,7 @@ export default function StudentExamAttemptPage() {
   if (loadError) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
-        <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <div className="max-w-md rounded-2xl border border-outline bg-surface p-8 text-center shadow-sm">
           <AlertTriangle className="mx-auto h-10 w-10 text-error" />
           <h1 className="mt-4 text-lg font-bold text-on-surface">Tidak dapat membuka ujian</h1>
           <p className="mt-2 text-sm text-on-surface-variant">{loadError}</p>
@@ -275,7 +275,7 @@ export default function StudentExamAttemptPage() {
     const result = done.result;
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
-        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-surface p-8 text-center shadow-sm">
           <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
           <h1 className="mt-4 text-xl font-bold text-on-surface">Ujian Selesai</h1>
           <p className="mt-1 text-sm text-on-surface-variant">Terima kasih. Jawaban Anda telah dikumpulkan.</p>
@@ -308,7 +308,7 @@ export default function StudentExamAttemptPage() {
   if (!started) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
-        <div className="w-full max-w-lg rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
+        <div className="w-full max-w-lg rounded-2xl border border-outline bg-surface p-8 shadow-sm">
           <h1 className="text-xl font-bold text-on-surface">Siap mengerjakan ujian?</h1>
           <p className="mt-2 text-sm text-on-surface-variant">
             Ujian akan dimulai dalam mode layar penuh. Anda tidak boleh berpindah tab atau keluar
@@ -341,7 +341,7 @@ export default function StudentExamAttemptPage() {
   if (expired) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
-        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-surface p-8 text-center shadow-sm">
           <Timer className="mx-auto h-12 w-12 text-error" />
           <h1 className="mt-4 text-xl font-bold text-on-surface">Waktu Habis</h1>
           <p className="mt-2 text-sm text-on-surface-variant">
@@ -368,7 +368,7 @@ export default function StudentExamAttemptPage() {
   return (
     <div className="flex min-h-screen flex-col bg-surface">
       {/* Top bar */}
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-slate-200 bg-white px-5 py-3 shadow-sm">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-outline bg-surface px-5 py-3 shadow-sm">
         <div className="flex items-center gap-2">
           <Timer className="h-5 w-5 text-primary" />
           <span className="text-sm font-bold text-on-surface">Ujian</span>
@@ -399,7 +399,7 @@ export default function StudentExamAttemptPage() {
       <main className="flex flex-1 flex-col gap-5 p-5 lg:flex-row">
         {/* Question number grid */}
         <aside className="order-2 w-full shrink-0 lg:order-1 lg:w-56">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="rounded-2xl border border-outline bg-surface p-4 shadow-sm">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-on-surface-variant">
               Navigasi Soal
             </p>
@@ -418,7 +418,7 @@ export default function StudentExamAttemptPage() {
                         ? "bg-primary text-on-primary ring-2 ring-primary/40"
                         : isAnswered
                           ? "bg-primary-container text-on-primary"
-                          : "border border-slate-200 bg-white text-on-surface-variant hover:bg-surface-container-high"
+                          : "border border-outline bg-surface text-on-surface-variant hover:bg-surface-container-high"
                     }`}
                   >
                     {idx + 1}
@@ -431,7 +431,7 @@ export default function StudentExamAttemptPage() {
                 <span className="h-3 w-3 rounded bg-primary" /> Dijawab
               </p>
               <p className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded border border-slate-300 bg-white" /> Belum dijawab
+                <span className="h-3 w-3 rounded border border-outline bg-surface" /> Belum dijawab
               </p>
             </div>
           </div>
@@ -439,7 +439,7 @@ export default function StudentExamAttemptPage() {
 
         {/* Question body */}
         <section className="order-1 flex-1 lg:order-2">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-outline bg-surface p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <Badge variant="secondary">Soal {currentIndex + 1} dari {questions.length}</Badge>
               <span className="text-xs text-on-surface-variant">{currentQuestion.points} poin</span>
@@ -455,7 +455,7 @@ export default function StudentExamAttemptPage() {
                   onChange={(e) => changeEssay(currentQuestion, e.target.value)}
                   rows={6}
                   placeholder="Tulis jawaban Anda di sini..."
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:border-primary-container focus:outline-none"
+                  className="w-full rounded-xl border border-outline bg-surface px-3 py-2.5 text-sm focus:border-primary-container focus:outline-none"
                 />
               ) : (
                 currentQuestion.options.map((opt) => {
@@ -468,12 +468,12 @@ export default function StudentExamAttemptPage() {
                       className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left text-sm transition-colors ${
                         isSel
                           ? "border-primary bg-primary-container/40"
-                          : "border-slate-200 bg-white hover:bg-surface-container-high"
+                          : "border-outline bg-surface hover:bg-surface-container-high"
                       }`}
                     >
                       <span
                         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                          isSel ? "border-primary bg-primary" : "border-slate-300"
+                          isSel ? "border-primary bg-primary" : "border-outline"
                         }`}
                       >
                         {isSel && <span className="h-2 w-2 rounded-full bg-white" />}

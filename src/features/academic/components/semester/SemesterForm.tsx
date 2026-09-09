@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -168,7 +168,7 @@ export default function SemesterForm({
           error={fieldErrors.academic_year_id?.[0] ?? (error && !academicYearId ? error.message : undefined)}
         >
           {yearsLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat tahun ajaran...
             </div>
@@ -190,7 +190,7 @@ export default function SemesterForm({
               </Button>
             </div>
           ) : years.length === 0 ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada tahun ajaran tersedia. Belum ada tahun ajaran, tambahkan
               melalui menu Tahun Ajaran.
             </p>
@@ -220,7 +220,7 @@ export default function SemesterForm({
           />
         </FormField>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
           <input
             type="checkbox"
             checked={isActive}

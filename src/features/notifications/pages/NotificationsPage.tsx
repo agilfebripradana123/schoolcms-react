@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { CheckCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -163,7 +163,7 @@ export default function NotificationsPage() {
 
       <Card>
         {loading ? (
-          <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-500">
+          <div className="flex items-center justify-center gap-2 py-16 text-sm text-outline">
             <Loader2 className="h-5 w-5 animate-spin" /> Memuat notifikasi...
           </div>
         ) : error ? (
@@ -192,7 +192,7 @@ export default function NotificationsPage() {
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-outline-variant">
             {data.map((n) => (
               <button
                 key={n.id}

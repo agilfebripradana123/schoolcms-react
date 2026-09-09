@@ -101,15 +101,15 @@ export default function StudentFinanceSummaryPage() {
 
       <Card>
         <CardBody>
-          <h2 className="text-sm font-semibold text-slate-700">Status Pembayaran</h2>
+          <h2 className="text-sm font-semibold text-secondary">Status Pembayaran</h2>
           <div className="mt-3 flex items-center gap-3">
             <Badge variant={variant}>{statusLabel}</Badge>
-            <span className="text-sm text-slate-500">{percentage}% dibayar</span>
+            <span className="text-sm text-secondary">{percentage}% dibayar</span>
           </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-surface-container-low">
             <div className={`h-2 rounded-full transition-all ${progressTone}`} style={{ width: `${Math.min(percentage, 100)}%` }} aria-hidden />
           </div>
-          <p className="mt-2 text-xs text-slate-400">Progress dari total dibayar terhadap total tagihan.</p>
+          <p className="mt-2 text-xs text-secondary">Progress dari total dibayar terhadap total tagihan.</p>
         </CardBody>
       </Card>
     </PageContainer>

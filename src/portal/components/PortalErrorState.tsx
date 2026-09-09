@@ -13,7 +13,7 @@ export default function PortalErrorState({
   return (
     <Card>
       <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-red-600">{message}</p>
+        <p className="text-sm text-error">{message}</p>
         {onRetry && (
           <Button variant="secondary" size="sm" onClick={onRetry}>
             Muat Ulang

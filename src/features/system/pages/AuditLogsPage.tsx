@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Eye } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -37,7 +37,7 @@ function formatDateTime(value?: string | null): string {
 
 function DetailRow({ label, value }: { label: string; value?: string | number | null }) {
   return (
-    <div className="grid grid-cols-3 gap-3 border-b border-slate-100 py-2 last:border-0">
+    <div className="grid grid-cols-3 gap-3 border-b border-outline-variant py-2 last:border-0">
       <dt className="text-sm text-on-surface-variant">{label}</dt>
       <dd className="col-span-2 text-sm font-medium text-on-surface break-words">
         {value ?? "-"}
@@ -116,7 +116,7 @@ export default function AuditLogsPage() {
         header: "User",
         accessor: "user" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.user?.name ?? "-"}</span>
+          <span className="text-on-surface">{row.user?.name ?? "-"}</span>
         ),
       },
       {
@@ -130,7 +130,7 @@ export default function AuditLogsPage() {
         header: "Model",
         accessor: "model" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span className="text-on-surface">
             {row.model ? `${row.model}${row.model_id != null ? ` #${row.model_id}` : ""}` : "-"}
           </span>
         ),
@@ -139,14 +139,14 @@ export default function AuditLogsPage() {
         header: "Deskripsi",
         accessor: "description" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="block max-w-xs truncate text-slate-700">{row.description}</span>
+          <span className="block max-w-xs truncate text-on-surface">{row.description}</span>
         ),
       },
       {
         header: "Waktu",
         accessor: "created_at" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="whitespace-nowrap text-slate-700">
+          <span className="whitespace-nowrap text-on-surface">
             {formatDateTime(row.created_at)}
           </span>
         ),
@@ -154,14 +154,14 @@ export default function AuditLogsPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openDetail(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label={`Detail log ${row.id}`}
               title="Detail"
             >
@@ -199,18 +199,18 @@ export default function AuditLogsPage() {
             {/* Kartu untuk mobile */}
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Tidak ada log aktivitas.
                 </div>
               ) : (
                 data.map((row) => (
                   <div
                     key={row.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
@@ -233,7 +233,7 @@ export default function AuditLogsPage() {
                     <p className="mt-1 text-xs text-outline">
                       {formatDateTime(row.created_at)}
                     </p>
-                    <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                    <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                       <Button
                         variant="secondary"
                         size="sm"

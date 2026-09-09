@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Textarea } from "@/components/ui/Form";
@@ -191,7 +191,7 @@ export default function ExamForm({
               </Button>
             </div>
           ) : subjects.length === 0 && !subjectsError ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Memuat data...
             </p>
           ) : (
@@ -269,7 +269,7 @@ export default function ExamForm({
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
             <input
               type="checkbox"
               checked={shuffleQuestions}
@@ -280,7 +280,7 @@ export default function ExamForm({
             <span className="text-sm font-semibold text-on-surface">Acak Soal</span>
           </label>
 
-          <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
             <input
               type="checkbox"
               checked={shuffleOptions}
@@ -291,7 +291,7 @@ export default function ExamForm({
             <span className="text-sm font-semibold text-on-surface">Acak Pilihan</span>
           </label>
 
-          <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
             <input
               type="checkbox"
               checked={showResult}

@@ -76,16 +76,16 @@ export default function TeacherExamSchedulesPage() {
         description="Jadwal ujian pada mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar className="mb-6">
-          <Calendar className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Tanggal:</label>
+      <PortalFilterBar>
+          <Calendar className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Tanggal:</label>
           <input
             type="date"
             value={examDate}
             onChange={(e) => setExamDate(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-300 focus:outline-none"
+            className="rounded-xl border border-outline bg-surface px-3 py-2 text-sm text-primary focus:border-primary-container focus:outline-none"
           />
-          <label className="text-sm font-medium text-slate-700">Ujian:</label>
+          <label className="text-sm font-medium text-secondary">Ujian:</label>
           <div className="min-w-[200px]">
             <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Semua ujian" isClearable />
           </div>
@@ -111,7 +111,7 @@ export default function TeacherExamSchedulesPage() {
                 <button
                   type="button"
                   onClick={() => setDetail(row)}
-                  className="text-left font-semibold text-indigo-600 hover:underline"
+                  className="text-left font-semibold text-primary hover:underline"
                 >
                   {row.exam?.title ?? "-"}
                 </button>
@@ -158,21 +158,21 @@ export default function TeacherExamSchedulesPage() {
         {detail && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">{detail.exam?.title ?? "-"}</h3>
-              <p className="mt-1 text-sm text-slate-500">{detail.exam?.subject?.name ?? "-"}</p>
+              <h3 className="text-lg font-bold text-primary">{detail.exam?.title ?? "-"}</h3>
+              <p className="mt-1 text-sm text-secondary">{detail.exam?.subject?.name ?? "-"}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Tanggal</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.exam_date ?? "-"}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Tanggal</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.exam_date ?? "-"}</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Ruang</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.room?.name ?? "-"}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Ruang</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.room?.name ?? "-"}</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Sesi</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.session?.name ?? "-"}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Sesi</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.session?.name ?? "-"}</p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">

@@ -48,7 +48,7 @@ export default function Sidebar({
 
   const sidebarContent = useMemo(
     () => (
-      <nav className="flex h-full flex-col bg-slate-950 text-white">
+      <nav className="flex h-full flex-col" style={{ backgroundColor: "var(--sidebar-bg)", color: "var(--sidebar-text)" }}>
         <div
           className={`flex h-16 items-center border-b border-white/10 px-4 ${
             collapsed ? "justify-center" : ""
@@ -56,9 +56,9 @@ export default function Sidebar({
         >
           <div className="flex items-center gap-3">
             {faviconUrl ? (
-              <img src={faviconUrl} alt={appName ?? "SchoolCMS"} className="h-10 w-10 rounded-2xl object-cover shadow-lg shadow-primary-container/30" />
+              <img src={faviconUrl} alt={appName ?? "SchoolCMS"} className="h-10 w-10 rounded-2xl object-cover shadow-lg" style={{ boxShadow: "0 4px 12px color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" }} />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl text-white shadow-lg" style={{ backgroundColor: "var(--sidebar-accent)", boxShadow: "0 4px 12px color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" }}>
                 <span className="text-base font-bold">A</span>
               </div>
             )}
@@ -67,7 +67,7 @@ export default function Sidebar({
                 <div className="font-display text-base font-bold leading-none">
                   {appName}
                 </div>
-                <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Administrator</div>
+                <div className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: "var(--sidebar-text-muted)" }}>Administrator</div>
               </div>
             )}
           </div>
@@ -79,17 +79,15 @@ export default function Sidebar({
               href={dashboardItem.path}
               className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
                 isActive(dashboardItem.path)
-                  ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
-                  : "text-slate-300 hover:bg-white/5 hover:text-white"
+                  ? "text-white ring-1"
+                  : "hover:bg-white/5 hover:text-white"
               } ${collapsed ? "justify-center" : ""}`}
+              style={isActive(dashboardItem.path) ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)", borderColor: "color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" } : { color: "var(--sidebar-text-muted)" }}
               title={collapsed ? dashboardItem.label : undefined}
             >
               <dashboardItem.icon
-                className={`h-5 w-5 shrink-0 ${
-                  isActive(dashboardItem.path)
-                    ? "text-primary-fixed"
-                    : "text-slate-400"
-                }`}
+                className="h-5 w-5 shrink-0"
+                style={{ color: isActive(dashboardItem.path) ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }}
               />
               {!collapsed && <span>{dashboardItem.label}</span>}
             </a>

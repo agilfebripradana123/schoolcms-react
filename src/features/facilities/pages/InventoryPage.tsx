@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -79,7 +79,7 @@ const STOCK_ACTION_CONFIG: Record<
   adjustment: {
     label: "Penyesuaian Stok",
     icon: SlidersHorizontal,
-    className: "hover:bg-slate-100 hover:text-primary-container",
+    className: "hover:bg-surface-container-low hover:text-primary-container",
   },
 };
 
@@ -285,7 +285,7 @@ export default function InventoryPage() {
         header: "Kategori",
         accessor: "category" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-sm text-slate-700">
+          <span className="text-sm text-on-surface">
             {CATEGORY_FILTER_OPTIONS.find((o) => o.value === row.category)?.label ??
               row.category}
           </span>
@@ -295,8 +295,8 @@ export default function InventoryPage() {
         header: "Stok",
         accessor: "quantity" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex min-w-[90px] flex-col items-center gap-1">
             <span className="whitespace-nowrap text-sm font-medium text-on-surface">
@@ -310,7 +310,7 @@ export default function InventoryPage() {
         header: "Ruangan",
         accessor: "room_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-sm text-slate-700">
+          <span className="text-sm text-on-surface">
             {roomName(row.room_id) || (row.location ? row.location : "-")}
           </span>
         ),
@@ -326,7 +326,7 @@ export default function InventoryPage() {
       {
         header: "Transaksi Stok",
         accessor: "id" as keyof Row,
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-1">
             {(["stock_in", "stock_out", "adjustment"] as StockMovementType[]).map(
@@ -337,7 +337,7 @@ export default function InventoryPage() {
                     key={type}
                     type="button"
                     onClick={() => openStockAction(row, type)}
-                    className={`rounded-lg p-2 text-slate-500 transition-colors ${config.className}`}
+                    className={`rounded-lg p-2 text-outline transition-colors ${config.className}`}
                     aria-label={config.label}
                     title={config.label}
                   >
@@ -353,14 +353,14 @@ export default function InventoryPage() {
         header: "Aksi",
         accessor: "id" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={() => openMovements(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label="Lihat riwayat transaksi"
               title="Riwayat Transaksi"
             >
@@ -369,7 +369,7 @@ export default function InventoryPage() {
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label="Edit inventaris"
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
@@ -377,7 +377,7 @@ export default function InventoryPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label="Hapus inventaris"
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
@@ -460,11 +460,11 @@ export default function InventoryPage() {
           <>
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Belum ada inventaris.
                 </div>
               ) : (
@@ -473,7 +473,7 @@ export default function InventoryPage() {
                   return (
                     <div
                       key={row.id}
-                      className="rounded-2xl border border-slate-200 bg-white p-4"
+                      className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
@@ -486,7 +486,7 @@ export default function InventoryPage() {
                           </p>
                           <p className="mt-1 text-sm font-medium text-on-surface">
                             {row.quantity} {row.unit}
-                            <span className="ml-2 text-xs font-normal text-slate-500">
+                            <span className="ml-2 text-xs font-normal text-outline">
                               (min. {row.minimum_stock})
                             </span>
                           </p>
@@ -499,7 +499,7 @@ export default function InventoryPage() {
                         </div>
                       </div>
 
-                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+                      <div className="mt-3 flex items-center justify-between border-t border-outline-variant pt-3">
                         <div className="flex items-center gap-1">
                           {(["stock_in", "stock_out", "adjustment"] as StockMovementType[]).map(
                             (type) => {
@@ -509,7 +509,7 @@ export default function InventoryPage() {
                                   key={type}
                                   type="button"
                                   onClick={() => openStockAction(row, type)}
-                                  className={`rounded-lg p-2 text-slate-500 transition-colors ${config.className}`}
+                                  className={`rounded-lg p-2 text-outline transition-colors ${config.className}`}
                                   aria-label={config.label}
                                 >
                                   <config.icon className="h-4 w-4" strokeWidth={1.75} />
@@ -520,7 +520,7 @@ export default function InventoryPage() {
                           <button
                             type="button"
                             onClick={() => openMovements(row)}
-                            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+                            className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
                             aria-label="Lihat riwayat transaksi"
                           >
                             <History className="h-4 w-4" strokeWidth={1.75} />

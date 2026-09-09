@@ -42,11 +42,11 @@ export default function TeacherLayout() {
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-[var(--sidebar-bg)]/60 backdrop-blur-sm"
             onClick={closeMobileSidebar}
             aria-label="Tutup sidebar"
           />
-          <div className="fixed inset-y-0 left-0 w-72 overflow-hidden bg-slate-950 shadow-2xl">
+          <div className="fixed inset-y-0 left-0 w-72 overflow-hidden bg-[var(--sidebar-bg)] shadow-2xl">
             <TeacherSidebar collapsed={false} onNavigation={closeMobileSidebar} />
           </div>
         </div>

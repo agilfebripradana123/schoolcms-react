@@ -1,4 +1,4 @@
-import Modal from "@/components/ui/Modal";
+﻿import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
 import type { Registrant } from "../api/types";
 
@@ -33,7 +33,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <section>
       <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-on-surface-variant">{title}</h3>
-      <div className="rounded-2xl border border-slate-200 p-5">{children}</div>
+      <div className="rounded-2xl border border-outline-variant p-5">{children}</div>
     </section>
   );
 }
@@ -59,13 +59,13 @@ export default function RegistrantDetail({ open, onClose, registrant }: Registra
       title="Detail Pendaftaran"
       size="lg"
       footer={
-        <button type="button" onClick={onClose} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200">
+        <button type="button" onClick={onClose} className="rounded-xl bg-surface-container-low px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200">
           Tutup
         </button>
       }
     >
       <div className="space-y-6">
-        <div className="flex items-center justify-between rounded-2xl border border-slate-200 p-5">
+        <div className="flex items-center justify-between rounded-2xl border border-outline-variant p-5">
           <div>
             <p className="text-xs uppercase tracking-wide text-outline">No. Pendaftaran</p>
             <p className="mt-0.5 font-semibold text-on-surface">{r?.registration_number ?? "-"}</p>

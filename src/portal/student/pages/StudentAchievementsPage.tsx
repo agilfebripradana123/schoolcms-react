@@ -88,18 +88,18 @@ export default function StudentAchievementsPage() {
                   <Award className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-slate-900 truncate">{a.title}</h3>
+                  <h3 className="font-semibold text-primary truncate">{a.title}</h3>
                   {a.organizer && (
-                    <p className="text-sm text-slate-500 truncate">{a.organizer}</p>
+                    <p className="text-sm text-secondary truncate">{a.organizer}</p>
                   )}
                 </div>
               </div>
               {a.level && <Badge variant="primary" className="mt-3">{a.level}</Badge>}
               {a.description && (
-                <p className="mt-2 text-sm text-slate-600 line-clamp-3">{a.description}</p>
+                <p className="mt-2 text-sm text-secondary line-clamp-3">{a.description}</p>
               )}
               {a.achievement_date && (
-                <p className="mt-2 flex items-center gap-1 text-xs text-slate-500">
+                <p className="mt-2 flex items-center gap-1 text-xs text-secondary">
                   <Calendar className="h-3 w-3" />
                   {formatDate(a.achievement_date)}
                 </p>

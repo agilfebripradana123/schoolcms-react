@@ -115,8 +115,8 @@ export default function StudentPaymentsPage() {
 
   const columns = [
     { header: "Tanggal", accessor: "date" as const },
-    { header: "Tagihan", accessor: "billing" as const, render: (v: unknown) => <span className="font-medium text-slate-900">{String(v)}</span> },
-    { header: "Nominal", accessor: "amount" as const, render: (v: unknown) => <span className="font-semibold text-slate-900">{String(v)}</span> },
+    { header: "Tagihan", accessor: "billing" as const, render: (v: unknown) => <span className="font-medium text-primary">{String(v)}</span> },
+    { header: "Nominal", accessor: "amount" as const, render: (v: unknown) => <span className="font-semibold text-primary">{String(v)}</span> },
     { header: "Metode", accessor: "method" as const, render: (v: unknown) => <Badge variant="secondary">{String(v)}</Badge> },
     {
       header: "Aksi",
@@ -125,7 +125,7 @@ export default function StudentPaymentsPage() {
         <Button variant="ghost" size="sm" onClick={() => fetchDetail(row.id)}>Detail</Button>
       ),
       className: "px-6 py-4 text-right",
-      headerClassName: "px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+      headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-outline uppercase tracking-wider",
     },
   ];
 

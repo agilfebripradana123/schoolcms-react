@@ -15,7 +15,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     "bg-primary-container text-on-primary hover:bg-primary focus:ring-primary-container shadow-lg shadow-primary-container/25",
   secondary:
-    "border border-slate-200 bg-white text-primary-container hover:bg-surface-container-low focus:ring-primary-container",
+    "border border-outline-variant bg-surface-container-lowest text-primary-container hover:bg-surface-container-low focus:ring-primary-container",
   ghost:
     "bg-transparent text-on-surface hover:bg-surface-container-high focus:ring-outline",
   danger:

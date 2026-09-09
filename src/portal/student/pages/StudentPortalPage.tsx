@@ -226,14 +226,14 @@ export default function StudentPortalPage() {
   if (isLoading && !globalError) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (globalError && !profile && !gradeSummary && !recentAssignments.length) {
     return (
-      <Card className="border-red-200 bg-red-50">
+      <Card className="border-error/20 bg-error-container/15">
         <CardBody>
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-6 w-6 text-red-500" />
@@ -261,10 +261,10 @@ export default function StudentPortalPage() {
               </div>
             )}
             <div>
-              <h1 className="text-xl font-bold leading-tight text-slate-900 sm:text-2xl">
+              <h1 className="text-xl font-bold leading-tight text-primary sm:text-2xl">
                 Selamat datang, {profile?.name || "Siswa"}
               </h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-secondary">
                 {profile?.nisn ? `NISN: ${profile.nisn}` : ""}
                 {profile?.nis && profile.nisn ? " · " : ""}
                 {profile?.nis ? `NIS: ${profile.nis}` : ""}
@@ -285,8 +285,8 @@ export default function StudentPortalPage() {
       {/* Akademik Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-slate-900">Akademik</h2>
-           <Link to="/siswa/grades" className="text-sm text-indigo-600 hover:underline">
+          <h2 className="text-base font-semibold text-primary">Akademik</h2>
+           <Link to="/siswa/grades" className="text-sm text-primary hover:underline">
              <ArrowRight className="h-4 w-4" />
            </Link>
         </div>
@@ -296,7 +296,7 @@ export default function StudentPortalPage() {
             {[1, 2, 3].map((i) => (
               <Card key={i} className="border-dashed">
                 <CardBody className="flex items-center justify-center py-8">
-                  <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </CardBody>
               </Card>
             ))}
@@ -306,10 +306,10 @@ export default function StudentPortalPage() {
             <Card className="transition-shadow hover:shadow-md">
               <CardHeader title="Rata-rata Nilai" />
               <CardBody className="text-center">
-                <p className="text-3xl font-bold text-slate-900">
+                <p className="text-3xl font-bold text-primary">
                   {gradeSummary?.average?.toFixed(1) ?? "-"}
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-secondary">
                   dari {gradeSummary?.total_subjects ?? 0} mata pelajaran
                 </p>
               </CardBody>
@@ -318,10 +318,10 @@ export default function StudentPortalPage() {
             <Card className="transition-shadow hover:shadow-md">
               <CardHeader title="Kehadiran" />
               <CardBody className="text-center">
-                <p className="text-3xl font-bold text-slate-900">
+                <p className="text-3xl font-bold text-primary">
                   {attendanceSummary?.percentage?.toFixed(0) ?? "-"}%
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-secondary">
                   {attendanceSummary?.present ?? 0} dari {attendanceSummary?.total_days ?? 0} hari hadir
                 </p>
               </CardBody>
@@ -331,13 +331,13 @@ export default function StudentPortalPage() {
               <CardHeader title="Jadwal Hari Ini" />
               <CardBody>
                 {todaySchedule.length === 0 ? (
-                  <p className="text-center text-sm text-slate-500 py-4">Tidak ada jadwal hari ini</p>
+                  <p className="text-center text-sm text-secondary py-4">Tidak ada jadwal hari ini</p>
                 ) : (
                   <div className="space-y-2">
                     {todaySchedule.map((s) => (
                       <div key={s.id} className="flex items-center gap-2 text-sm">
                         <Badge variant="secondary">{s.subject_name}</Badge>
-                        <span className="text-slate-500">
+                        <span className="text-secondary">
                           {s.start_time} - {s.end_time}
                         </span>
                       </div>
@@ -350,7 +350,7 @@ export default function StudentPortalPage() {
         )}
 
         {akademikError && (
-          <Card className="border-red-200 bg-red-50">
+          <Card className="border-error/20 bg-error-container/15">
             <CardBody>
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 text-red-500" />
@@ -364,7 +364,7 @@ export default function StudentPortalPage() {
       {/* Aktivitas Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-slate-900">Aktivitas</h2>
+          <h2 className="text-base font-semibold text-primary">Aktivitas</h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -374,19 +374,19 @@ export default function StudentPortalPage() {
             <CardBody className="space-y-3">
               {aktivitasLoading && !aktivitasError ? (
                 <div className="flex items-center justify-center py-6">
-                  <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </div>
               ) : recentAssignments.length === 0 ? (
-                <p className="text-center text-sm text-slate-500 py-4">Belum ada tugas</p>
+                <p className="text-center text-sm text-secondary py-4">Belum ada tugas</p>
               ) : (
                 recentAssignments.map((a) => (
-                  <div key={a.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50">
+                  <div key={a.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
                     <div className="flex-shrink-0 mt-0.5">
-                      <Calendar className="h-4 w-4 text-indigo-500" />
+                      <Calendar className="h-4 w-4 text-primary" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-slate-900">{a.title}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="truncate text-sm font-medium text-primary">{a.title}</p>
+                      <p className="text-xs text-secondary">
                         {a.subject?.name ?? `Mata pelajaran #${a.subject_id}`}
                         {a.due_date ? ` · Jatuh tempo ${formatDate(a.due_date)}` : ""}
                       </p>
@@ -395,7 +395,7 @@ export default function StudentPortalPage() {
                 ))
               )}
               <div className="pt-2">
-                <Link to="/siswa/assignments" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline">
+                <Link to="/siswa/assignments" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
                   Lihat semua tugas <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -408,19 +408,19 @@ export default function StudentPortalPage() {
             <CardBody className="space-y-3">
               {aktivitasLoading && !aktivitasError ? (
                 <div className="flex items-center justify-center py-6">
-                  <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </div>
               ) : recentExams.length === 0 ? (
-                <p className="text-center text-sm text-slate-500 py-4">Belum ada ujian</p>
+                <p className="text-center text-sm text-secondary py-4">Belum ada ujian</p>
               ) : (
                 recentExams.map((e) => (
-                  <div key={e.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50">
+                  <div key={e.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
                     <div className="flex-shrink-0 mt-0.5">
-                      <FileText className="h-4 w-4 text-indigo-500" />
+                      <FileText className="h-4 w-4 text-primary" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-slate-900">{e.title}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="truncate text-sm font-medium text-primary">{e.title}</p>
+                      <p className="text-xs text-secondary">
                         {e.subject?.name ?? ""}
                         {e.exam_date ? ` · ${formatDate(e.exam_date)}` : ""}
                       </p>
@@ -429,7 +429,7 @@ export default function StudentPortalPage() {
                 ))
               )}
               <div className="pt-2">
-                 <Link to="/siswa/exams" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline">
+                 <Link to="/siswa/exams" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
                    Lihat semua ujian <ArrowRight className="h-3.5 w-3.5" />
                  </Link>
               </div>
@@ -442,24 +442,24 @@ export default function StudentPortalPage() {
             <CardBody className="space-y-3">
               {aktivitasLoading && !aktivitasError ? (
                 <div className="flex items-center justify-center py-6">
-                  <Loader2 className="h-5 w-5 animate-spin text-indigo-500" />
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
                 </div>
               ) : recentNotifications.length === 0 ? (
-                <p className="text-center text-sm text-slate-500 py-4">Belum ada notifikasi</p>
+                <p className="text-center text-sm text-secondary py-4">Belum ada notifikasi</p>
               ) : (
                 recentNotifications.map((n) => (
-                  <div key={n.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-slate-50">
+                  <div key={n.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
                     <div className="flex-shrink-0 mt-0.5">
-                      <Bell className={`h-4 w-4 ${n.is_read ? "text-slate-400" : "text-indigo-500"}`} />
+                      <Bell className={`h-4 w-4 ${n.is_read ? "text-secondary" : "text-primary"}`} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className={`text-sm ${n.is_read ? "font-medium" : "font-semibold"} text-slate-900`}>
+                      <p className={`text-sm ${n.is_read ? "font-medium" : "font-semibold"} text-primary`}>
                         {n.title}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-secondary">
                         {n.message ? `${n.message.slice(0, 60)}${n.message.length > 60 ? "..." : ""}` : ""}
                       </p>
-                      <p className="mt-0.5 text-[11px] text-slate-400">
+                      <p className="mt-0.5 text-[11px] text-secondary">
                         {new Date(n.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                       </p>
                     </div>
@@ -467,7 +467,7 @@ export default function StudentPortalPage() {
                 ))
               )}
                             <div className="pt-2">
-                <Link to="/siswa/notifications" className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline">
+                <Link to="/siswa/notifications" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
                   Lihat semua notifikasi <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -476,7 +476,7 @@ export default function StudentPortalPage() {
         </div>
 
         {aktivitasError && (
-          <Card className="border-red-200 bg-red-50">
+          <Card className="border-error/20 bg-error-container/15">
             <CardBody>
               <div className="flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 text-red-500" />
@@ -496,15 +496,15 @@ export default function StudentPortalPage() {
               <div className="space-y-2">
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-lg font-bold text-rose-600">{completeness.missing}</span>
-                  <span className="text-xs text-slate-500">data belum lengkap</span>
+                  <span className="text-xs text-secondary">data belum lengkap</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-low">
                   <div
                     className="h-full rounded-full bg-rose-500 transition-all duration-500"
                     style={{ width: `${completeness.pct}%` }}
                   />
                 </div>
-                <p className="text-[11px] text-slate-400">{completeness.pct}% terisi</p>
+                <p className="text-[11px] text-secondary">{completeness.pct}% terisi</p>
               </div>
             ) : (
               <div className="flex items-center gap-1.5">

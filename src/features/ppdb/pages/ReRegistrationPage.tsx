@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { CheckCircle2, ClipboardCheck, Eye } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -166,8 +166,8 @@ export default function ReRegistrationPage() {
       {
         header: "Aksi",
         accessor: "id",
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_v: unknown, row: Row) => {
           const isCompleted = row.re_registration_status === "completed";
           const hasStudent = !!row.student_id;
@@ -176,7 +176,7 @@ export default function ReRegistrationPage() {
               <button
                 type="button"
                 onClick={() => openDetail(row)}
-                className="inline-flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200"
+                className="inline-flex items-center gap-1 rounded-lg bg-surface-container-low px-3 py-1.5 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200"
               >
                 <Eye className="h-4 w-4" /> Detail
               </button>

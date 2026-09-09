@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -201,7 +201,7 @@ export default function ClassSubjectForm({
       >
         <FormField label="Kelas" required error={fieldErrors.class_id?.[0]}>
           {classesLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat kelas...
             </div>
@@ -223,7 +223,7 @@ export default function ClassSubjectForm({
               </Button>
             </div>
           ) : classes.length === 0 ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada kelas tersedia.
             </p>
           ) : (
@@ -239,7 +239,7 @@ export default function ClassSubjectForm({
 
         <FormField label="Mata Pelajaran" required error={fieldErrors.subject_id?.[0]}>
           {subjectsLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat mata pelajaran...
             </div>
@@ -261,7 +261,7 @@ export default function ClassSubjectForm({
               </Button>
             </div>
           ) : subjects.length === 0 ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada mata pelajaran tersedia.
             </p>
           ) : (
@@ -281,7 +281,7 @@ export default function ClassSubjectForm({
           error={fieldErrors.teacher_id?.[0]}
         >
           {teachersLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat guru...
             </div>
@@ -303,7 +303,7 @@ export default function ClassSubjectForm({
               </Button>
             </div>
           ) : teachers.length === 0 ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada guru tersedia.
             </p>
           ) : (

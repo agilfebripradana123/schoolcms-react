@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -190,7 +190,7 @@ export default function CounselingsPage() {
         header: "Konselor",
         accessor: "counselor" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">
+          <span className="text-on-surface">
             {row.counselor
               ? formatTeacherName(row.counselor)
               : `#${row.counselor_id}`}
@@ -201,21 +201,21 @@ export default function CounselingsPage() {
         header: "Tanggal",
         accessor: "counseling_date" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.counseling_date}</span>
+          <span className="text-on-surface">{row.counseling_date}</span>
         ),
       },
       {
         header: "Topik",
         accessor: "topic" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-slate-700">{row.topic}</span>
+          <span className="text-on-surface">{row.topic}</span>
         ),
       },
       {
         header: "Status",
         accessor: "status" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => {
           const meta = STATUS_META[row.status] ?? { label: row.status, variant: "neutral" as const };
           return (
@@ -228,14 +228,14 @@ export default function CounselingsPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label={`Edit ${row.student?.name ?? row.student_id}`}
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
@@ -243,7 +243,7 @@ export default function CounselingsPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label={`Hapus ${row.student?.name ?? row.student_id}`}
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
@@ -332,11 +332,11 @@ export default function CounselingsPage() {
             {/* Kartu untuk mobile */}
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Tidak ada data bimbingan.
                 </div>
               ) : (
@@ -346,7 +346,7 @@ export default function CounselingsPage() {
                   return (
                     <div
                       key={row.id}
-                      className="rounded-2xl border border-slate-200 bg-white p-4"
+                      className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
@@ -370,7 +370,7 @@ export default function CounselingsPage() {
                           {meta.label}
                         </Badge>
                       </div>
-                      <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                      <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                         <Button variant="secondary" size="sm" onClick={() => openEdit(row)}>
                           <Pencil className="h-4 w-4" /> Edit
                         </Button>

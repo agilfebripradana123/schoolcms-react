@@ -94,12 +94,12 @@ export default function StudentViolationsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-semibold text-slate-900">{v.category}</h3>
+                    <h3 className="font-semibold text-primary">{v.category}</h3>
                     {v.points != null && <Badge variant="danger">-{v.points} poin</Badge>}
                   </div>
-                  <p className="mt-1 text-sm text-slate-600">{v.description}</p>
+                  <p className="mt-1 text-sm text-secondary">{v.description}</p>
                   {v.violated_at && (
-                    <p className="mt-2 text-xs text-slate-500">
+                    <p className="mt-2 text-xs text-secondary">
                       Tanggal: {formatDate(v.violated_at)}
                     </p>
                   )}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Select, Textarea } from "@/components/ui/Form";
@@ -334,7 +334,7 @@ export default function TeacherForm({
         </div>
 
         {/* Kepegawaian & Pendidikan */}
-        <div className="border-t border-slate-200 pt-5">
+        <div className="border-t border-outline-variant pt-5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
             Kepegawaian & Pendidikan
           </h3>

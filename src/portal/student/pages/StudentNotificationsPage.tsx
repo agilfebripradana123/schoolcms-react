@@ -104,12 +104,12 @@ export default function StudentNotificationsPage() {
       <Card>
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Bell className="h-12 w-12 text-slate-300" />
-            <p className="mt-4 text-sm font-medium text-slate-500">Belum ada notifikasi</p>
-            <p className="mt-1 text-xs text-slate-400">Pemberitahuan dari sekolah akan muncul di sini.</p>
+            <Bell className="h-12 w-12 text-secondary" />
+            <p className="mt-4 text-sm font-medium text-secondary">Belum ada notifikasi</p>
+            <p className="mt-1 text-xs text-secondary">Pemberitahuan dari sekolah akan muncul di sini.</p>
           </div>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-outline-variant">
             {notifications.map((n) => (
               <li
                 key={n.id}
@@ -121,7 +121,7 @@ export default function StudentNotificationsPage() {
                   <span
                     className={`flex h-9 w-9 items-center justify-center rounded-full ${
                       n.is_read
-                        ? "bg-slate-100 text-slate-400"
+                        ? "bg-surface-container-low text-secondary"
                         : "bg-primary-container/20 text-primary-container"
                     }`}
                   >
@@ -132,7 +132,7 @@ export default function StudentNotificationsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <p
                       className={`text-sm leading-snug ${
-                        n.is_read ? "font-medium text-slate-700" : "font-semibold text-slate-900"
+                        n.is_read ? "font-medium text-secondary" : "font-semibold text-primary"
                       }`}
                     >
                       {n.title}
@@ -142,11 +142,11 @@ export default function StudentNotificationsPage() {
                     )}
                   </div>
                   {n.message && (
-                    <p className="mt-1 text-sm leading-relaxed text-slate-500 line-clamp-2">
+                    <p className="mt-1 text-sm leading-relaxed text-secondary line-clamp-2">
                       {n.message}
                     </p>
                   )}
-                  <p className="mt-1.5 text-xs text-slate-400">
+                  <p className="mt-1.5 text-xs text-secondary">
                     {formatDate(n.created_at)}
                   </p>
                 </div>

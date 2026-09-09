@@ -106,16 +106,16 @@ export default function TeacherAttendancePage() {
         description="Input kehadiran siswa pada kelas yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar className="mb-6">
-          <Calendar className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Tanggal:</label>
+      <PortalFilterBar>
+          <Calendar className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Tanggal:</label>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-300 focus:outline-none"
+            className="rounded-xl border border-outline bg-surface px-3 py-2 text-sm text-primary focus:border-primary-container focus:outline-none"
           />
-          <label className="text-sm font-medium text-slate-700">Kelas:</label>
+          <label className="text-sm font-medium text-secondary">Kelas:</label>
           <div className="min-w-[200px]">
             <AppSelect<number>
               options={classOptions}
@@ -140,7 +140,7 @@ export default function TeacherAttendancePage() {
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-slate-500">{rows.length} siswa aktif</p>
+            <p className="text-sm text-secondary">{rows.length} siswa aktif</p>
             {canManage && (
               <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
                 Simpan Kehadiran
@@ -156,7 +156,7 @@ export default function TeacherAttendancePage() {
                 accessor: "student_id",
                 render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
               },
-              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-slate-900">{String(v ?? "-")}</span> },
+              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-on-surface">{String(v ?? "-")}</span> },
               { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
               { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
               {
@@ -190,7 +190,7 @@ export default function TeacherAttendancePage() {
             data={rows}
           />
           {canManage && hasAnyMissing && (
-            <p className="mt-3 text-xs text-red-600">Beberapa siswa belum dipilih statusnya.</p>
+            <p className="mt-3 text-xs text-error">Beberapa siswa belum dipilih statusnya.</p>
           )}
         </>
       )}

@@ -98,7 +98,7 @@ export default function StudentExamLobbyPage() {
         <PageHeader title="Ujian" description="Mulai ujian" />
         <Card>
           <CardBody>
-            <p className="text-sm text-red-600">{error ?? "Ujian tidak ditemukan."}</p>
+            <p className="text-sm text-error">{error ?? "Ujian tidak ditemukan."}</p>
             <Button variant="secondary" className="mt-4" onClick={() => navigate("/siswa/exams")}>
               Kembali
             </Button>
@@ -117,8 +117,8 @@ export default function StudentExamLobbyPage() {
         <CardBody>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">{exam.title}</h2>
-              <p className="mt-1 text-sm text-slate-500 line-clamp-3">{exam.description ?? "-"}</p>
+              <h2 className="text-xl font-bold text-primary">{exam.title}</h2>
+              <p className="mt-1 text-sm text-secondary line-clamp-3">{exam.description ?? "-"}</p>
             </div>
             <Badge variant={canStart ? "primary" : "neutral"}>
               {STATUS_LABELS[exam.status] ?? exam.status}
@@ -126,30 +126,30 @@ export default function StudentExamLobbyPage() {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div className="rounded-xl bg-slate-50 p-4">
-              <Clock className="h-5 w-5 text-indigo-500" />
-              <p className="mt-2 text-xs text-slate-500">Durasi</p>
-              <p className="mt-0.5 text-sm font-semibold text-slate-900">{exam.duration_minutes} menit</p>
+            <div className="rounded-xl bg-surface-container p-4">
+              <Clock className="h-5 w-5 text-primary" />
+              <p className="mt-2 text-xs text-secondary">Durasi</p>
+              <p className="mt-0.5 text-sm font-semibold text-primary">{exam.duration_minutes} menit</p>
             </div>
-            <div className="rounded-xl bg-slate-50 p-4">
-              <Layers className="h-5 w-5 text-indigo-500" />
-              <p className="mt-2 text-xs text-slate-500">Jumlah Soal</p>
-              <p className="mt-0.5 text-sm font-semibold text-slate-900">{exam.total_questions}</p>
+            <div className="rounded-xl bg-surface-container p-4">
+              <Layers className="h-5 w-5 text-primary" />
+              <p className="mt-2 text-xs text-secondary">Jumlah Soal</p>
+              <p className="mt-0.5 text-sm font-semibold text-primary">{exam.total_questions}</p>
             </div>
-            <div className="rounded-xl bg-slate-50 p-4">
-              <RotateCcw className="h-5 w-5 text-indigo-500" />
-              <p className="mt-2 text-xs text-slate-500">Maks. Percobaan</p>
-              <p className="mt-0.5 text-sm font-semibold text-slate-900">{exam.max_attempts}</p>
+            <div className="rounded-xl bg-surface-container p-4">
+              <RotateCcw className="h-5 w-5 text-primary" />
+              <p className="mt-2 text-xs text-secondary">Maks. Percobaan</p>
+              <p className="mt-0.5 text-sm font-semibold text-primary">{exam.max_attempts}</p>
             </div>
-            <div className="rounded-xl bg-slate-50 p-4">
-              <BookOpen className="h-5 w-5 text-indigo-500" />
-              <p className="mt-2 text-xs text-slate-500">KKM</p>
-              <p className="mt-0.5 text-sm font-semibold text-slate-900">{exam.passing_score}</p>
+            <div className="rounded-xl bg-surface-container p-4">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <p className="mt-2 text-xs text-secondary">KKM</p>
+              <p className="mt-0.5 text-sm font-semibold text-primary">{exam.passing_score}</p>
             </div>
           </div>
 
-          <div className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50/50 p-4 text-sm text-slate-600">
-            <p className="font-semibold text-slate-700">Petunjuk</p>
+          <div className="mt-5 rounded-xl border border-indigo-100 bg-primary-container/15/50 p-4 text-sm text-secondary">
+            <p className="font-semibold text-secondary">Petunjuk</p>
             <ul className="mt-2 list-inside list-disc space-y-1">
               <li>Ujian dikerjakan dalam mode layar penuh.</li>
               <li>Jangan berpindah tab atau keluar dari layar penuh selama ujian.</li>

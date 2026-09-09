@@ -10,9 +10,9 @@ interface BadgeProps {
 
 const variantStyles: Record<BadgeVariant, string> = {
   primary: "bg-primary-container/15 text-primary-container",
-  secondary: "border border-slate-200 bg-white text-on-surface-variant",
+  secondary: "border border-outline-variant bg-surface-container-lowest text-on-surface-variant",
   success: "bg-tertiary-container/30 text-tertiary",
-  warning: "bg-amber-100 text-amber-700",
+  warning: "bg-warning-container/30 text-warning",
   danger: "bg-error-container text-error",
   neutral: "bg-surface-container-high text-on-surface-variant",
 };

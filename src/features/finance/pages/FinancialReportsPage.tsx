@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -170,11 +170,11 @@ export default function FinancialReportsPage() {
       {
         header: "Jenis",
         accessor: "report_type" as keyof Row,
-        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        headerClassName: "px-6 py-3.5 text-center text-xs font-semibold text-outline uppercase tracking-wider",
         className: "px-6 py-4 text-sm whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex justify-center">
-            <Badge variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}>
+            <Badge variant={TYPE_VARIANTS[row.report_type] ?? "neutral"}>
               {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
             </Badge>
           </div>
@@ -183,7 +183,7 @@ export default function FinancialReportsPage() {
       {
         header: "Periode",
         accessor: "period_start" as keyof Row,
-        className: "px-6 py-4 text-sm text-slate-700 whitespace-nowrap",
+        className: "px-6 py-4 text-sm text-on-surface whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <span>{periodLabel(row)}</span>
         ),
@@ -191,8 +191,8 @@ export default function FinancialReportsPage() {
       {
         header: "Total Tagihan",
         accessor: "total_billed" as keyof Row,
-        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-right text-sm text-slate-700 whitespace-nowrap",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-right text-sm text-on-surface whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <span>
             {row.total_billed != null ? formatCurrency(row.total_billed) : "-"}
@@ -202,7 +202,7 @@ export default function FinancialReportsPage() {
       {
         header: "Total Dibayar",
         accessor: "total_paid" as keyof Row,
-        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-outline uppercase tracking-wider",
         className: "px-6 py-4 text-right text-sm text-tertiary font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <span>
@@ -213,7 +213,7 @@ export default function FinancialReportsPage() {
       {
         header: "Total Tertunggak",
         accessor: "total_outstanding" as keyof Row,
-        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-outline uppercase tracking-wider",
         className: "px-6 py-4 text-right text-sm text-error font-semibold whitespace-nowrap",
         render: (_value: Row[keyof Row], row: Row) => (
           <span>
@@ -224,14 +224,14 @@ export default function FinancialReportsPage() {
       {
         header: "Aksi",
         accessor: "id" as keyof Row,
-        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider",
+        headerClassName: "px-4 py-3.5 text-center text-xs font-semibold text-outline uppercase tracking-wider",
         className: "px-4 py-4 text-center text-sm",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label={`Edit ${row.title}`}
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
@@ -239,7 +239,7 @@ export default function FinancialReportsPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label={`Hapus ${row.title}`}
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
@@ -301,18 +301,18 @@ export default function FinancialReportsPage() {
             {/* Kartu untuk mobile */}
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Belum ada data laporan keuangan.
                 </div>
               ) : (
                 data.map((row) => (
                   <div
                     key={row.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
@@ -344,13 +344,13 @@ export default function FinancialReportsPage() {
                         </div>
                       </div>
                       <Badge
-                        variant={TYPE_VARIANTS[row.report_type] ?? "secondary"}
+                        variant={TYPE_VARIANTS[row.report_type] ?? "neutral"}
                         className="shrink-0 px-2.5 py-1 text-xs leading-4"
                       >
                         {TYPE_LABELS[row.report_type] ?? row.report_type ?? "-"}
                       </Badge>
                     </div>
-                    <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                    <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                       <Button
                         variant="secondary"
                         size="sm"
