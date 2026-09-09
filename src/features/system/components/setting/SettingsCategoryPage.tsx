@@ -12,6 +12,7 @@ import { getSettingsCategory } from "../../settings/categoryConfig";
 import { formatFieldValue } from "../../settings/settingsUtils";
 import SettingField from "./SettingField";
 import { settingService } from "../../api/setting.service";
+import { invalidatePublicSettingsCache } from "../../hooks/usePublicSettings";
 import type { CreateSettingPayload, Setting, UpdateSettingPayload } from "../../api/types";
 
 const SECRET_MASK = "********";
@@ -158,11 +159,13 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
       }
 
       toast.success("Pengaturan berhasil disimpan.");
+      invalidatePublicSettingsCache();
       const res = await loadGroup(group);
       setSettings(res.data);
       const initial: Record<string, string> = {};
       for (const setting of res.data) initial[setting.key] = formatFieldValue(setting);
       setValues(initial);
+      window.dispatchEvent(new Event("schoolcms-settings-changed"));
     } catch (err) {
       const apiError = toApiError(err);
       setSaveError(apiError);
@@ -191,7 +194,7 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
       <form onSubmit={handleSubmit} noValidate>
         <Card>
           {loading ? (
-            <div className="py-16 text-center text-sm text-slate-500">Memuat data...</div>
+            <div className="py-16 text-center text-sm text-outline">Memuat data...</div>
           ) : error ? (
             <div className="flex min-h-[160px] flex-col items-center justify-center gap-3 rounded-xl py-10">
               <p className="text-sm text-error">Gagal memuat data pengaturan.</p>
@@ -207,7 +210,7 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
                 return (
                   <div
                     key={field.key}
-                    className="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-start sm:justify-between"
+                    className="flex flex-col gap-3 rounded-2xl border border-outline-variant p-4 sm:flex-row sm:items-start sm:justify-between"
                   >
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
@@ -223,15 +226,16 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
                       )}
                     </div>
                     <div className="w-full sm:w-64">
-                      <SettingField
-                        settingKey={field.key}
-                        type={field.type}
-                        value={values[field.key] ?? ""}
-                        onChange={(v) => setValue(field.key, v)}
-                        disabled={saving}
-                        isSecretEdit={Boolean(existing) && isSecret}
-                        placeholder={field.placeholder}
-                      />
+                       <SettingField
+                         settingKey={field.key}
+                         type={field.type}
+                         value={values[field.key] ?? ""}
+                         onChange={(v) => setValue(field.key, v)}
+                         disabled={saving}
+                         isSecretEdit={Boolean(existing) && isSecret}
+                         placeholder={field.placeholder}
+                         options={field.options}
+                       />
                     </div>
                   </div>
                 );
@@ -243,7 +247,7 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
                 </p>
               )}
 
-              <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+              <div className="flex justify-end gap-3 border-t border-outline-variant pt-4">
                 <Button type="submit" loading={saving} leftIcon={<Save className="h-4 w-4" />}>
                   Simpan Perubahan
                 </Button>

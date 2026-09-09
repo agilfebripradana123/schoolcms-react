@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Textarea } from "@/components/ui/Form";
@@ -152,7 +152,7 @@ export default function StockActionDialog({
         className="space-y-6"
         noValidate
       >
-        <p className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+        <p className="flex items-center justify-between gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
           <span className="truncate font-medium text-on-surface">
             {inventory?.name}
           </span>

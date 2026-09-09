@@ -37,11 +37,8 @@ export default function SidebarSection({
     <div className="mb-1">
       <button
         onClick={onToggle}
-        className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors ${
-          active
-            ? "bg-primary-container/15 text-white"
-            : "text-slate-300 hover:bg-white/5 hover:text-white"
-        }`}
+        className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors"
+        style={active ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 15%, transparent)", color: "#fff" } : { color: "var(--sidebar-text-muted)" }}
         aria-expanded={expanded}
       >
         <span>{group.label}</span>

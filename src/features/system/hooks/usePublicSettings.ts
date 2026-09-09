@@ -10,6 +10,9 @@ export interface PublicSettings {
   app_name?: string | null;
   school_logo?: string | null;
   favicon?: string | null;
+  theme?: string | null;
+  primary_color?: string | null;
+  sidebar_behavior?: string | null;
 }
 
 interface PublicSettingsEnvelope {
@@ -26,6 +29,14 @@ export const DEFAULT_PUBLIC_SETTINGS: Record<"hero_text" | "hero_text_sub" | "sc
 };
 
 const CACHE_KEY = "schoolcms_public_settings";
+
+export function invalidatePublicSettingsCache() {
+  try {
+    localStorage.removeItem(CACHE_KEY);
+  } catch {
+    // ignore
+  }
+}
 
 function readCache(): PublicSettings {
   try {
@@ -68,6 +79,36 @@ export function usePublicSettings() {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let active = true;
+    const handler = async () => {
+      if (!active) return;
+      setLoading(true);
+      try {
+        const res = await api.get<PublicSettingsEnvelope>("/public-settings");
+        if (active && res.success) {
+          const data = res.data ?? {};
+          setSettings(data);
+          try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+          } catch {
+            // ignore quota errors
+          }
+        }
+      } catch {
+        // ignore
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    window.addEventListener("schoolcms-settings-changed", handler);
+    return () => {
+      active = false;
+      window.removeEventListener("schoolcms-settings-changed", handler);
+    };
+  }, []);
+
   const schoolLogo: string | undefined = settings.school_logo ?? undefined;
   const faviconUrl: string | undefined = settings.favicon ?? undefined;
   const appName = settings.app_name || DEFAULT_PUBLIC_SETTINGS.app_name;
@@ -100,5 +141,8 @@ export function usePublicSettings() {
     appName,
     schoolLogo,
     faviconUrl,
+    theme: settings.theme ?? "light",
+    primaryColor: settings.primary_color ?? null,
+    sidebarBehavior: settings.sidebar_behavior ?? "expand",
   };
 }

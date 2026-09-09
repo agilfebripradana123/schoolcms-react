@@ -135,7 +135,7 @@ export default function StudentBillingsPage() {
   }));
 
   const columns = [
-    { header: "Jenis Tagihan", accessor: "title" as const, render: (v: unknown) => <span className="font-medium text-slate-900">{String(v)}</span> },
+    { header: "Jenis Tagihan", accessor: "title" as const, render: (v: unknown) => <span className="font-medium text-primary">{String(v)}</span> },
     { header: "Nominal", accessor: "amount" as const },
     { header: "Jatuh Tempo", accessor: "due_date" as const },
     {
@@ -153,7 +153,7 @@ export default function StudentBillingsPage() {
         <Button variant="ghost" size="sm" onClick={() => fetchDetail(row.id)}>Detail</Button>
       ),
       className: "px-6 py-4 text-right",
-      headerClassName: "px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider",
+      headerClassName: "px-6 py-3.5 text-right text-xs font-semibold text-outline uppercase tracking-wider",
     },
   ];
 

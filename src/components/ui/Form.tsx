@@ -11,7 +11,7 @@ export type SelectOption = { value: string; label: string };
 // ponytail: komponen form minimal — tambah date picker / file upload saat modul butuh
 
 const baseInput =
-  "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30 disabled:cursor-not-allowed disabled:opacity-50";
+  "w-full rounded-2xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-sm text-on-surface placeholder-outline transition-colors focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/30 disabled:cursor-not-allowed disabled:opacity-50";
 
 /* ── FormField wrapper ── */
 interface FormFieldProps {

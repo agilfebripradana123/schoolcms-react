@@ -75,17 +75,17 @@ export default function TeacherClassesPage() {
             >
               <Card className="h-full transition-shadow group-hover:shadow-md">
                 <CardBody>
-                  <h3 className="font-semibold text-slate-900">{c.name}</h3>
+                  <h3 className="font-semibold text-primary">{c.name}</h3>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     {c.level && <Badge variant="secondary">{c.level}</Badge>}
                     {c.academic_year && <Badge variant="neutral">{c.academic_year}</Badge>}
                   </div>
-                  <div className="mt-4 flex items-center gap-5 text-sm text-slate-500">
+                  <div className="mt-4 flex items-center gap-5 text-sm text-secondary">
                     <span className="inline-flex items-center gap-1.5">
                       <Users className="h-4 w-4" />
                       {studentCount} siswa
                     </span>
-                    <span className="font-semibold text-indigo-600 opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
                       Lihat siswa →
                     </span>
                   </div>

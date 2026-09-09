@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 @import "./tokens.css";
 
 @layer base {
@@ -19,4 +20,25 @@
   h6 {
     font-family: "Plus Jakarta Sans", sans-serif;
   }
+}
+
+.dark {
+  --color-background: #0f1214;
+  --color-surface: #0f1214;
+  --color-surface-dim: #0f1214;
+  --color-surface-bright: #1c2024;
+  --color-surface-container-lowest: #171b1e;
+  --color-surface-container-low: #1d2126;
+  --color-surface-container: #23282e;
+  --color-surface-container-high: #2a3038;
+  --color-surface-container-highest: #323942;
+  --color-surface-variant: #23282e;
+  --color-on-surface: #e8eaed;
+  --color-on-surface-variant: #c3c7cf;
+  --color-on-background: #e8eaed;
+  --color-inverse-surface: #e8eaed;
+  --color-inverse-on-surface: #1a1d20;
+  --color-outline: #8b939e;
+  --color-outline-variant: #3a4048;
+  color-scheme: dark;
 }

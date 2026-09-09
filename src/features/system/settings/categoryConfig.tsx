@@ -26,6 +26,7 @@ export interface SettingsFieldConfig {
   placeholder?: string;
   isPublic?: boolean;
   uploadable?: boolean;
+  options?: { value: string; label: string }[];
 }
 
 export interface SettingsCategoryConfig {
@@ -142,9 +143,9 @@ export const settingsCategories: SettingsCategoryConfig[] = [
     route: "/admin/system/settings/appearance",
     icon: Palette,
     fields: [
-      { key: "theme", label: "Theme", type: "string", description: "Pilihan tema belum disediakan backend — diisi sebagai teks." },
-      { key: "primary_color", label: "Primary color", type: "color" },
-      { key: "sidebar_behavior", label: "Sidebar behavior", type: "string", description: "Pilihan perilaku sidebar belum disediakan backend — diisi sebagai teks." },
+      { key: "theme", label: "Theme", type: "select", description: "Pilih tema tampilan aplikasi.", options: [{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }, { value: "system", label: "System / Ikuti sistem" }], isPublic: true },
+      { key: "primary_color", label: "Primary color", type: "color", isPublic: true },
+      { key: "sidebar_behavior", label: "Sidebar behavior", type: "select", description: "Pilih perilaku sidebar.", options: [{ value: "expand", label: "Selalu terbuka" }, { value: "collapse", label: "Selalu tertutup" }, { value: "collapsible", label: "Otomatis (bisa dilipat)" }], isPublic: true },
     ],
   },
 ];

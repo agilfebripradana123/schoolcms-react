@@ -103,16 +103,16 @@ export default function TeacherExamsPage() {
         description="Ujian pada mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar className="mb-6">
-          <label className="text-sm font-medium text-slate-700">Cari:</label>
+      <PortalFilterBar>
+          <label className="text-sm font-medium text-secondary">Cari:</label>
           <div className="min-w-[200px]">
             <Search value={search} onChange={setSearch} placeholder="Cari judul..." />
           </div>
-          <label className="text-sm font-medium text-slate-700">Mapel:</label>
+          <label className="text-sm font-medium text-secondary">Mapel:</label>
           <div className="min-w-[180px]">
             <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Semua mapel" isClearable />
           </div>
-          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <label className="text-sm font-medium text-secondary">Status:</label>
           <div className="min-w-[180px]">
             <Select<ExamStatus> options={statusOptions} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
           </div>
@@ -136,7 +136,7 @@ export default function TeacherExamsPage() {
                 <button
                   type="button"
                   onClick={() => setDetail(row)}
-                  className="font-semibold text-indigo-600 hover:underline"
+                  className="font-semibold text-primary hover:underline"
                 >
                   {String(v ?? "-")}
                 </button>
@@ -183,25 +183,25 @@ export default function TeacherExamsPage() {
         {detail && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">{detail.title}</h3>
-              <p className="mt-1 text-sm text-slate-500">{detail.subject?.name ?? "-"}</p>
+              <h3 className="text-lg font-bold text-primary">{detail.title}</h3>
+              <p className="mt-1 text-sm text-secondary">{detail.subject?.name ?? "-"}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Durasi</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.duration_minutes} menit</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Durasi</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.duration_minutes} menit</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Jumlah Soal</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.total_questions}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Jumlah Soal</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.total_questions}</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Maks. Percobaan</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.max_attempts}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Maks. Percobaan</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.max_attempts}</p>
               </div>
             </div>
             {detail.description && (
-              <p className="text-sm text-slate-500">{detail.description}</p>
+              <p className="text-sm text-secondary">{detail.description}</p>
             )}
             <div className="flex flex-wrap gap-2">
               <Badge variant={STATUS_VARIANTS[detail.status] ?? "neutral"}>{STATUS_LABELS[detail.status]}</Badge>

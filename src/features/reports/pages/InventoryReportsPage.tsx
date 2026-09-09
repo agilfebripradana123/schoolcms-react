@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -145,7 +145,7 @@ export default function InventoryReportsPage() {
         row: InventoryStockSummary["items"][number],
       ) => (
         <div className="min-w-0">
-          <p className="truncate text-sm text-slate-700">{row.name}</p>
+          <p className="truncate text-sm text-on-surface">{row.name}</p>
           {row.location && (
             <p className="truncate text-xs text-on-surface-variant">{row.location}</p>
           )}
@@ -158,19 +158,19 @@ export default function InventoryReportsPage() {
       render: (
         _value: unknown,
         row: InventoryStockSummary["items"][number],
-      ) => <span className="text-sm text-slate-700">{row.category || "-"}</span>,
+      ) => <span className="text-sm text-on-surface">{row.category || "-"}</span>,
     },
     {
       header: "Stok",
       accessor: "quantity" as keyof InventoryStockSummary["items"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
       render: (
         _value: unknown,
         row: InventoryStockSummary["items"][number],
       ) => (
-        <span className="whitespace-nowrap text-sm text-slate-700">
+        <span className="whitespace-nowrap text-sm text-on-surface">
           {row.quantity} {row.unit ?? ""}
         </span>
       ),
@@ -178,16 +178,16 @@ export default function InventoryReportsPage() {
     {
       header: "Min. Stok",
       accessor: "minimum_stock" as keyof InventoryStockSummary["items"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Status",
       accessor: "stock_status" as keyof InventoryStockSummary["items"][number],
-      className: "px-6 py-4 text-center text-sm text-slate-700",
+      className: "px-6 py-4 text-center text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
       render: (
         _value: unknown,
         row: InventoryStockSummary["items"][number],
@@ -220,14 +220,14 @@ export default function InventoryReportsPage() {
       render: (
         _value: unknown,
         row: InventoryMovementSummary["recent"][number],
-      ) => <span className="text-sm text-slate-700">{row.type || "-"}</span>,
+      ) => <span className="text-sm text-on-surface">{row.type || "-"}</span>,
     },
     {
       header: "Jumlah",
       accessor: "quantity" as keyof InventoryMovementSummary["recent"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Catatan",
@@ -236,7 +236,7 @@ export default function InventoryReportsPage() {
         _value: unknown,
         row: InventoryMovementSummary["recent"][number],
       ) => (
-        <p className="truncate text-sm text-slate-700">{row.notes ?? "-"}</p>
+        <p className="truncate text-sm text-on-surface">{row.notes ?? "-"}</p>
       ),
     },
   ];
@@ -268,7 +268,7 @@ export default function InventoryReportsPage() {
       {section === "stock" ? (
         stockLoading ? (
           <Card>
-            <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
+            <div className="py-10 text-center text-sm text-outline">Memuat data...</div>
           </Card>
         ) : stockError || !stock ? (
           <Card>
@@ -291,13 +291,13 @@ export default function InventoryReportsPage() {
         ) : (
           <>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+              <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
                 <p className="text-sm font-medium text-on-surface-variant">Total Item</p>
                 <p className="mt-3 font-display text-3xl font-bold tracking-tight text-on-surface">
                   {stock.totals.total_items}
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+              <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
                 <p className="text-sm font-medium text-on-surface-variant">Stok Menipis</p>
                 <p className="mt-3 font-display text-3xl font-bold tracking-tight text-on-surface">
                   {stock.totals.total_low_stock}
@@ -379,7 +379,7 @@ export default function InventoryReportsPage() {
                 </Button>
               </div>
             ) : movementLoading || !movement ? (
-              <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
+              <div className="py-10 text-center text-sm text-outline">Memuat data...</div>
             ) : Object.keys(movement.totals_by_type).length === 0 ? (
               <p className="text-sm text-on-surface-variant">Belum ada data pergerakan.</p>
             ) : (
@@ -387,7 +387,7 @@ export default function InventoryReportsPage() {
                 {Object.entries(movement.totals_by_type).map(([type, total]) => (
                   <div
                     key={type}
-                    className="rounded-2xl border border-slate-200 bg-surface-container-low p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-low p-4"
                   >
                     <p className="text-xs font-medium text-on-surface-variant">{type}</p>
                     <p className="mt-1 font-display text-2xl font-bold text-on-surface">

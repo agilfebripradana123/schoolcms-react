@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { Plus, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -282,7 +282,7 @@ export default function QuestionForm({
                 </Button>
               </div>
             ) : subjects.length === 0 && !subjectsError ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Memuat data...
               </p>
             ) : (
@@ -421,7 +421,7 @@ export default function QuestionForm({
               {options.map((option, index) => (
                 <div
                   key={option.id}
-                  className="rounded-2xl border border-slate-200 bg-surface-container-lowest p-3"
+                  className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-3"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs font-semibold text-on-surface-variant">
@@ -431,7 +431,7 @@ export default function QuestionForm({
                       type="button"
                       onClick={() => removeOption(option.id)}
                       disabled={submitting}
-                      className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-error-container hover:text-error disabled:opacity-50"
+                      className="rounded-lg p-1.5 text-outline transition-colors hover:bg-error-container hover:text-error disabled:opacity-50"
                       aria-label={`Hapus pilihan ${index + 1}`}
                     >
                       <Trash2 className="h-4 w-4" strokeWidth={1.75} />

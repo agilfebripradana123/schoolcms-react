@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
@@ -205,14 +205,14 @@ export default function BillingDetail({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200"
+          className="rounded-xl bg-surface-container-low px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-slate-200"
         >
           Tutup
         </button>
       }
     >
       {loading ? (
-        <p className="py-8 text-center text-sm text-slate-500">
+        <p className="py-8 text-center text-sm text-outline">
           Memuat data tagihan...
         </p>
       ) : error ? (
@@ -246,7 +246,7 @@ export default function BillingDetail({
 
           <section>
             <SectionTitle>Informasi Tagihan</SectionTitle>
-            <div className="rounded-2xl border border-slate-200 p-5">
+            <div className="rounded-2xl border border-outline-variant p-5">
               <FieldGrid>
                 <Field label="Jenis Tagihan" value={billing.fee_type?.name} />
                 <Field
@@ -277,7 +277,7 @@ export default function BillingDetail({
 
           <section>
             <SectionTitle>Informasi Siswa</SectionTitle>
-            <div className="rounded-2xl border border-slate-200 p-5">
+            <div className="rounded-2xl border border-outline-variant p-5">
               <FieldGrid>
                 <Field label="Nama" value={billing.student?.name} />
                 <Field label="NIS" value={billing.student?.nis} />
@@ -288,7 +288,7 @@ export default function BillingDetail({
 
           <section>
             <SectionTitle>Ringkasan Pembayaran</SectionTitle>
-            <div className="rounded-2xl border border-slate-200 p-5">
+            <div className="rounded-2xl border border-outline-variant p-5">
               <FieldGrid>
                 <Field
                   label="Total"
@@ -318,7 +318,7 @@ export default function BillingDetail({
 
           <section>
             <SectionTitle>Riwayat Pembayaran</SectionTitle>
-            <div className="rounded-2xl border border-slate-200 p-5">
+            <div className="rounded-2xl border border-outline-variant p-5">
               {payments.length === 0 ? (
                 emptyText
               ) : (
@@ -326,7 +326,7 @@ export default function BillingDetail({
                   {payments.map((payment) => (
                     <div
                       key={payment.id}
-                      className="border-b border-slate-100 pb-4 last:border-b-0 last:pb-0"
+                      className="border-b border-outline-variant pb-4 last:border-b-0 last:pb-0"
                     >
                       {renderTransactions(payment)}
                     </div>
@@ -337,7 +337,7 @@ export default function BillingDetail({
           </section>
         </div>
       ) : (
-        <p className="py-8 text-center text-sm text-slate-500">
+        <p className="py-8 text-center text-sm text-outline">
           Data tagihan tidak tersedia.
         </p>
       )}

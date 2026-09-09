@@ -5,6 +5,13 @@ import StudentSidebarSection from "./StudentSidebarSection";
 import StudentSidebarItem from "./StudentSidebarItem";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 
+const sidebarBg = "var(--sidebar-bg)";
+const sidebarText = "var(--sidebar-text)";
+const sidebarMuted = "var(--sidebar-text-muted)";
+const sidebarAccent = "var(--sidebar-accent)";
+const accent20 = `color-mix(in srgb, ${sidebarAccent} 20%, transparent)`;
+const accent30 = `color-mix(in srgb, ${sidebarAccent} 30%, transparent)`;
+
 export default function StudentSidebar({
   collapsed = false,
   onNavigation,
@@ -58,7 +65,7 @@ export default function StudentSidebar({
   }
 
   return (
-    <nav className="flex h-full flex-col bg-slate-950 text-white">
+    <nav className="flex h-full flex-col" style={{ backgroundColor: sidebarBg, color: sidebarText }}>
       <div
         className={`flex h-16 items-center border-b border-white/10 px-4 ${
           collapsed ? "justify-center" : ""
@@ -66,16 +73,16 @@ export default function StudentSidebar({
       >
         <div className="flex items-center gap-3">
           {faviconUrl ? (
-            <img src={faviconUrl} alt={appName ?? "SchoolCMS"} className="h-10 w-10 rounded-2xl object-cover shadow-lg shadow-primary-container/30" />
+            <img src={faviconUrl} alt={appName ?? "SchoolCMS"} className="h-10 w-10 rounded-2xl object-cover" style={{ boxShadow: `0 4px 12px ${accent30}` }} />
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg shadow-primary-container/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: sidebarAccent, boxShadow: `0 4px 12px ${accent30}` }}>
               <span className="text-base font-bold">S</span>
             </div>
           )}
           {!collapsed && (
             <div>
               <div className="font-display text-base font-bold leading-none">{appName}</div>
-              <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Portal Siswa</div>
+              <div className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: sidebarMuted }}>Portal Siswa</div>
             </div>
           )}
         </div>
@@ -87,14 +94,14 @@ export default function StudentSidebar({
             onClick={() => goTo(studentDashboardItem.path)}
             className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               isActive(studentDashboardItem.path)
-                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30 hover:bg-primary-container/25 hover:text-white"
-                : "text-slate-300 hover:bg-white/5 hover:text-white"
+                ? "hover:text-white"
+                : "hover:bg-white/5 hover:text-white"
             } ${collapsed ? "justify-center" : ""}`}
+            style={isActive(studentDashboardItem.path) ? { backgroundColor: accent20, color: sidebarText, border: `1px solid ${accent30}` } : { color: sidebarMuted }}
           >
             <studentDashboardItem.icon
-              className={`h-5 w-5 shrink-0 ${
-                isActive(studentDashboardItem.path) ? "text-primary-fixed" : "text-slate-400"
-              }`}
+              className="h-5 w-5 shrink-0"
+              style={{ color: isActive(studentDashboardItem.path) ? "var(--sidebar-accent)" : sidebarMuted }}
             />
             {!collapsed && <span>{studentDashboardItem.label}</span>}
           </button>

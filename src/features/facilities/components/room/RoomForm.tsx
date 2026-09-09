@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input } from "@/components/ui/Form";
@@ -175,7 +175,7 @@ export default function RoomForm({
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <label className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3">
             <input
               type="checkbox"
               checked={hasComputer}

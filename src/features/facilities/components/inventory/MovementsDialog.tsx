@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import { inventoryService } from "../../api/inventory.service";
@@ -72,7 +72,7 @@ export default function MovementsDialog({
       title="Riwayat Transaksi Stok"
       size="lg"
     >
-      <p className="mb-4 flex items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+      <p className="mb-4 flex items-center justify-between gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
         <span className="truncate font-medium text-on-surface">{inventory?.name}</span>
         <span className="whitespace-nowrap">
           Stok saat ini: {inventory?.quantity ?? 0} {inventory?.unit}
@@ -80,7 +80,7 @@ export default function MovementsDialog({
       </p>
 
       {loading ? (
-        <p className="py-10 text-center text-sm text-slate-500">
+        <p className="py-10 text-center text-sm text-outline">
           Memuat data...
         </p>
       ) : error ? (
@@ -88,7 +88,7 @@ export default function MovementsDialog({
           Gagal memuat riwayat transaksi.
         </p>
       ) : movements.length === 0 ? (
-        <p className="py-10 text-center text-sm text-slate-500">
+        <p className="py-10 text-center text-sm text-outline">
           Belum ada transaksi untuk barang ini.
         </p>
       ) : (
@@ -98,7 +98,7 @@ export default function MovementsDialog({
             return (
               <div
                 key={movement.id}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
               >
                 <div className="flex items-center gap-3">
                   <Badge variant={typeConfig.variant}>{typeConfig.label}</Badge>

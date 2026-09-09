@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -194,8 +194,8 @@ export default function TeacherAttendanceListPage() {
         header: "Status",
         accessor: "status" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_val: unknown, row: Row) => {
           const meta = STATUS_META[row.status ?? ""];
           if (!meta) {
@@ -226,14 +226,14 @@ export default function TeacherAttendanceListPage() {
         header: "Aksi",
         accessor: "id" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_val: unknown, row: Row) => (
           <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label={`Edit kehadiran ${teacherName(row)}`}
             >
               <Pencil className="h-4 w-4" strokeWidth={2} />
@@ -241,7 +241,7 @@ export default function TeacherAttendanceListPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label="Hapus kehadiran"
             >
               <Trash2 className="h-4 w-4" strokeWidth={2} />
@@ -298,11 +298,11 @@ export default function TeacherAttendanceListPage() {
             {/* Kartu untuk mobile */}
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-slate-500">
+                <div className="py-10 text-center text-outline">
                   Memuat data...
                 </div>
               ) : pageData.length === 0 ? (
-                <div className="py-10 text-center text-slate-500">
+                <div className="py-10 text-center text-outline">
                   {search
                     ? "Tidak ada kehadiran yang cocok."
                     : "Belum ada data kehadiran."}
@@ -313,7 +313,7 @@ export default function TeacherAttendanceListPage() {
                   return (
                     <div
                       key={row.id}
-                      className="rounded-2xl border border-slate-200 bg-white p-4"
+                      className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div>
@@ -341,7 +341,7 @@ export default function TeacherAttendanceListPage() {
                         </p>
                         {row.notes && <p>{row.notes}</p>}
                       </div>
-                      <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                      <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                         <Button
                           variant="secondary"
                           size="sm"

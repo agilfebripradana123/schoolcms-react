@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -141,13 +141,13 @@ export default function TeacherReportsPage() {
     {
       header: "Jumlah",
       accessor: "total" as keyof TeacherReportSummary["employment_breakdown"][number],
-      className: "px-6 py-4 text-center text-sm text-slate-700",
+      className: "px-6 py-4 text-center text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
       render: (
         _value: unknown,
         row: TeacherReportSummary["employment_breakdown"][number],
-      ) => <span className="text-sm text-slate-700">{row.total}</span>,
+      ) => <span className="text-sm text-on-surface">{row.total}</span>,
     },
   ];
 
@@ -162,44 +162,44 @@ export default function TeacherReportsPage() {
     {
       header: "Hadir",
       accessor: "hadir" as keyof TeacherAttendanceSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Sakit",
       accessor: "sakit" as keyof TeacherAttendanceSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Izin",
       accessor: "izin" as keyof TeacherAttendanceSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Alfa",
       accessor: "alfa" as keyof TeacherAttendanceSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Terlambat",
       accessor: "terlambat" as keyof TeacherAttendanceSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
     {
       header: "Total Hari",
       accessor: "total_days" as keyof TeacherAttendanceSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
     },
   ];
 
@@ -233,7 +233,7 @@ export default function TeacherReportsPage() {
       {section === "summary" ? (
         summaryLoading ? (
           <Card>
-            <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
+            <div className="py-10 text-center text-sm text-outline">Memuat data...</div>
           </Card>
         ) : summaryError || !summary ? (
           <Card>
@@ -256,13 +256,13 @@ export default function TeacherReportsPage() {
         ) : (
           <>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+              <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
                 <p className="text-sm font-medium text-on-surface-variant">Total Guru</p>
                 <p className="mt-3 font-display text-3xl font-bold tracking-tight text-on-surface">
                   {summary.total_teachers}
                 </p>
               </div>
-              <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+              <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
                 <p className="text-sm font-medium text-on-surface-variant">Guru Aktif</p>
                 <p className="mt-3 font-display text-3xl font-bold tracking-tight text-on-surface">
                   {summary.active_teachers}
@@ -333,18 +333,18 @@ export default function TeacherReportsPage() {
               <>
                 <div className="space-y-3 sm:hidden">
                   {attendanceLoading ? (
-                    <div className="py-10 text-center text-sm text-slate-500">
+                    <div className="py-10 text-center text-sm text-outline">
                       Memuat data...
                     </div>
                   ) : attendanceData.length === 0 ? (
-                    <div className="py-10 text-center text-sm text-slate-500">
+                    <div className="py-10 text-center text-sm text-outline">
                       Belum ada data kehadiran guru.
                     </div>
                   ) : (
                     attendanceData.map((row) => (
                       <div
                         key={row.teacher_id}
-                        className="rounded-2xl border border-slate-200 bg-white p-4"
+                        className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                       >
                         <p className="font-semibold text-on-surface">{row.teacher_name}</p>
                         <p className="mt-0.5 text-xs text-on-surface-variant">

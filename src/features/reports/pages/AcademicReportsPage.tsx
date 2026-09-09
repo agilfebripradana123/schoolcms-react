@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -217,11 +217,11 @@ export default function AcademicReportsPage() {
     {
       header: "Rata-rata Nilai",
       accessor: "average_score" as keyof AcademicGradesSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
       render: (_value: unknown, row: AcademicGradesSummaryRow) => (
-        <span className="text-sm text-slate-700">
+        <span className="text-sm text-on-surface">
           {Number(row.average_score).toFixed(1)}
         </span>
       ),
@@ -229,11 +229,11 @@ export default function AcademicReportsPage() {
     {
       header: "Jumlah Nilai",
       accessor: "total_grades" as keyof AcademicGradesSummaryRow,
-      className: "px-6 py-4 text-right text-sm text-slate-700",
+      className: "px-6 py-4 text-right text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
       render: (_value: unknown, row: AcademicGradesSummaryRow) => (
-        <span className="text-sm text-slate-700">{Number(row.total_grades)}</span>
+        <span className="text-sm text-on-surface">{Number(row.total_grades)}</span>
       ),
     },
   ];
@@ -308,18 +308,18 @@ export default function AcademicReportsPage() {
           <>
             <div className="mt-4 space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : rows.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   {emptyMessage}
                 </div>
               ) : (
                 rows.map((row) => (
                   <div
                     key={row.student_id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                   >
                     <p className="font-semibold text-on-surface">{row.student_name}</p>
                     <p className="mt-0.5 text-xs text-on-surface-variant">

@@ -88,25 +88,25 @@ export default function TeacherDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
         <PortalStatCard
-          icon={<School className="h-5 w-5 text-indigo-500" />}
+          icon={<School className="h-5 w-5 text-primary" />}
           label="Kelas yang diajar"
           value={classCount ?? 0}
           loading={loading}
         />
         <PortalStatCard
-          icon={<CalendarClock className="h-5 w-5 text-indigo-500" />}
+          icon={<CalendarClock className="h-5 w-5 text-primary" />}
           label="Jadwal hari ini"
           value={todaySchedules.length}
           loading={loading}
         />
         <PortalStatCard
-          icon={<ClipboardList className="h-5 w-5 text-indigo-500" />}
+          icon={<ClipboardList className="h-5 w-5 text-primary" />}
           label="Tugas aktif"
           value={assignments.length}
           loading={loading}
         />
         <PortalStatCard
-          icon={<BookOpen className="h-5 w-5 text-indigo-500" />}
+          icon={<BookOpen className="h-5 w-5 text-primary" />}
           label="Ujian"
           value={exams.length}
           loading={loading}
@@ -116,8 +116,8 @@ export default function TeacherDashboardPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex items-center gap-2 mb-4">
-            <Bell className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Notifikasi</h2>
+            <Bell className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-semibold text-secondary">Notifikasi</h2>
           </div>
           <TeacherNotificationsWidget />
         </CardBody>
@@ -126,29 +126,29 @@ export default function TeacherDashboardPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex items-center gap-2 mb-4">
-            <CalendarClock className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Jadwal Hari Ini</h2>
-            <span className="text-xs text-slate-500">{todayDay ? SCHEDULE_DAY_LABELS[todayDay] : "Hari ini"}</span>
+            <CalendarClock className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-semibold text-secondary">Jadwal Hari Ini</h2>
+            <span className="text-xs text-secondary">{todayDay ? SCHEDULE_DAY_LABELS[todayDay] : "Hari ini"}</span>
           </div>
           {loading ? (
-            <p className="py-6 text-center text-sm text-slate-500">Memuat...</p>
+            <p className="py-6 text-center text-sm text-secondary">Memuat...</p>
           ) : todaySchedules.length === 0 ? (
             <div className="p-6 text-center">
-              <Calendar className="mx-auto h-8 w-8 text-slate-300" />
-              <p className="mt-2 text-sm font-semibold text-slate-500">Tidak ada jadwal hari ini</p>
-              <p className="mt-1 text-xs text-slate-400">Anda tidak memiliki jadwal mengajar hari ini.</p>
+              <Calendar className="mx-auto h-8 w-8 text-secondary" />
+              <p className="mt-2 text-sm font-semibold text-secondary">Tidak ada jadwal hari ini</p>
+              <p className="mt-1 text-xs text-secondary">Anda tidak memiliki jadwal mengajar hari ini.</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-outline-variant">
               {todaySchedules.map((s) => (
                 <div key={s.id} className="flex flex-wrap items-center gap-4 py-3 first:pt-0 last:pb-0">
                   <div className="flex w-24 shrink-0 flex-col">
-                    <span className="text-sm font-semibold text-slate-900">{formatTime(s.period?.start_time)}</span>
-                    <span className="text-xs text-slate-500">{formatTime(s.period?.end_time)}</span>
+                    <span className="text-sm font-semibold text-primary">{formatTime(s.period?.start_time)}</span>
+                    <span className="text-xs text-secondary">{formatTime(s.period?.end_time)}</span>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-900">{s.subject?.name ?? "—"}</p>
-                    <p className="text-xs text-slate-500">Kelas {s.class?.name ?? "—"}</p>
+                    <p className="text-sm font-semibold text-primary">{s.subject?.name ?? "—"}</p>
+                    <p className="text-xs text-secondary">Kelas {s.class?.name ?? "—"}</p>
                   </div>
                 </div>
               ))}
@@ -160,23 +160,23 @@ export default function TeacherDashboardPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex items-center gap-2 mb-4">
-            <ClipboardList className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Tugas Terbaru</h2>
+            <ClipboardList className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-semibold text-secondary">Tugas Terbaru</h2>
           </div>
           {loading ? (
-            <p className="py-6 text-center text-sm text-slate-500">Memuat...</p>
+            <p className="py-6 text-center text-sm text-secondary">Memuat...</p>
           ) : assignments.length === 0 ? (
             <div className="p-6 text-center">
-              <ClipboardList className="mx-auto h-8 w-8 text-slate-300" />
-              <p className="mt-2 text-sm text-slate-400">Belum ada tugas.</p>
+              <ClipboardList className="mx-auto h-8 w-8 text-secondary" />
+              <p className="mt-2 text-sm text-secondary">Belum ada tugas.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {assignments.map((a) => (
-                <Card key={a.id} className="bg-slate-50">
+                <Card key={a.id} className="bg-surface-container">
                   <CardBody>
-                    <p className="text-sm font-semibold text-slate-900">{a.title}</p>
-                    <p className="mt-1 text-xs text-slate-500">
+                    <p className="text-sm font-semibold text-primary">{a.title}</p>
+                    <p className="mt-1 text-xs text-secondary">
                       {a.subject?.name ?? "—"} · {a.class?.name ?? "—"}
                       {a.due_date ? ` · Deadline: ${a.due_date}` : ""}
                     </p>
@@ -191,25 +191,25 @@ export default function TeacherDashboardPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Ujian Terbaru</h2>
+            <BookOpen className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-semibold text-secondary">Ujian Terbaru</h2>
           </div>
           {loading ? (
-            <p className="py-6 text-center text-sm text-slate-500">Memuat...</p>
+            <p className="py-6 text-center text-sm text-secondary">Memuat...</p>
           ) : exams.length === 0 ? (
             <div className="p-6 text-center">
-              <BookOpen className="mx-auto h-8 w-8 text-slate-300" />
-              <p className="mt-2 text-sm text-slate-400">Belum ada ujian.</p>
+              <BookOpen className="mx-auto h-8 w-8 text-secondary" />
+              <p className="mt-2 text-sm text-secondary">Belum ada ujian.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {exams.map((e) => (
-                <Card key={e.id} className="bg-slate-50">
+                <Card key={e.id} className="bg-surface-container">
                   <CardBody>
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-slate-900">{e.title}</p>
-                        <p className="text-xs text-slate-500">{e.subject?.name ?? "—"} · {e.duration_minutes} menit</p>
+                        <p className="text-sm font-semibold text-primary">{e.title}</p>
+                        <p className="text-xs text-secondary">{e.subject?.name ?? "—"} · {e.duration_minutes} menit</p>
                       </div>
                       <Badge variant={statusVariants[e.status] ?? "neutral"}>{statusLabels[e.status] ?? e.status}</Badge>
                     </div>
@@ -224,10 +224,10 @@ export default function TeacherDashboardPage() {
       <Card>
         <CardBody>
           <div className="flex items-center gap-2 mb-4">
-            <School className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Kelas Saya</h2>
+            <School className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-semibold text-secondary">Kelas Saya</h2>
           </div>
-          <p className="text-sm text-slate-500 mb-3">Kelas yang Anda ajar</p>
+          <p className="text-sm text-secondary mb-3">Kelas yang Anda ajar</p>
           <Button variant="secondary" size="sm" onClick={loadAll} disabled={loading}>
             {loading ? "Memuat..." : "Lihat Semua Kelas"}
           </Button>

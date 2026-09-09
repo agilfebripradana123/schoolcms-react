@@ -119,7 +119,7 @@ export default function StudentGradesPage() {
         header: "Nilai Akhir",
         accessor: "final_score" as const,
         render: (v: unknown) => (v != null ? String(v) : "-"),
-        className: "px-6 py-4 text-sm font-semibold text-slate-900",
+        className: "px-6 py-4 text-sm font-semibold text-on-surface",
       },
     ],
     [],
@@ -147,28 +147,7 @@ export default function StudentGradesPage() {
     <PageContainer>
       <PageHeader title="Nilai" description="Nilai akademik Anda" />
 
-      <PortalFilterBar>
-          <label className="text-sm font-medium text-slate-700">Tahun Ajaran:</label>
-          <div className="min-w-[200px]">
-            <AppSelect<number | string>
-              options={academicYearOptions}
-              value={selectedAcademicYear ?? ""}
-              onChange={(v) => setSelectedAcademicYear(v === "" || v == null ? null : Number(v))}
-              placeholder="Pilih tahun ajaran..."
-            />
-          </div>
-          <label className="text-sm font-medium text-slate-700">Semester:</label>
-          <div className="min-w-[200px]">
-            <AppSelect<number | string>
-              options={semesterOptions}
-              value={selectedSemester ?? ""}
-              onChange={(v) => setSelectedSemester(v === "" || v == null ? null : Number(v))}
-              placeholder="Pilih semester..."
-            />
-          </div>
-        </PortalFilterBar>
-
-      <div className="mb-6 grid grid-cols-3 gap-4">
+      <div className="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
         <PortalStatCard
           icon={<TrendingUp />}
           label="Rata-rata"
@@ -185,6 +164,27 @@ export default function StudentGradesPage() {
           value={summary?.total_subjects ?? "-"}
         />
       </div>
+
+      <PortalFilterBar>
+          <label className="text-sm font-medium text-secondary">Tahun Ajaran:</label>
+          <div className="w-full sm:w-auto sm:min-w-[200px]">
+            <AppSelect<number | string>
+              options={academicYearOptions}
+              value={selectedAcademicYear ?? ""}
+              onChange={(v) => setSelectedAcademicYear(v === "" || v == null ? null : Number(v))}
+              placeholder="Pilih tahun ajaran..."
+            />
+          </div>
+          <label className="text-sm font-medium text-secondary">Semester:</label>
+          <div className="w-full sm:w-auto sm:min-w-[200px]">
+            <AppSelect<number | string>
+              options={semesterOptions}
+              value={selectedSemester ?? ""}
+              onChange={(v) => setSelectedSemester(v === "" || v == null ? null : Number(v))}
+              placeholder="Pilih semester..."
+            />
+          </div>
+        </PortalFilterBar>
 
       <DataTable
         columns={columns}

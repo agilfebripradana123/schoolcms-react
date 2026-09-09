@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -166,14 +166,14 @@ export default function FinanceReportsPage() {
     {
       header: "Ditagih",
       accessor: "total_billed" as keyof FinanceReportSummary["per_fee_type"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700 whitespace-nowrap",
+      className: "px-6 py-4 text-right text-sm text-on-surface whitespace-nowrap",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
       render: (
         _value: unknown,
         row: FinanceReportSummary["per_fee_type"][number],
       ) => (
-        <span className="whitespace-nowrap text-sm text-slate-700">
+        <span className="whitespace-nowrap text-sm text-on-surface">
           {formatCurrency(row.total_billed)}
         </span>
       ),
@@ -181,14 +181,14 @@ export default function FinanceReportsPage() {
     {
       header: "Dibayar",
       accessor: "total_paid" as keyof FinanceReportSummary["per_fee_type"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700 whitespace-nowrap",
+      className: "px-6 py-4 text-right text-sm text-on-surface whitespace-nowrap",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
       render: (
         _value: unknown,
         row: FinanceReportSummary["per_fee_type"][number],
       ) => (
-        <span className="whitespace-nowrap text-sm text-slate-700">
+        <span className="whitespace-nowrap text-sm text-on-surface">
           {formatCurrency(row.total_paid)}
         </span>
       ),
@@ -211,14 +211,14 @@ export default function FinanceReportsPage() {
     {
       header: "Total Dibayar",
       accessor: "total_paid" as keyof FinanceReportSummary["monthly_trend"][number],
-      className: "px-6 py-4 text-right text-sm text-slate-700 whitespace-nowrap",
+      className: "px-6 py-4 text-right text-sm text-on-surface whitespace-nowrap",
       headerClassName:
-        "px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-right text-xs font-medium text-outline uppercase tracking-wider",
       render: (
         _value: unknown,
         row: FinanceReportSummary["monthly_trend"][number],
       ) => (
-        <span className="whitespace-nowrap text-sm text-slate-700">
+        <span className="whitespace-nowrap text-sm text-on-surface">
           {formatCurrency(row.total_paid)}
         </span>
       ),
@@ -282,7 +282,7 @@ export default function FinanceReportsPage() {
 
       {loading ? (
         <Card className="mt-6">
-          <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
+          <div className="py-10 text-center text-sm text-outline">Memuat data...</div>
         </Card>
       ) : error || !data ? (
         <Card className="mt-6">
@@ -305,19 +305,19 @@ export default function FinanceReportsPage() {
       ) : (
         <>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+            <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
               <p className="text-sm font-medium text-on-surface-variant">Total Ditagih</p>
               <p className="mt-3 font-display text-2xl font-bold tracking-tight text-on-surface">
                 {formatCurrency(data.totals.total_billed)}
               </p>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+            <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
               <p className="text-sm font-medium text-on-surface-variant">Total Dibayar</p>
               <p className="mt-3 font-display text-2xl font-bold tracking-tight text-on-surface">
                 {formatCurrency(data.totals.total_paid)}
               </p>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+            <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
               <p className="text-sm font-medium text-on-surface-variant">
                 Total Belum Dibayar
               </p>

@@ -75,8 +75,8 @@ export default function StudentSchedulePage() {
 
   const columns = [
     { header: "Hari", accessor: "day" as const, render: (v: unknown) => <Badge variant="secondary">{String(v)}</Badge> },
-    { header: "Jam", accessor: "jam" as const, render: (v: unknown) => <span className="flex items-center gap-1 text-slate-600"><Clock className="h-3 w-3" />{String(v)}</span> },
-    { header: "Mata Pelajaran", accessor: "subject_name" as const, render: (v: unknown) => <span className="font-medium text-slate-900">{String(v)}</span> },
+    { header: "Jam", accessor: "jam" as const, render: (v: unknown) => <span className="flex items-center gap-1 text-secondary"><Clock className="h-3 w-3" />{String(v)}</span> },
+    { header: "Mata Pelajaran", accessor: "subject_name" as const, render: (v: unknown) => <span className="font-medium text-primary">{String(v)}</span> },
     { header: "Guru", accessor: "teacher_name" as const },
     { header: "Ruangan", accessor: "room_name" as const },
   ];
@@ -86,8 +86,8 @@ export default function StudentSchedulePage() {
       <PageHeader title="Jadwal" description="Jadwal pelajaran berdasarkan kelas Anda" />
 
       <PortalFilterBar>
-          <Calendar className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Hari:</label>
+          <Calendar className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Hari:</label>
           <div className="min-w-[200px]">
             <AppSelect
               options={[

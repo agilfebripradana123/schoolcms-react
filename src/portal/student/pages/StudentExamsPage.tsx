@@ -132,7 +132,7 @@ export default function StudentExamsPage() {
   }));
 
   const scheduleColumns = [
-    { header: "Ujian", accessor: "exam" as const, render: (v: unknown) => <span className="font-medium text-slate-700">{String(v)}</span> },
+    { header: "Ujian", accessor: "exam" as const, render: (v: unknown) => <span className="font-medium text-on-surface">{String(v)}</span> },
     { header: "Tanggal", accessor: "date" as const },
     { header: "Waktu", accessor: "time" as const },
   ];
@@ -144,18 +144,18 @@ export default function StudentExamsPage() {
       <Card className="mb-6">
         <CardBody>
           <div className="flex items-center gap-2 mb-4">
-            <BookOpen className="h-5 w-5 text-indigo-500" />
-            <h2 className="text-sm font-semibold text-slate-700">Daftar Ujian</h2>
+            <BookOpen className="h-5 w-5 text-primary" />
+            <h2 className="text-sm font-semibold text-secondary">Daftar Ujian</h2>
           </div>
           <div className="space-y-3">
             {exams.map((e) => (
-              <Card key={e.id} className="bg-slate-50">
+              <Card key={e.id} className="bg-surface-container">
                 <CardBody>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-slate-900">{e.title}</h3>
-                      <p className="mt-1 text-sm text-slate-600 line-clamp-2">{e.description ?? "-"}</p>
-                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
+                      <h3 className="font-semibold text-primary">{e.title}</h3>
+                      <p className="mt-1 text-sm text-secondary line-clamp-2">{e.description ?? "-"}</p>
+                      <div className="mt-2 flex flex-wrap gap-2 text-xs text-secondary">
                         {e.subject?.name && <Badge variant="secondary">{e.subject.name}</Badge>}
                         {e.exam_date && <span>{formatDate(e.exam_date)}</span>}
                         {e.status && <Badge variant="primary">{e.status}</Badge>}
@@ -178,8 +178,8 @@ export default function StudentExamsPage() {
         <Card className="mb-6">
           <CardBody>
             <div className="flex items-center gap-2 mb-4">
-              <Calendar className="h-5 w-5 text-indigo-500" />
-              <h2 className="text-sm font-semibold text-slate-700">Jadwal Ujian</h2>
+              <Calendar className="h-5 w-5 text-primary" />
+              <h2 className="text-sm font-semibold text-secondary">Jadwal Ujian</h2>
             </div>
             <DataTable columns={scheduleColumns} data={scheduleData} />
           </CardBody>
@@ -190,13 +190,13 @@ export default function StudentExamsPage() {
         <Card className="mb-6">
           <CardBody>
             <div className="flex items-center gap-2 mb-4">
-              <FileText className="h-5 w-5 text-indigo-500" />
-              <h2 className="text-sm font-semibold text-slate-700">Instruksi Ujian</h2>
+              <FileText className="h-5 w-5 text-primary" />
+              <h2 className="text-sm font-semibold text-secondary">Instruksi Ujian</h2>
             </div>
             <div className="space-y-2">
               {instructions.map((i) => (
                 <Card key={i.id} className="bg-amber-50/50 border-amber-100">
-                  <CardBody><p className="text-sm text-slate-700">{i.instruction}</p></CardBody>
+                  <CardBody><p className="text-sm text-secondary">{i.instruction}</p></CardBody>
                 </Card>
               ))}
             </div>
@@ -208,13 +208,13 @@ export default function StudentExamsPage() {
         <Card className="mb-6">
           <CardBody>
             <div className="flex items-center gap-2 mb-4">
-              <Users className="h-5 w-5 text-indigo-500" />
-              <h2 className="text-sm font-semibold text-slate-700">Peserta Ujian (Anda)</h2>
+              <Users className="h-5 w-5 text-primary" />
+              <h2 className="text-sm font-semibold text-secondary">Peserta Ujian (Anda)</h2>
             </div>
             <div className="space-y-2">
               {participants.map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3">
-                  <span className="text-sm text-slate-700">{p.exam?.title ?? `Ujian #${p.exam_id}`}</span>
+                <div key={p.id} className="flex items-center justify-between rounded-xl border border-outline p-3">
+                  <span className="text-sm text-secondary">{p.exam?.title ?? `Ujian #${p.exam_id}`}</span>
                   <Badge variant="neutral">{p.status ?? "-"}</Badge>
                 </div>
               ))}
@@ -227,15 +227,15 @@ export default function StudentExamsPage() {
         <Card>
           <CardBody>
             <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="h-5 w-5 text-indigo-500" />
-              <h2 className="text-sm font-semibold text-slate-700">Hasil</h2>
+              <BarChart3 className="h-5 w-5 text-primary" />
+              <h2 className="text-sm font-semibold text-secondary">Hasil</h2>
             </div>
             <div className="space-y-2">
               {results.map((r) => (
-                <div key={r.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-3">
-                  <div className="text-sm text-slate-700">
+                <div key={r.id} className="flex items-center justify-between rounded-xl border border-outline p-3">
+                  <div className="text-sm text-secondary">
                     <span className="font-semibold">Nilai: {r.score ?? "-"}</span>
-                    {r.grade && <span className="ml-2 text-slate-500">({r.grade})</span>}
+                    {r.grade && <span className="ml-2 text-secondary">({r.grade})</span>}
                   </div>
                   {r.status && <Badge variant="success">{r.status}</Badge>}
                 </div>

@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import StudentHeader from "./StudentHeader";
 import StudentSidebar from "./StudentSidebar";
+import { useAppearance } from "@/features/system/hooks/useAppearance";
 
 function PageLoadingFallback() {
   return (
@@ -13,7 +14,13 @@ function PageLoadingFallback() {
 }
 
 export default function StudentLayout() {
+  const { sidebarBehavior } = useAppearance();
+  const [collapsed, setCollapsed] = useState(() => sidebarBehavior === "collapse");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setCollapsed(sidebarBehavior === "collapse");
+  }, [sidebarBehavior]);
   const location = useLocation();
   const toggleMobileSidebar = useCallback(() => setMobileSidebarOpen((open) => !open), []);
   const closeMobileSidebar = useCallback(() => setMobileSidebarOpen(false), []);
@@ -34,7 +41,7 @@ export default function StudentLayout() {
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Desktop sidebar - fixed side */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:flex-col overflow-hidden transition-all duration-300 lg:w-64">
-        <StudentSidebar collapsed={false} />
+        <StudentSidebar collapsed={collapsed} />
       </aside>
 
       {/* Mobile sidebar overlay */}
@@ -42,12 +49,12 @@ export default function StudentLayout() {
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
-            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-[var(--sidebar-bg)]/60 backdrop-blur-sm"
             onClick={closeMobileSidebar}
             aria-label="Tutup sidebar"
           />
-          <div className="fixed inset-y-0 left-0 w-72 overflow-hidden bg-slate-950 shadow-2xl">
-            <StudentSidebar collapsed={false} onNavigation={closeMobileSidebar} />
+          <div className="fixed inset-y-0 left-0 w-72 overflow-hidden bg-[var(--sidebar-bg)] shadow-2xl">
+            <StudentSidebar collapsed={collapsed} onNavigation={closeMobileSidebar} />
           </div>
         </div>
       )}

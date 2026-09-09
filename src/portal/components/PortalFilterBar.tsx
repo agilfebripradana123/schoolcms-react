@@ -11,7 +11,7 @@ export default function PortalFilterBar({
   className = "",
 }: PortalFilterBarProps) {
   return (
-    <Card className={className}>
+    <Card className={`mb-6 ${className}`}>
       <CardBody className="flex flex-wrap items-center gap-3">
         {children}
       </CardBody>

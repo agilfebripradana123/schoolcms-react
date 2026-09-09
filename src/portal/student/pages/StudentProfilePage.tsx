@@ -346,12 +346,12 @@ export default function StudentProfilePage() {
               onError={() => setImgFailed(true)}
             />
           ) : (
-            <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-slate-100 border border-dashed">
-              <ShieldCheck className="h-10 w-10 text-slate-400" />
+            <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-surface-container-low border border-dashed">
+              <ShieldCheck className="h-10 w-10 text-secondary" />
             </div>
           )}
           {imgFailed && photoUrl && !previewUrl && (
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-secondary">
               Foto tersimpan, tap Ubah Foto untuk mengganti.
             </p>
           )}
@@ -502,7 +502,7 @@ export default function StudentProfilePage() {
                         onChange={(e) =>
                           setDraft((d) => ({ ...d, [f.key]: e.target.value }))
                         }
-                        className={`rounded-xl border bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${!g.noRed && !f.noRed && isEmpty(src[f.key]) ? "border-error/40 bg-error-container/10" : "border-slate-200"}`}
+                        className={`rounded-xl border bg-surface px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary ${!g.noRed && !f.noRed && isEmpty(src[f.key]) ? "border-error/40 bg-error-container/10" : "border-outline"}`}
                         placeholder={f.label}
                       />
                     )}
@@ -635,7 +635,7 @@ export default function StudentProfilePage() {
                   onChange={(e) =>
                     setDraft((d) => ({ ...d, [f.key]: e.target.value }))
                   }
-                  className="rounded-xl border border-slate-200 bg-surface px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
+                  className="rounded-xl border border-outline bg-surface px-3 py-2 text-sm focus:ring-2 focus:ring-primary outline-none"
                   placeholder={f.label}
                 />
               </label>

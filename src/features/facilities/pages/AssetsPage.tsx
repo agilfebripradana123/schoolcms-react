@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -262,7 +262,7 @@ export default function AssetsPage() {
         header: "Kategori",
         accessor: "category" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-sm text-slate-700">
+          <span className="text-sm text-on-surface">
             {CATEGORY_FILTER_OPTIONS.find((o) => o.value === row.category)?.label ?? row.category}
           </span>
         ),
@@ -271,8 +271,8 @@ export default function AssetsPage() {
         header: "Kondisi",
         accessor: "condition" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => {
           const c = CONDITION_BADGE[row.condition] ?? CONDITION_BADGE.good;
           return <Badge variant={c.variant}>{c.label}</Badge>;
@@ -282,7 +282,7 @@ export default function AssetsPage() {
         header: "Ruangan",
         accessor: "room_id" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="text-sm text-slate-700">
+          <span className="text-sm text-on-surface">
             {roomName(row.room_id) || (row.location ? row.location : "-")}
           </span>
         ),
@@ -292,19 +292,19 @@ export default function AssetsPage() {
         accessor: "purchase_price" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) =>
           row.purchase_price !== null && row.purchase_price !== undefined ? (
-            <span className="text-sm text-slate-700">
+            <span className="text-sm text-on-surface">
               {formatCurrency(row.purchase_price)}
             </span>
           ) : (
-            <span className="text-sm text-slate-400">-</span>
+            <span className="text-sm text-outline">-</span>
           ),
       },
       {
         header: "Status",
         accessor: "status" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => {
           const s = STATUS_BADGE[row.status] ?? STATUS_BADGE.active;
           return <Badge variant={s.variant}>{s.label}</Badge>;
@@ -314,14 +314,14 @@ export default function AssetsPage() {
         header: "Aksi",
         accessor: "id" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label="Edit aset"
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
@@ -329,7 +329,7 @@ export default function AssetsPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label="Hapus aset"
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
@@ -432,11 +432,11 @@ export default function AssetsPage() {
           <>
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Belum ada aset.
                 </div>
               ) : (
@@ -446,7 +446,7 @@ export default function AssetsPage() {
                   return (
                     <div
                       key={row.id}
-                      className="rounded-2xl border border-slate-200 bg-white p-4"
+                      className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
@@ -457,7 +457,7 @@ export default function AssetsPage() {
                               ? ` · ${roomName(row.room_id)}`
                               : ""}
                           </p>
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-xs text-outline">
                             {row.category &&
                               CATEGORY_FILTER_OPTIONS.find((o) => o.value === row.category)
                                 ?.label}
@@ -469,7 +469,7 @@ export default function AssetsPage() {
                           <Badge variant={c.variant}>{c.label}</Badge>
                         </div>
                       </div>
-                      <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                      <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                         <Button
                           variant="secondary"
                           size="sm"

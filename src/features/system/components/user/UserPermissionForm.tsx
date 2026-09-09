@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -147,7 +147,7 @@ export default function UserPermissionForm({
         </p>
 
         {rolePermissions.length > 0 && (
-          <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="mb-4 rounded-2xl border border-outline-variant bg-surface-container-low p-4">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-outline">
               Hak akses dari Role{initialData?.role?.name ? ` — ${initialData.role.name}` : ""}
             </p>
@@ -155,7 +155,7 @@ export default function UserPermissionForm({
               {rolePermissions.map((p) => (
                 <span
                   key={p.id}
-                  className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-on-surface-variant"
+                  className="inline-flex items-center gap-1 rounded-full border border-outline-variant bg-surface-container-lowest px-2.5 py-1 text-xs font-medium text-on-surface-variant"
                 >
                   {p.name}
                 </span>
@@ -169,7 +169,7 @@ export default function UserPermissionForm({
         </p>
 
         {catalogLoading ? (
-          <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+          <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
             <RefreshCw className="h-4 w-4 animate-spin" />
             Memuat permission...
           </div>
@@ -187,7 +187,7 @@ export default function UserPermissionForm({
             </Button>
           </div>
         ) : permissions.length === 0 ? (
-          <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+          <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
             Tidak ada permission yang tersedia.
           </p>
         ) : (
@@ -199,11 +199,11 @@ export default function UserPermissionForm({
               className="mb-3"
             />
 
-            <div className="overflow-hidden rounded-2xl border border-slate-200">
+            <div className="overflow-hidden rounded-2xl border border-outline-variant">
               <button
                 type="button"
                 onClick={toggleAll}
-                className="flex w-full items-center justify-between gap-2 border-b border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-on-surface hover:bg-slate-100"
+                className="flex w-full items-center justify-between gap-2 border-b border-outline-variant bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low"
               >
                 <span>
                   Pilih Permission ({selectedIds.length}/{permissions.length})
@@ -215,13 +215,13 @@ export default function UserPermissionForm({
                   Tidak ada permission yang cocok dengan pencarian.
                 </p>
               ) : (
-                <div className="max-h-[320px] divide-y divide-slate-100 overflow-y-auto">
+                <div className="max-h-[320px] divide-y divide-outline-variant overflow-y-auto">
                   {filteredPermissions.map((perm) => {
                     const checked = selectedIds.includes(perm.id);
                     return (
                       <label
                         key={perm.id}
-                        className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-slate-50"
+                        className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-surface-container-low"
                       >
                         <input
                           type="checkbox"

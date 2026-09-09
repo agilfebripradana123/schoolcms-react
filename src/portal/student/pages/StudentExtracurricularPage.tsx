@@ -83,11 +83,11 @@ export default function StudentExtracurricularPage() {
           <Card key={e.id}>
             <CardBody>
               <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-container/15 text-primary">
                   <Dumbbell className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-slate-900 truncate">{e.name}</h3>
+                  <h3 className="font-semibold text-primary truncate">{e.name}</h3>
                   {e.is_active != null && (
                     <Badge variant={e.is_active ? "success" : "neutral"} className="mt-1">
                       {e.is_active ? "Aktif" : "Nonaktif"}
@@ -96,9 +96,9 @@ export default function StudentExtracurricularPage() {
                 </div>
               </div>
               {e.description && (
-                <p className="mt-3 text-sm text-slate-600 line-clamp-3">{e.description}</p>
+                <p className="mt-3 text-sm text-secondary line-clamp-3">{e.description}</p>
               )}
-              <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+              <div className="mt-3 flex flex-wrap gap-3 text-xs text-secondary">
                 {e.schedule_day && (
                   <span className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />

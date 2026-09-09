@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, IdCard, Loader2, Lock, Mail, ShieldCheck, User } from "lucide-react";
 import { useAuth } from "@/features/auth/useAuth";
@@ -143,10 +143,10 @@ export function LoginForm({ mode }: LoginFormProps) {
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-container text-white shadow-lg">
               <Icon className="h-7 w-7" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">{cfg.title}</h1>
-            <p className="mt-2 text-sm text-slate-500">{cfg.description}</p>
+            <h1 className="text-2xl font-bold text-on-surface">{cfg.title}</h1>
+            <p className="mt-2 text-sm text-outline">{cfg.description}</p>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] sm:p-8">
+          <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-lg sm:p-8">
             <LoginFields
               cfg={cfg}
               Icon={Icon}
@@ -168,9 +168,9 @@ export function LoginForm({ mode }: LoginFormProps) {
   const heroBg = heroImage || loginBg;
 
   return (
-    <div className="relative min-h-screen bg-white text-on-surface">
+    <div className="relative min-h-screen bg-surface-container-lowest text-on-surface">
       <div
-        className="pointer-events-none absolute inset-0 overflow-hidden bg-white lg:hidden"
+        className="pointer-events-none absolute inset-0 overflow-hidden bg-surface-container-lowest lg:hidden"
         style={{
           backgroundImage: `url(${heroBg})`,
           backgroundSize: "cover",
@@ -202,14 +202,14 @@ export function LoginForm({ mode }: LoginFormProps) {
                 <ShieldCheck className="mb-4 h-8 w-8 text-primary-fixed" />
               )}
               <h2 className="text-2xl font-bold">{appName}</h2>
-              <p className="mt-1 text-sm text-slate-300">{schoolName}</p>
+              <p className="mt-1 text-sm text-outline">{schoolName}</p>
               {schoolAddress && (
-                <p className="mt-1 text-xs text-slate-400">{schoolAddress}</p>
+                <p className="mt-1 text-xs text-outline">{schoolAddress}</p>
               )}
               <h1 className="mt-10 text-4xl font-bold leading-tight tracking-tight">
                 {heroText}
               </h1>
-              <p className="mt-4 max-w-md text-base text-slate-200">
+              <p className="mt-4 max-w-md text-base text-outline">
                 {heroTextSub}
               </p>
             </div>
@@ -232,19 +232,19 @@ export function LoginForm({ mode }: LoginFormProps) {
                   </div>
                 )}
                 <div>
-                  <h2 className="font-bold text-slate-900">{appName}</h2>
-                  <p className="text-xs text-slate-500">{schoolName}</p>
+                  <h2 className="font-bold text-on-surface">{appName}</h2>
+                  <p className="text-xs text-outline">{schoolName}</p>
                   {schoolAddress && (
-                    <p className="text-[10px] text-slate-400">{schoolAddress}</p>
+                    <p className="text-[10px] text-outline">{schoolAddress}</p>
                   )}
                 </div>
               </div>
             </div>
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-slate-900">{cfg.title}</h1>
-              <p className="mt-2 text-sm text-slate-500">{cfg.description}</p>
+              <h1 className="text-2xl font-bold text-on-surface">{cfg.title}</h1>
+              <p className="mt-2 text-sm text-outline">{cfg.description}</p>
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] sm:p-8">
+            <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-6 shadow-lg sm:p-8">
               <LoginFields
                 cfg={cfg}
                 Icon={Icon}
@@ -290,10 +290,10 @@ function LoginFields({
   onSubmit: (e: React.FormEvent) => void;
   dark?: boolean;
 }) {
-  const labelClass = dark ? "text-slate-200" : "text-slate-700";
+  const labelClass = dark ? "text-outline" : "text-on-surface";
   const inputClass = dark
-    ? "border-white/10 bg-white/10 text-white placeholder:text-slate-400 focus:border-primary-fixed focus:bg-white/15 focus:ring-primary-fixed/10"
-    : "border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:border-primary-container focus:bg-white focus:ring-primary-container/10";
+    ? "border-white/10 bg-surface-container-lowest/10 text-white placeholder:text-outline focus:border-primary-fixed focus:bg-surface-container-lowest/15 focus:ring-primary-fixed/10"
+    : "border-outline-variant bg-surface-container-low text-on-surface placeholder:text-outline focus:border-primary-container focus:bg-surface-container-lowest focus:ring-primary-container/10";
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
@@ -302,7 +302,7 @@ function LoginFields({
           {cfg.label}
         </label>
         <div className="relative">
-          <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <Icon className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline" />
           <input
             id="login"
             type={cfg.inputType}
@@ -322,7 +322,7 @@ function LoginFields({
           Kata sandi
         </label>
         <div className="relative">
-          <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <Lock className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline" />
           <input
             id="password"
             type={showPassword ? "text" : "password"}
@@ -337,7 +337,7 @@ function LoginFields({
           <button
             type="button"
             onClick={onTogglePassword}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-700"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-outline transition-colors hover:text-on-surface"
             aria-label={showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
           >
             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

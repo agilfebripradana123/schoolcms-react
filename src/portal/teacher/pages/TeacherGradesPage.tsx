@@ -179,25 +179,25 @@ export default function TeacherGradesPage() {
         description="Input nilai siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar className="mb-6">
-          <Filter className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Kelas:</label>
+      <PortalFilterBar>
+          <Filter className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Kelas:</label>
           <div className="min-w-[180px]">
             <Select<number> options={classOptions} value={classId} onChange={setClassId} placeholder="Pilih kelas" />
           </div>
-          <label className="text-sm font-medium text-slate-700">Mapel:</label>
+          <label className="text-sm font-medium text-secondary">Mapel:</label>
           <div className="min-w-[180px]">
             <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Pilih mapel" />
           </div>
-          <label className="text-sm font-medium text-slate-700">Komponen:</label>
+          <label className="text-sm font-medium text-secondary">Komponen:</label>
           <div className="min-w-[150px]">
             <Select<GradeType> options={typeOptions} value={type} onChange={(v) => v && setType(v)} />
           </div>
-          <label className="text-sm font-medium text-slate-700">Tahun:</label>
+          <label className="text-sm font-medium text-secondary">Tahun:</label>
           <div className="min-w-[150px]">
             <Select<number> options={yearOptions} value={academicYearId} onChange={(v) => { setAcademicYearId(v); setSemesterId(null); }} placeholder="Tahun" isClearable />
           </div>
-          <label className="text-sm font-medium text-slate-700">Semester:</label>
+          <label className="text-sm font-medium text-secondary">Semester:</label>
           <div className="min-w-[150px]">
             <Select<number> options={semesterOptions} value={semesterId} onChange={setSemesterId} placeholder="Semester" isClearable />
           </div>
@@ -217,7 +217,7 @@ export default function TeacherGradesPage() {
       ) : (
         <>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-slate-500">{rows.length} siswa</p>
+            <p className="text-sm text-secondary">{rows.length} siswa</p>
             {canManage && (
               <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
                 Simpan Nilai
@@ -233,7 +233,7 @@ export default function TeacherGradesPage() {
                 accessor: "student_id",
                 render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
               },
-              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-slate-900">{String(v ?? "-")}</span> },
+              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-on-surface">{String(v ?? "-")}</span> },
               { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
               { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
               {
@@ -250,10 +250,10 @@ export default function TeacherGradesPage() {
                       onChange={(e) =>
                         setScoreById((prev) => ({ ...prev, [row.student_id]: e.target.value }))
                       }
-                      className="w-24 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 focus:border-indigo-300 focus:outline-none"
+                      className="w-24 rounded-xl border border-outline bg-surface px-3 py-1.5 text-sm text-primary focus:border-primary-container focus:outline-none"
                     />
                   ) : (
-                    <span className="text-sm text-slate-900">
+                    <span className="text-sm text-primary">
                       {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
                         ? scoreById[row.student_id]
                         : "---"}

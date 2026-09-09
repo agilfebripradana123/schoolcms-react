@@ -56,8 +56,8 @@ export default function Modal({
       aria-modal="true"
       aria-label={title}
     >
-      <div className={`${sizeMap[size]} w-full rounded-2xl bg-white shadow-xl`}>
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+      <div className={`${sizeMap[size]} w-full rounded-2xl bg-surface-container-lowest shadow-xl`}>
+        <div className="flex items-center justify-between border-b border-outline-variant px-6 py-4">
           <h2 className="text-lg font-semibold text-on-surface">{title}</h2>
           <button
             type="button"
@@ -74,7 +74,7 @@ export default function Modal({
         </div>
 
         {footer && (
-          <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4">
+          <div className="flex items-center justify-end gap-3 border-t border-outline-variant px-6 py-4">
             {footer}
           </div>
         )}

@@ -123,20 +123,20 @@ export default function StudentAttendancePage() {
     <PageContainer>
       <PageHeader title="Kehadiran" description="Rekap kehadiran Anda" />
 
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
         <Card>
           <CardBody>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-secondary">
               Total Hari
             </p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">
+            <p className="mt-1 text-2xl font-bold text-primary">
               {summary?.total_days ?? 0}
             </p>
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-secondary">
               Kehadiran
             </p>
             <p className="mt-1 text-2xl font-bold text-emerald-600">
@@ -146,20 +146,20 @@ export default function StudentAttendancePage() {
         </Card>
         <Card>
           <CardBody>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-secondary">
               Persentase
             </p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">
+            <p className="mt-1 text-2xl font-bold text-primary">
               {summary?.percentage.toFixed(1) ?? "0"}%
             </p>
           </CardBody>
         </Card>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardBody className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Hadir</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Hadir</p>
             <p className="mt-1 text-lg font-bold text-emerald-600">
               {summary?.present ?? 0}
             </p>
@@ -167,13 +167,13 @@ export default function StudentAttendancePage() {
         </Card>
         <Card>
           <CardBody className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Sakit</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Sakit</p>
             <p className="mt-1 text-lg font-bold text-amber-600">{summary?.sick ?? 0}</p>
           </CardBody>
         </Card>
         <Card>
           <CardBody className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Izin</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Izin</p>
             <p className="mt-1 text-lg font-bold text-sky-600">
               {summary?.permission ?? 0}
             </p>
@@ -181,15 +181,15 @@ export default function StudentAttendancePage() {
         </Card>
         <Card>
           <CardBody className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Alpa</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-secondary">Alpa</p>
             <p className="mt-1 text-lg font-bold text-rose-600">{summary?.absent ?? 0}</p>
           </CardBody>
         </Card>
       </div>
 
       <PortalFilterBar>
-          <Filter className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <Filter className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Status:</label>
           <div className="min-w-[200px]">
             <AppSelect
               options={

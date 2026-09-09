@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { Loader2, Shield, Camera } from "lucide-react";
 import { api } from "@/lib/api";
 import { PROFILE } from "@/lib/api/endpoints";
@@ -167,8 +167,8 @@ export default function ProfilePage() {
           ) : displayPhoto && !imgFailed ? (
             <img src={displayPhoto} alt={profile?.name ?? "foto"} className="h-32 w-32 rounded-2xl object-cover border" onError={() => setImgFailed(true)} />
           ) : (
-            <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-slate-100 border border-dashed">
-              <Camera className="h-10 w-10 text-slate-400" />
+            <div className="flex h-32 w-32 items-center justify-center rounded-2xl bg-surface-container-low border border-dashed">
+              <Camera className="h-10 w-10 text-outline" />
             </div>
           )}
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />

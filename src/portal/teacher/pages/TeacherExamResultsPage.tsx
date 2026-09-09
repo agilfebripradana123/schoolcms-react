@@ -106,13 +106,13 @@ export default function TeacherExamResultsPage() {
         description="Hasil ujian siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar className="mb-6">
-          <BarChart3 className="h-4 w-4 text-slate-500" />
-          <label className="text-sm font-medium text-slate-700">Ujian:</label>
+      <PortalFilterBar>
+          <BarChart3 className="h-4 w-4 text-secondary" />
+          <label className="text-sm font-medium text-secondary">Ujian:</label>
           <div className="min-w-[200px]">
             <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Semua ujian" isClearable />
           </div>
-          <label className="text-sm font-medium text-slate-700">Status:</label>
+          <label className="text-sm font-medium text-secondary">Status:</label>
           <div className="min-w-[180px]">
             <Select<ExamResultStatus> options={statusOptions()} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
           </div>
@@ -138,7 +138,7 @@ export default function TeacherExamResultsPage() {
                 <button
                   type="button"
                   onClick={() => setDetail(row)}
-                  className="text-left font-semibold text-indigo-600 hover:underline"
+                  className="text-left font-semibold text-primary hover:underline"
                 >
                   {row.participant?.student?.name ?? "-"}
                 </button>
@@ -185,43 +185,43 @@ export default function TeacherExamResultsPage() {
         {detail && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">{detail.participant?.student?.name ?? "-"}</h3>
-              <p className="mt-1 text-sm text-slate-500">
+              <h3 className="text-lg font-bold text-primary">{detail.participant?.student?.name ?? "-"}</h3>
+              <p className="mt-1 text-sm text-secondary">
                 {detail.participant?.exam?.title ?? "-"} · {detail.participant?.exam?.subject?.name ?? "-"}
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Skor</p>
-                <p className="mt-1 text-lg font-bold text-slate-900">{detail.total_score}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Skor</p>
+                <p className="mt-1 text-lg font-bold text-primary">{detail.total_score}</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Nilai Huruf</p>
-                <p className="mt-1 text-lg font-bold text-slate-900">{detail.grade ?? "-"}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Nilai Huruf</p>
+                <p className="mt-1 text-lg font-bold text-primary">{detail.grade ?? "-"}</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Status</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Status</p>
                 <p className="mt-1">
                   <Badge variant={STATUS_VARIANTS[detail.status] ?? "neutral"}>{STATUS_LABELS[detail.status]}</Badge>
                 </p>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Benar</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.correct_count}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Benar</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.correct_count}</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Salah</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.wrong_count}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Salah</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.wrong_count}</p>
               </div>
-              <div className="rounded-xl bg-slate-50 p-3">
-                <p className="text-xs text-slate-500">Tidak Dijawab</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">{detail.unanswered_count}</p>
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Tidak Dijawab</p>
+                <p className="mt-1 text-sm font-semibold text-primary">{detail.unanswered_count}</p>
               </div>
             </div>
             {detail.graded_at && (
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-secondary">
                 Dinilai pada {String(detail.graded_at)}
               </p>
             )}

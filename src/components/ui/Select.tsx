@@ -1,6 +1,19 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import type { GroupBase } from "react-select";
+
+function useIsDark(): boolean {
+  const [dark, setDark] = useState(
+    () => typeof document !== "undefined" && document.documentElement.classList.contains("dark"),
+  );
+  useEffect(() => {
+    const el = document.documentElement;
+    const observer = new MutationObserver(() => setDark(el.classList.contains("dark")));
+    observer.observe(el, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return dark;
+}
 
 export interface SelectOption<T = string | number> {
   value: T;
@@ -23,16 +36,22 @@ interface AppSelectProps<T = string | number> {
   size?: "default" | "sm";
 }
 
-const primary = "#7c3aed";
-const primarySoft = "rgba(124, 58, 237, 0.08)";
-const primarySofter = "rgba(124, 58, 237, 0.15)";
-const borderDefault = "#e2e8f0";
-const borderHover = "#cbd5e1";
-const onSurface = "#191c1e";
-const outline = "#7b7487";
-const error = "#ba1a1a";
+// ponytail: hardcoded colors — replace with CSS var reads or class-based react-select when theme system matures
+const isDark = () => typeof document !== "undefined" && document.documentElement.classList.contains("dark");
+const css = (v: string, fallback: string) => typeof getComputedStyle !== "undefined" ? (getComputedStyle(document.documentElement).getPropertyValue(v).trim() || fallback) : fallback;
 
-function buildStyles(errorFlag?: boolean, size: "default" | "sm" = "default") {
+const primary = () => css("--color-primary-container", "#7c3aed");
+const primarySoft = () => isDark() ? "rgba(124, 58, 237, 0.2)" : "rgba(124, 58, 237, 0.08)";
+const primarySofter = () => isDark() ? "rgba(124, 58, 237, 0.3)" : "rgba(124, 58, 237, 0.15)";
+const borderDefault = () => css("--color-outline-variant", "#e2e8f0");
+const borderHover = () => css("--color-outline", "#cbd5e1");
+const onSurface = () => css("--color-on-surface", "#191c1e");
+const outline = () => css("--color-outline", "#7b7487");
+const error = () => css("--color-error", "#ba1a1a");
+const surfaceBg = () => css("--color-surface-container-lowest", "#ffffff");
+const selectedText = () => css("--color-on-primary-container", "#ffffff");
+
+function buildStyles(errorFlag?: boolean, size: "default" | "sm" = "default", dark = false) {
   const compact = size === "sm";
   const fontSize = compact ? "0.75rem" : "0.875rem";
   return {
@@ -41,15 +60,15 @@ function buildStyles(errorFlag?: boolean, size: "default" | "sm" = "default") {
       minHeight: compact ? 32 : 46,
       borderRadius: compact ? "0.5rem" : "1rem",
       borderColor: errorFlag
-        ? error
+        ? error()
         : state.isFocused
-          ? primary
-          : borderDefault,
-      boxShadow: state.isFocused ? "0 0 0 2px rgba(124, 58, 237, 0.3)" : "0 0 0 0",
+          ? primary()
+          : borderDefault(),
+      boxShadow: state.isFocused ? `0 0 0 2px ${primarySoft()}` : "0 0 0 0",
       "&:hover": {
-        borderColor: state.isFocused ? primary : borderHover,
+        borderColor: state.isFocused ? primary() : borderHover(),
       },
-      backgroundColor: "#ffffff",
+      backgroundColor: surfaceBg(),
       padding: compact ? "0 2px" : "2px 4px",
       cursor: "pointer",
     }),
@@ -59,24 +78,25 @@ function buildStyles(errorFlag?: boolean, size: "default" | "sm" = "default") {
     }),
     placeholder: (base: object) => ({
       ...base,
-      color: outline,
+      color: outline(),
       fontSize,
     }),
     singleValue: (base: object) => ({
       ...base,
-      color: onSurface,
+      color: onSurface(),
       fontSize,
     }),
     input: (base: object) => ({
       ...base,
       fontSize,
-      color: onSurface,
+      color: onSurface(),
     }),
     menu: (base: object) => ({
       ...base,
       borderRadius: compact ? "0.5rem" : "1rem",
-      border: `1px solid ${borderDefault}`,
-      boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
+      border: `1px solid ${borderDefault()}`,
+      boxShadow: dark ? "0 8px 24px rgba(0,0,0,0.4)" : "0 8px 24px rgba(0,0,0,0.10)",
+      backgroundColor: surfaceBg(),
       overflow: "hidden",
       zIndex: 60,
     }),
@@ -91,16 +111,16 @@ function buildStyles(errorFlag?: boolean, size: "default" | "sm" = "default") {
     option: (base: object, state: { isFocused: boolean; isSelected: boolean }) => ({
       ...base,
       backgroundColor: state.isSelected
-        ? primary
+        ? primary()
         : state.isFocused
-          ? primarySoft
+          ? primarySoft()
           : "transparent",
-      color: state.isSelected ? "#ffffff" : onSurface,
+      color: state.isSelected ? selectedText() : onSurface(),
       fontSize,
       padding: compact ? "4px 8px" : "6px 10px",
       cursor: "pointer",
       "&:active": {
-        backgroundColor: state.isSelected ? primary : primarySofter,
+        backgroundColor: state.isSelected ? primary() : primarySofter(),
       },
     }),
   };
@@ -121,7 +141,8 @@ export default function AppSelect<T = string | number>({
   className = "",
   size = "default",
 }: AppSelectProps<T>) {
-  const styles = useMemo(() => buildStyles(error, size), [error, size]);
+  const dark = useIsDark();
+  const styles = useMemo(() => buildStyles(error, size, dark), [error, size, dark]);
 
   const selectedOption = useMemo(
     () => options.find((o) => String(o.value) === String(value)) ?? null,

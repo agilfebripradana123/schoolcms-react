@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -222,7 +222,7 @@ export default function DispositionsPage() {
         header: "Diteruskan Kepada",
         accessor: "assigned_to" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="whitespace-nowrap text-sm text-slate-700">
+          <span className="whitespace-nowrap text-sm text-on-surface">
             {row.assigned_to}
           </span>
         ),
@@ -232,7 +232,7 @@ export default function DispositionsPage() {
         accessor: "instruction" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="min-w-0">
-            <p className="truncate text-sm text-slate-700">
+            <p className="truncate text-sm text-on-surface">
               {row.instruction ?? "-"}
             </p>
           </div>
@@ -242,7 +242,7 @@ export default function DispositionsPage() {
         header: "Batas Waktu",
         accessor: "due_date" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
-          <span className="whitespace-nowrap text-sm text-slate-700">
+          <span className="whitespace-nowrap text-sm text-on-surface">
             {row.due_date ? formatDate(row.due_date) : "-"}
           </span>
         ),
@@ -251,8 +251,8 @@ export default function DispositionsPage() {
         header: "Status",
         accessor: "status" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex justify-center">
             <Badge variant={STATUS_VARIANTS[row.status] ?? "neutral"}>
@@ -265,14 +265,14 @@ export default function DispositionsPage() {
         header: "Aksi",
         accessor: "id" as keyof Row,
         headerClassName:
-          "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
-        className: "px-6 py-4 text-center text-sm text-slate-700",
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-container"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label="Edit disposisi"
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
@@ -280,7 +280,7 @@ export default function DispositionsPage() {
             <button
               type="button"
               onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-error-container hover:text-error"
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
               aria-label="Hapus disposisi"
             >
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
@@ -353,18 +353,18 @@ export default function DispositionsPage() {
           <>
             <div className="space-y-3 sm:hidden">
               {loading ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Memuat data...
                 </div>
               ) : data.length === 0 ? (
-                <div className="py-10 text-center text-sm text-slate-500">
+                <div className="py-10 text-center text-sm text-outline">
                   Belum ada disposisi.
                 </div>
               ) : (
                 data.map((row) => (
                   <div
                     key={row.id}
-                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                    className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
@@ -386,7 +386,7 @@ export default function DispositionsPage() {
                         {STATUS_LABELS[row.status] ?? row.status ?? "-"}
                       </Badge>
                     </div>
-                    <div className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+                    <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
                       <Button
                         variant="secondary"
                         size="sm"

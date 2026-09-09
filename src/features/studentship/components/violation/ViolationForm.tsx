@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -191,7 +191,7 @@ export default function ViolationForm({
       >
         <FormField label="Siswa" error={fieldErrors.student_id?.[0]}>
           {studentsLoading ? (
-            <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
               Memuat siswa...
             </div>
@@ -209,7 +209,7 @@ export default function ViolationForm({
               </Button>
             </div>
           ) : students.length === 0 ? (
-            <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada siswa tersedia.
             </p>
           ) : (
@@ -261,7 +261,7 @@ export default function ViolationForm({
 
           <FormField label="Ditangani Oleh" error={fieldErrors.handled_by?.[0]}>
             {teachersLoading ? (
-              <div className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat guru...
               </div>
@@ -279,7 +279,7 @@ export default function ViolationForm({
                 </Button>
               </div>
             ) : teachers.length === 0 ? (
-              <p className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-on-surface-variant">
+              <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada guru tersedia.
               </p>
             ) : (

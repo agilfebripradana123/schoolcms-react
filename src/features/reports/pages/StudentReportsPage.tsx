@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -58,11 +58,11 @@ export default function StudentReportsPage() {
     {
       header: "Jumlah Siswa",
       accessor: "total_students" as keyof PerClassRow,
-      className: "px-6 py-4 text-center text-sm text-slate-700",
+      className: "px-6 py-4 text-center text-sm text-on-surface",
       headerClassName:
-        "px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider",
+        "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
       render: (_value: unknown, row: PerClassRow) => (
-        <span className="text-sm text-slate-700">{row.total_students}</span>
+        <span className="text-sm text-on-surface">{row.total_students}</span>
       ),
     },
   ];
@@ -76,7 +76,7 @@ export default function StudentReportsPage() {
 
       {loading ? (
         <Card>
-          <div className="py-10 text-center text-sm text-slate-500">Memuat data...</div>
+          <div className="py-10 text-center text-sm text-outline">Memuat data...</div>
         </Card>
       ) : error || !data ? (
         <Card>
@@ -99,13 +99,13 @@ export default function StudentReportsPage() {
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+            <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
               <p className="text-sm font-medium text-on-surface-variant">Total Siswa</p>
               <p className="mt-3 font-display text-3xl font-bold tracking-tight text-on-surface">
                 {data.totals.total_students}
               </p>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-surface-container-lowest p-6 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+            <div className="rounded-3xl border border-outline-variant bg-surface-container-lowest p-6 shadow-sm">
               <p className="text-sm font-medium text-on-surface-variant">Total Kelas</p>
               <p className="mt-3 font-display text-3xl font-bold tracking-tight text-on-surface">
                 {data.totals.total_classes}

@@ -66,11 +66,11 @@ export default function TeacherClassDetailPage() {
         description="Daftar siswa pada kelas yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar className="mb-6">
+      <PortalFilterBar>
         <form onSubmit={handleSearch} className="min-w-[240px] flex-1 max-w-xs">
           <Search value={search} onChange={setSearch} placeholder="Cari nama / NIS / NISN" />
         </form>
-        {meta && <span className="text-sm text-slate-500">{meta.total} siswa aktif</span>}
+        {meta && <span className="text-sm text-secondary">{meta.total} siswa aktif</span>}
       </PortalFilterBar>
 
       {error ? (
@@ -92,7 +92,7 @@ export default function TeacherClassDetailPage() {
               header: "Nama",
               accessor: "id",
               render: (_v, row) => (
-                <span className="font-medium text-slate-900">
+                <span className="font-medium text-primary">
                   {row.student?.name ?? "-"}
                 </span>
               ),

@@ -63,7 +63,7 @@ export default function SettingsPage() {
               key={category.group}
               type="button"
               onClick={() => navigate(category.route)}
-              className="group flex flex-col rounded-3xl border border-slate-200 bg-surface-container-lowest p-5 text-left shadow-[0_4px_12px_rgba(0,0,0,0.04)] transition-colors hover:border-primary-container hover:bg-surface-container-low"
+              className="group flex flex-col rounded-3xl border border-outline-variant bg-surface-container-lowest p-5 text-left shadow-sm transition-colors hover:border-primary-container hover:bg-surface-container-low"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-container/15 text-primary-container">
                 <CountIcon className="h-5 w-5" />
@@ -74,7 +74,7 @@ export default function SettingsPage() {
               <span className="mt-1 text-xs text-on-surface-variant">
                 {category.description}
               </span>
-              <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+              <div className="mt-4 flex items-center justify-between border-t border-outline-variant pt-3">
                 <Badge variant="secondary">{count} pengaturan</Badge>
                 <span className="flex items-center gap-0.5 text-xs font-semibold text-primary-container">
                   Kelola
