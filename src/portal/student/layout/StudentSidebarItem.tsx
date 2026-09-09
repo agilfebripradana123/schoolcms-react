@@ -26,7 +26,7 @@ export default function StudentSidebarItem({
     <button
       onClick={() => onGo(item.path)}
       className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
-        active ? "" : "hover:bg-white/5 hover:text-white"
+        active ? "" : "hover:bg-white/5"
       } ${collapsed ? "justify-center px-2" : ""}`}
       style={active ? activeStyle : inactiveStyle}
       title={collapsed ? item.label : undefined}

@@ -53,7 +53,7 @@ export default function StudentSidebar({
     (entry: (typeof studentNavigation)[number]): boolean =>
       Boolean(
         "items" in entry &&
-          entry.items?.some((i) => pathname === i.path || pathname.startsWith(i.path + "/")),
+          entry.items?.some((i) => pathname === i.path),
       ),
     [pathname],
   );
@@ -94,8 +94,8 @@ export default function StudentSidebar({
             onClick={() => goTo(studentDashboardItem.path)}
             className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               isActive(studentDashboardItem.path)
-                ? "hover:text-white"
-                : "hover:bg-white/5 hover:text-white"
+                ? ""
+                : "hover:bg-white/5"
             } ${collapsed ? "justify-center" : ""}`}
             style={isActive(studentDashboardItem.path) ? { backgroundColor: accent20, color: sidebarText, border: `1px solid ${accent30}` } : { color: sidebarMuted }}
           >

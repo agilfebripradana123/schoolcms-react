@@ -12,16 +12,14 @@ export function useAppearance() {
     return "light";
   }, [theme]);
 
-  // Sidebar text colors: softer than pure white for less eye strain.
-  // Background: darkened variant of primaryColor via color-mix; fallback deeper when unset.
+  // Sidebar: same dark background for both light and dark theme.
+  // Text colors: bright for readability on dark sidebar.
   const sidebarBg = useMemo(() => {
     if (!primaryColor || !/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(primaryColor)) {
-      return resolvedTheme === "dark" ? "#040507" : "#0a0d11";
+      return "#06080a";
     }
-    return resolvedTheme === "dark"
-      ? `color-mix(in srgb, ${primaryColor} 20%, #020304)`
-      : `color-mix(in srgb, ${primaryColor} 40%, #050608)`;
-  }, [primaryColor, resolvedTheme]);
+    return `color-mix(in srgb, ${primaryColor} 15%, #030405)`;
+  }, [primaryColor]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -29,15 +27,13 @@ export function useAppearance() {
     if (resolvedTheme === "dark") {
       el.classList.add("dark");
       el.style.colorScheme = "dark";
-      el.style.setProperty("--sidebar-text", "#dbe2ea");
-      el.style.setProperty("--sidebar-text-muted", "#9aa5b3");
     } else {
       el.classList.remove("dark");
       el.style.colorScheme = "light";
-      el.style.setProperty("--sidebar-text", "#e2e8f0");
-      el.style.setProperty("--sidebar-text-muted", "#94a3b8");
     }
     el.style.setProperty("--sidebar-bg", sidebarBg);
+    el.style.setProperty("--sidebar-text", "#f1f5f9");
+    el.style.setProperty("--sidebar-text-muted", "#cbd5e1");
   }, [resolvedTheme, sidebarBg]);
 
   useEffect(() => {

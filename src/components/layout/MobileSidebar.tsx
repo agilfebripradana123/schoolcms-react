@@ -14,7 +14,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const location = useLocation();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = navigation.find((group) =>
-      group.items.some((item) => location.pathname.startsWith(item.path)),
+      group.items.some((item) => location.pathname === item.path || location.pathname.startsWith(item.path + "/")),
     );
     return new Set(activeGroup ? [activeGroup.label] : []);
   });
@@ -40,7 +40,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
   const isActive = (path: string) => location.pathname === path;
   const isGroupActive = (group: (typeof navigation)[number]) =>
-    group.items.some((item) => location.pathname === item.path || location.pathname.startsWith(item.path + "/"));
+    group.items.some((item) => location.pathname === item.path);
 
   const handleBackdropClick = useCallback(() => onClose(), [onClose]);
 
@@ -77,7 +77,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             <div className="mb-2">
               <a
                 href={dashboardItem.path}
-                className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${isActive(dashboardItem.path) ? "" : "hover:bg-white/5 hover:text-white"}`}
+                className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${isActive(dashboardItem.path) ? "" : "hover:bg-white/5"}`}
                 style={isActive(dashboardItem.path) ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)", color: "var(--sidebar-text)", border: "1px solid color-mix(in srgb, var(--sidebar-accent) 20%, transparent)" } : { color: "var(--sidebar-text-muted)" }}
               >
                 <dashboardItem.icon className="h-5 w-5 shrink-0" style={{ color: isActive(dashboardItem.path) ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }} />

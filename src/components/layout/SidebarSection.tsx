@@ -26,7 +26,7 @@ export default function SidebarSection({
             key={item.path}
             item={item}
             collapsed={collapsed}
-            active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
+            active={currentPath === item.path}
           />
         ))}
       </div>
@@ -37,13 +37,14 @@ export default function SidebarSection({
     <div className="mb-1">
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors"
-        style={active ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 15%, transparent)", color: "#fff" } : { color: "var(--sidebar-text-muted)" }}
+        className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/5"
+        style={active ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 15%, transparent)", color: "var(--sidebar-text)" } : { color: "var(--sidebar-text-muted)" }}
         aria-expanded={expanded}
       >
         <span>{group.label}</span>
         <svg
-          className={`h-4 w-4 text-slate-400 transition-transform ${expanded ? "rotate-90" : ""}`}
+          className={`h-4 w-4 transition-transform ${expanded ? "rotate-90" : ""}`}
+          style={{ color: "var(--sidebar-text-muted)" }}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -56,12 +57,12 @@ export default function SidebarSection({
       {expanded && (
         <div className="ml-2 mt-2 mb-2 space-y-0.5 border-l border-white/10 pl-2">
           {group.items.map((item) => (
-            <SidebarItem
-              key={item.path}
-              item={item}
-              collapsed={false}
-              active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
-            />
+          <SidebarItem
+            key={item.path}
+            item={item}
+            collapsed={collapsed}
+            active={currentPath === item.path}
+          />
           ))}
         </div>
       )}

@@ -22,7 +22,7 @@ export default function Sidebar({
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = navigation.find((group) =>
-      group.items.some((item) => pathname.startsWith(item.path)),
+      group.items.some((item) => pathname === item.path || pathname.startsWith(item.path + "/")),
     );
     return new Set(activeGroup ? [activeGroup.label] : []);
   });
@@ -39,10 +39,7 @@ export default function Sidebar({
   const isActive = useCallback((path: string) => pathname === path, [pathname]);
   const isGroupActive = useCallback(
     (group: (typeof navigation)[number]) =>
-      group.items.some(
-        (item) =>
-          pathname === item.path || pathname.startsWith(item.path + "/"),
-      ),
+      group.items.some((item) => pathname === item.path),
     [pathname],
   );
 
@@ -80,7 +77,7 @@ export default function Sidebar({
               className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
                 isActive(dashboardItem.path)
                   ? "text-white ring-1"
-                  : "hover:bg-white/5 hover:text-white"
+                  : "hover:bg-white/5"
               } ${collapsed ? "justify-center" : ""}`}
               style={isActive(dashboardItem.path) ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)", borderColor: "color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" } : { color: "var(--sidebar-text-muted)" }}
               title={collapsed ? dashboardItem.label : undefined}

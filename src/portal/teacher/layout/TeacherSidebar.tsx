@@ -53,12 +53,12 @@ export default function TeacherSidebar({
   const isGroupActive = useCallback(
     (entry: (typeof visibleNavigation)[number]) =>
       "items" in entry &&
-      entry.items?.some((i) => pathname === i.path || pathname.startsWith(i.path + "/")),
+      entry.items?.some((i) => pathname === i.path),
     [pathname],
   );
 
   return (
-    <nav className="flex h-full flex-col bg-[var(--sidebar-bg)] text-white">
+    <nav className="flex h-full flex-col" style={{ backgroundColor: "var(--sidebar-bg)", color: "var(--sidebar-text)" }}>
       <div
         className={`flex h-16 items-center border-b border-white/10 px-4 ${
           collapsed ? "justify-center" : ""
@@ -75,7 +75,7 @@ export default function TeacherSidebar({
           {!collapsed && (
             <div>
               <div className="font-display text-base font-bold leading-none">{appName}</div>
-              <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">Portal Guru</div>
+              <div className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: "var(--sidebar-text-muted)" }}>Portal Guru</div>
             </div>
           )}
         </div>
@@ -87,14 +87,16 @@ export default function TeacherSidebar({
             onClick={() => goTo(teacherDashboardItem.path)}
             className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
               isActive(teacherDashboardItem.path)
-                ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
-                : "text-slate-300 hover:bg-white/5 hover:text-white"
+                ? ""
+                : "hover:bg-white/5"
             } ${collapsed ? "justify-center" : ""}`}
+            style={isActive(teacherDashboardItem.path)
+              ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)", color: "var(--sidebar-text)", border: "1px solid color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" }
+              : { color: "var(--sidebar-text-muted)" }}
           >
             <teacherDashboardItem.icon
-              className={`h-5 w-5 shrink-0 ${
-                isActive(teacherDashboardItem.path) ? "text-primary-fixed" : "text-slate-400"
-              }`}
+              className="h-5 w-5 shrink-0"
+              style={{ color: isActive(teacherDashboardItem.path) ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }}
             />
             {!collapsed && <span>{teacherDashboardItem.label}</span>}
           </button>

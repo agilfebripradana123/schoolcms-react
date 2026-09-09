@@ -23,7 +23,7 @@ export default function SidebarItem({ item, collapsed, active }: SidebarItemProp
     <Link
       to={item.path}
       className={`flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-        active ? "" : "hover:bg-white/5 hover:text-white"
+        active ? "" : "hover:bg-white/5"
       } ${collapsed ? "justify-center px-2" : ""}`}
       style={active ? activeStyle : inactiveStyle}
       title={collapsed ? item.label : undefined}

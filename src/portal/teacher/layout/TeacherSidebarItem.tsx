@@ -16,15 +16,17 @@ export default function TeacherSidebarItem({
       onClick={() => onGo(item.path)}
       className={`flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
         active
-          ? "bg-primary-container/20 text-white ring-1 ring-primary-fixed/30"
-          : "text-slate-300 hover:bg-white/5 hover:text-white"
+          ? ""
+          : "hover:bg-white/5"
       } ${collapsed ? "justify-center px-2" : ""}`}
+      style={active
+        ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)", color: "var(--sidebar-text)", border: "1px solid color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" }
+        : { color: "var(--sidebar-text-muted)" }}
       title={collapsed ? item.label : undefined}
     >
       <item.icon
-        className={`h-5 w-5 shrink-0 ${
-          active ? "text-primary-fixed" : "text-slate-400"
-        }`}
+        className="h-5 w-5 shrink-0"
+        style={{ color: active ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }}
       />
       {!collapsed && <span>{item.label}</span>}
     </button>

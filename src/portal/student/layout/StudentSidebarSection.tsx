@@ -39,9 +39,7 @@ export default function StudentSidebarSection({
     <div className="mb-1">
       <button
         onClick={onToggle}
-        className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors ${
-          active ? "" : "hover:bg-white/5 hover:text-white"
-        }`}
+        className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/5"
         style={active ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 15%, transparent)", color: "var(--sidebar-text)" } : { color: "var(--sidebar-text-muted)" }}
         aria-expanded={expanded}
       >
