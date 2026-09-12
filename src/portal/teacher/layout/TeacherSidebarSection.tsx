@@ -28,7 +28,7 @@ export default function TeacherSidebarSection({
   entry,
   collapsed,
   expanded,
-  active,
+  active: _active,
   can,
   onToggle,
   onGo,
@@ -57,9 +57,7 @@ export default function TeacherSidebarSection({
       <button
         onClick={onToggle}
         className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/5"
-        style={active
-          ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 15%, transparent)", color: "var(--sidebar-text)" }
-          : { color: "var(--sidebar-text-muted)" }}
+        style={{ color: "var(--sidebar-text-muted)" }}
         aria-expanded={expanded}
       >
         <span>{entry.label}</span>

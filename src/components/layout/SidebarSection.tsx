@@ -14,7 +14,7 @@ export default function SidebarSection({
   group,
   collapsed,
   expanded,
-  active,
+  active: _active,
   onToggle,
   currentPath,
 }: SidebarSectionProps) {
@@ -38,7 +38,7 @@ export default function SidebarSection({
       <button
         onClick={onToggle}
         className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/5"
-        style={active ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 15%, transparent)", color: "var(--sidebar-text)" } : { color: "var(--sidebar-text-muted)" }}
+        style={{ color: "var(--sidebar-text-muted)" }}
         aria-expanded={expanded}
       >
         <span>{group.label}</span>
@@ -57,12 +57,12 @@ export default function SidebarSection({
       {expanded && (
         <div className="ml-2 mt-2 mb-2 space-y-0.5 border-l border-white/10 pl-2">
           {group.items.map((item) => (
-          <SidebarItem
-            key={item.path}
-            item={item}
-            collapsed={collapsed}
-            active={currentPath === item.path}
-          />
+            <SidebarItem
+              key={item.path}
+              item={item}
+              collapsed={collapsed}
+              active={currentPath === item.path}
+            />
           ))}
         </div>
       )}

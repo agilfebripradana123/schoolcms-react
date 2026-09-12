@@ -151,16 +151,18 @@ export default function StudentForm({
     setError(null);
     setFieldErrors({});
 
-    // Validasi wajib orang tua & wali
-    if (!fatherName.trim() || !motherName.trim()) {
-      setError({ message: "Nama ayah dan ibu wajib diisi." });
-      setSubmitting(false);
-      return;
-    }
-    if (!guardianName.trim()) {
-      setError({ message: "Nama wali wajib diisi." });
-      setSubmitting(false);
-      return;
+    // Validasi wajib orang tua & wali (khusus alur Create)
+    if (!initialData) {
+      if (!fatherName.trim() || !motherName.trim()) {
+        setError({ message: "Nama ayah dan ibu wajib diisi." });
+        setSubmitting(false);
+        return;
+      }
+      if (!guardianName.trim()) {
+        setError({ message: "Nama wali wajib diisi." });
+        setSubmitting(false);
+        return;
+      }
     }
 
     const payload: CreateStudentPayload = {
@@ -205,13 +207,13 @@ export default function StudentForm({
 
       if (parentId) {
         await parentService.update(parentId, { ...parentPayload, student_id: studentId });
-      } else {
+      } else if (fatherName.trim() || motherName.trim()) {
         await parentService.create({ ...parentPayload, student_id: studentId });
       }
 
       if (guardianId) {
         await guardianService.update(guardianId, { ...guardianPayload, student_id: studentId });
-      } else {
+      } else if (guardianName.trim()) {
         await guardianService.create({ ...guardianPayload, student_id: studentId });
       }
 
