@@ -422,18 +422,19 @@ export default function StudentProfilePage() {
                     >
                       <X className="h-4 w-4" /> Batal
                     </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => saveGroup(g.title, g.fields)}
-                      disabled={saving}
-                    >
-                      {saving ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Save className="h-4 w-4" />
-                      )}{" "}
-                      Simpan
-                    </Button>
+                     <Button
+                       variant="secondary"
+                       size="sm"
+                       onClick={() => saveGroup(g.title, g.fields)}
+                       disabled={saving}
+                     >
+                       {saving ? (
+                         <Loader2 className="h-4 w-4 animate-spin" />
+                       ) : (
+                         <Save className="h-4 w-4" />
+                       )}{" "}
+                       Simpan
+                     </Button>
                   </div>
                 )}
               </div>
@@ -557,20 +558,21 @@ export default function StudentProfilePage() {
                 >
                   <X className="h-4 w-4" /> Batal
                 </Button>
-                <Button
-                  size="sm"
-                  onClick={() =>
-                    saveGroup("Orang Tua / Wali", PARENT_FIELDS, true)
-                  }
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Save className="h-4 w-4" />
-                  )}{" "}
-                  Simpan
-                </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      saveGroup("Orang Tua / Wali", PARENT_FIELDS, true)
+                    }
+                    disabled={saving}
+                  >
+                    {saving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}{" "}
+                    Simpan
+                  </Button>
               </div>
             )}
           </div>

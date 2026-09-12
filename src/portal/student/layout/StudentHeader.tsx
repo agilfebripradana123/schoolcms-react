@@ -77,7 +77,7 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
         onConfirm={handleLogout}
       />
 
-      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-outline bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
+      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-4 backdrop-blur-md lg:px-6">
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
@@ -111,7 +111,7 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
           <div className="relative" ref={menuRef}>
             <button
               onClick={toggleUserMenu}
-              className="flex items-center gap-2 rounded-2xl border border-outline bg-surface px-2 py-1.5 text-secondary shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
+              className="flex items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-lowest px-2 py-1.5 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
               aria-label="Menu pengguna"
               aria-expanded={userMenuOpen}
             >
@@ -119,7 +119,7 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
                 <img
                   src={(studentPhoto ?? user?.photo) as string}
                   alt={userDisplayName}
-                  className="h-9 w-9 rounded-full object-cover border border-outline"
+                  className="h-9 w-9 rounded-full object-cover border border-outline-variant"
                   onError={() => setImgFailed(true)}
                 />
               ) : (

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Loader2,
   Calendar,
@@ -16,6 +16,8 @@ import { toApiError } from "@/lib/api/error";
 import { formatDate } from "@/lib/format";
 import Card, { CardBody, CardHeader } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import { useAppearance } from "@/features/system/hooks/useAppearance";
 
 interface StudentProfile {
   id: number;
@@ -123,6 +125,8 @@ export default function StudentPortalPage() {
   const [recentExams, setRecentExams] = useState<ExamItem[]>([]);
   const [recentNotifications, setRecentNotifications] = useState<NotificationItem[]>([]);
   const [recentViolations, setRecentViolations] = useState<ViolationItem[]>([]);
+  const navigate = useNavigate();
+  const { primaryColor } = useAppearance();
 
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
@@ -246,22 +250,27 @@ export default function StudentPortalPage() {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Hero Card */}
-      <Card className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 opacity-10" />
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            {profile?.photo ? (
-              <img src={profile.photo} alt={profile.name} className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-sm" onError={(e)=>{ (e.target as HTMLImageElement).style.display='none'; }} />
-            ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-600 text-white shadow-sm">
-                <span className="text-2xl font-bold">
-                  {profile?.name?.charAt(0).toUpperCase() || "S"}
-                </span>
-              </div>
-            )}
+       {/* Welcome Hero Card */}
+       <Card className="relative overflow-hidden">
+         <div
+           className="absolute inset-0 opacity-10"
+           style={{
+             backgroundImage: `linear-gradient(to bottom right, ${primaryColor || "#4f46e5"}, #7e22ce)`,
+           }}
+         />
+         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+           <div className="flex items-center gap-4">
+             {profile?.photo ? (
+               <img src={profile.photo} alt={profile.name} className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-sm" onError={(e)=>{ (e.target as HTMLImageElement).style.display='none'; }} />
+             ) : (
+               <div className="flex h-16 w-16 items-center justify-center rounded-full text-white shadow-sm" style={{ backgroundColor: primaryColor || "#4f46e5" }}>
+                 <span className="text-2xl font-bold">
+                   {profile?.name?.charAt(0).toUpperCase() || "S"}
+                 </span>
+               </div>
+             )}
             <div>
-              <h1 className="text-xl font-bold leading-tight text-primary sm:text-2xl">
+              <h1 className="text-xl font-bold leading-tight text-on-surface sm:text-2xl">
                 Selamat datang, {profile?.name || "Siswa"}
               </h1>
               <p className="mt-1 text-sm text-secondary">
@@ -272,21 +281,21 @@ export default function StudentPortalPage() {
               </p>
             </div>
           </div>
-          <Link
-            to="/siswa/profile"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 shadow-sm"
+          <Button
+            size="md"
+            onClick={() => navigate("/siswa/profile")}
+            leftIcon={<CheckCircle className="h-4 w-4" />}
           >
-            <CheckCircle className="h-4 w-4" />
             Lihat Profil
-          </Link>
+          </Button>
         </div>
       </Card>
 
       {/* Akademik Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-primary">Akademik</h2>
-           <Link to="/siswa/grades" className="text-sm text-primary hover:underline">
+          <h2 className="text-base font-semibold text-on-surface">Akademik</h2>
+           <Link to="/siswa/grades" className="text-sm text-on-surface hover:underline">
              <ArrowRight className="h-4 w-4" />
            </Link>
         </div>
@@ -306,7 +315,7 @@ export default function StudentPortalPage() {
             <Card className="transition-shadow hover:shadow-md">
               <CardHeader title="Rata-rata Nilai" />
               <CardBody className="text-center">
-                <p className="text-3xl font-bold text-primary">
+                <p className="text-3xl font-bold text-on-surface">
                   {gradeSummary?.average?.toFixed(1) ?? "-"}
                 </p>
                 <p className="mt-1 text-xs text-secondary">
@@ -318,7 +327,7 @@ export default function StudentPortalPage() {
             <Card className="transition-shadow hover:shadow-md">
               <CardHeader title="Kehadiran" />
               <CardBody className="text-center">
-                <p className="text-3xl font-bold text-primary">
+                <p className="text-3xl font-bold text-on-surface">
                   {attendanceSummary?.percentage?.toFixed(0) ?? "-"}%
                 </p>
                 <p className="mt-1 text-xs text-secondary">
@@ -364,7 +373,7 @@ export default function StudentPortalPage() {
       {/* Aktivitas Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-primary">Aktivitas</h2>
+          <h2 className="text-base font-semibold text-on-surface">Aktivitas</h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -382,10 +391,10 @@ export default function StudentPortalPage() {
                 recentAssignments.map((a) => (
                   <div key={a.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
                     <div className="flex-shrink-0 mt-0.5">
-                      <Calendar className="h-4 w-4 text-primary" />
+                      <Calendar className="h-4 w-4 text-on-surface" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-primary">{a.title}</p>
+                      <p className="truncate text-sm font-medium text-on-surface">{a.title}</p>
                       <p className="text-xs text-secondary">
                         {a.subject?.name ?? `Mata pelajaran #${a.subject_id}`}
                         {a.due_date ? ` · Jatuh tempo ${formatDate(a.due_date)}` : ""}
@@ -395,7 +404,7 @@ export default function StudentPortalPage() {
                 ))
               )}
               <div className="pt-2">
-                <Link to="/siswa/assignments" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                <Link to="/siswa/assignments" className="inline-flex items-center gap-1 text-sm font-medium text-primary-container hover:underline">
                   Lihat semua tugas <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -416,10 +425,10 @@ export default function StudentPortalPage() {
                 recentExams.map((e) => (
                   <div key={e.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
                     <div className="flex-shrink-0 mt-0.5">
-                      <FileText className="h-4 w-4 text-primary" />
+                      <FileText className="h-4 w-4 text-on-surface" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-primary">{e.title}</p>
+                      <p className="truncate text-sm font-medium text-on-surface">{e.title}</p>
                       <p className="text-xs text-secondary">
                         {e.subject?.name ?? ""}
                         {e.exam_date ? ` · ${formatDate(e.exam_date)}` : ""}
@@ -429,7 +438,7 @@ export default function StudentPortalPage() {
                 ))
               )}
               <div className="pt-2">
-                 <Link to="/siswa/exams" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                 <Link to="/siswa/exams" className="inline-flex items-center gap-1 text-sm font-medium text-primary-container hover:underline">
                    Lihat semua ujian <ArrowRight className="h-3.5 w-3.5" />
                  </Link>
               </div>
@@ -450,10 +459,10 @@ export default function StudentPortalPage() {
                 recentNotifications.map((n) => (
                   <div key={n.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
                     <div className="flex-shrink-0 mt-0.5">
-                      <Bell className={`h-4 w-4 ${n.is_read ? "text-secondary" : "text-primary"}`} />
+                      <Bell className={`h-4 w-4 ${n.is_read ? "text-secondary" : "text-on-surface"}`} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className={`text-sm ${n.is_read ? "font-medium" : "font-semibold"} text-primary`}>
+                      <p className={`text-sm ${n.is_read ? "font-medium" : "font-semibold"} text-on-surface`}>
                         {n.title}
                       </p>
                       <p className="text-xs text-secondary">
@@ -467,7 +476,7 @@ export default function StudentPortalPage() {
                 ))
               )}
                             <div className="pt-2">
-                <Link to="/siswa/notifications" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                <Link to="/siswa/notifications" className="inline-flex items-center gap-1 text-sm font-medium text-primary-container hover:underline">
                   Lihat semua notifikasi <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
