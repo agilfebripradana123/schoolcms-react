@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronLeft, Save } from "lucide-react";
+import { ChevronLeft, RotateCcw, Save } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -92,10 +92,9 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
   const setValue = (key: string, val: string) =>
     setValues((prev) => ({ ...prev, [key]: val }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const persist = async (vals: Record<string, string>) => {
     for (const field of category.fields) {
-      const raw = (values[field.key] ?? "").trim();
+      const raw = (vals[field.key] ?? "").trim();
       if (raw === "") continue;
       if (field.type === "integer") {
         const n = Number(raw);
@@ -111,11 +110,10 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
     }
     setSaving(true);
     setSaveError(null);
-
     try {
       for (const field of category.fields) {
         const existing = settingsByKey[field.key];
-        const raw = values[field.key] ?? "";
+        const raw = vals[field.key] ?? "";
         const isSecret = field.type === "password";
         const unchangedSecret = isSecret && (raw === "" || raw === SECRET_MASK);
 
@@ -173,6 +171,21 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await persist(values);
+  };
+
+  const handleDefault = (e: React.FormEvent) => {
+    e.preventDefault();
+    const defaults: Record<string, string> = {};
+    for (const field of category.fields) {
+      defaults[field.key] = field.defaultValue ?? "";
+    }
+    setValues(defaults);
+    persist(defaults);
   };
 
   const content = (
@@ -248,6 +261,16 @@ export default function SettingsCategoryPage({ group, noContainer = false }: Set
               )}
 
               <div className="flex justify-end gap-3 border-t border-outline-variant pt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleDefault}
+                  loading={saving}
+                  disabled={loading}
+                  leftIcon={<RotateCcw className="h-4 w-4" />}
+                >
+                  Gunakan Default
+                </Button>
                 <Button type="submit" loading={saving} leftIcon={<Save className="h-4 w-4" />}>
                   Simpan Perubahan
                 </Button>
