@@ -6,6 +6,7 @@ import loginBg from "@/assets/images/gambar_login.webp";
 import { toast } from "sonner";
 import { toApiError } from "@/lib/api/error";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
+import { useAppearance } from "@/features/system/hooks/useAppearance";
 import { LoginPreloader } from "@/components/ui/LoginPreloader";
 
 interface LoginFormProps {
@@ -55,6 +56,7 @@ function getRedirectPath(role: string): string {
 export function LoginForm({ mode }: LoginFormProps) {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { primaryColor } = useAppearance();
   const { heroImage, heroText, heroTextSub, schoolName, schoolAddress, schoolLogo, faviconUrl, appName, loading: settingsLoading } = usePublicSettings();
   const [loginValue, setLoginValue] = useState("");
   const [password, setPassword] = useState("");
@@ -167,6 +169,18 @@ export function LoginForm({ mode }: LoginFormProps) {
 
   const heroBg = heroImage || loginBg;
 
+  const heroTint = (() => {
+    const hex = primaryColor || "";
+    if (/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex)) {
+      const full = hex.length === 4 ? hex.slice(1).split("").map((c) => c + c).join("") : hex.slice(1);
+      const r = parseInt(full.slice(0, 2), 16);
+      const g = parseInt(full.slice(2, 4), 16);
+      const b = parseInt(full.slice(4, 6), 16);
+      return `rgba(${r},${g},${b},0.68)`;
+    }
+    return "rgba(88,28,135,0.68)";
+  })();
+
   return (
     <div className="relative min-h-screen bg-surface-container-lowest text-on-surface">
       <div
@@ -183,7 +197,7 @@ export function LoginForm({ mode }: LoginFormProps) {
         <section
           className="relative hidden flex-col justify-between bg-slate-950 px-10 py-10 text-white lg:flex"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(15,23,42,0.94) 0%, rgba(30,41,59,0.82) 45%, rgba(88,28,135,0.68) 100%), url(${heroImage || loginBg})`,
+            backgroundImage: `linear-gradient(135deg, rgba(15,23,42,0.94) 0%, rgba(30,41,59,0.82) 45%, ${heroTint} 100%), url(${heroImage || loginBg})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -201,17 +215,17 @@ export function LoginForm({ mode }: LoginFormProps) {
               ) : (
                 <ShieldCheck className="mb-4 h-8 w-8 text-primary-fixed" />
               )}
-              <h2 className="text-2xl font-bold">{appName}</h2>
-              <p className="mt-1 text-sm text-outline">{schoolName}</p>
-              {schoolAddress && (
-                <p className="mt-1 text-xs text-outline">{schoolAddress}</p>
-              )}
-              <h1 className="mt-10 text-4xl font-bold leading-tight tracking-tight">
-                {heroText}
-              </h1>
-              <p className="mt-4 max-w-md text-base text-outline">
-                {heroTextSub}
-              </p>
+<h2 className="text-2xl font-bold text-white">{appName}</h2>
+                  <p className="mt-1 text-sm text-white/70">{schoolName}</p>
+                  {schoolAddress && (
+                    <p className="mt-1 text-xs text-white/60">{schoolAddress}</p>
+                  )}
+                  <h1 className="mt-10 text-4xl font-bold leading-tight tracking-tight text-white">
+                    {heroText}
+                  </h1>
+                  <p className="mt-4 max-w-md text-base text-white/70">
+                    {heroTextSub}
+                  </p>
             </div>
           </div>
         </section>

@@ -27,6 +27,8 @@ export interface SettingsFieldConfig {
   isPublic?: boolean;
   uploadable?: boolean;
   options?: { value: string; label: string }[];
+  /** Nilai bawaan aplikasi, dipakai tombol "Gunakan Default". */
+  defaultValue?: string;
 }
 
 export interface SettingsCategoryConfig {
@@ -143,9 +145,9 @@ export const settingsCategories: SettingsCategoryConfig[] = [
     route: "/admin/system/settings/appearance",
     icon: Palette,
     fields: [
-      { key: "theme", label: "Theme", type: "select", description: "Pilih tema tampilan aplikasi.", options: [{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }, { value: "system", label: "System / Ikuti sistem" }], isPublic: true },
-      { key: "primary_color", label: "Primary color", type: "color", isPublic: true },
-      { key: "sidebar_behavior", label: "Sidebar behavior", type: "select", description: "Pilih perilaku sidebar.", options: [{ value: "expand", label: "Selalu terbuka" }, { value: "collapse", label: "Selalu tertutup" }, { value: "collapsible", label: "Otomatis (bisa dilipat)" }], isPublic: true },
+      { key: "theme", label: "Theme", type: "select", description: "Pilih tema tampilan aplikasi.", options: [{ value: "light", label: "Light" }, { value: "dark", label: "Dark" }, { value: "system", label: "System / Ikuti sistem" }], isPublic: true, defaultValue: "light" },
+      { key: "primary_color", label: "Primary color", type: "color", isPublic: true, defaultValue: "#630ed4" },
+      { key: "sidebar_behavior", label: "Sidebar behavior", type: "select", description: "Pilih perilaku sidebar.", options: [{ value: "expand", label: "Selalu terbuka" }, { value: "collapse", label: "Selalu tertutup" }, { value: "collapsible", label: "Otomatis (bisa dilipat)" }], isPublic: true, defaultValue: "expand" },
     ],
   },
 ];
