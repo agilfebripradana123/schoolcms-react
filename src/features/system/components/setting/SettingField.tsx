@@ -52,8 +52,10 @@ export default function SettingField({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder ?? "Nilai teks panjang"}
           disabled={disabled}
+          className="min-h-[100px]"
         />
       );
+      // ponytail: assert save/load — tambahkan test manual di console.log(values) pada persist() di SettingsCategoryPage.tsx
     case "integer":
       return (
         <Input
@@ -66,7 +68,7 @@ export default function SettingField({
     case "boolean":
       return (
         <AppSelect
-          value={value}
+          value={value === "Belum dikonfigurasi" ? "" : value}
           onChange={(v) => onChange(v ?? "")}
           options={BOOLEAN_OPTIONS}
           placeholder="Pilih Ya / Tidak"
