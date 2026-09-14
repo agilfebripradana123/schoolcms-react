@@ -50,8 +50,7 @@ export default function TeacherSidebar({
   );
 
   const isActive = useCallback((path: string) => {
-    const normalized = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-    return normalized === path || normalized === path + "/dashboard";
+    return pathname === path || pathname.startsWith(path + "/");
   }, [pathname]);
   const isGroupActive = useCallback(
     (entry: (typeof visibleNavigation)[number]) =>

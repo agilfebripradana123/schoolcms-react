@@ -7,15 +7,18 @@ import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import { settingsCategories } from "../settings/categoryConfig";
 import { settingService } from "../api/setting.service";
+import ErrorState from "../components/ErrorState";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [error, setError] = useState<ApiError | null>(null);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     let active = true;
 
+    setError(null);
     settingService
       .list({ per_page: 100 })
       .then((res) => {
@@ -35,7 +38,7 @@ export default function SettingsPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [retry]);
 
   return (
     <PageContainer className="py-6">
@@ -49,9 +52,10 @@ export default function SettingsPage() {
       </div>
 
       {error && (
-        <p className="mb-4 rounded-xl bg-error-container px-3 py-2 text-sm text-error">
-          Gagal memuat jumlah pengaturan: {error.message}
-        </p>
+        <ErrorState 
+          error={error} 
+          onRetry={() => setRetry(r => r + 1)} 
+        />
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, BookOpen } from "lucide-react";
+import { BookOpen, ArrowRight } from "lucide-react";
 import { teacherClassService } from "@/features/academic";
 import type { TeacherClass } from "@/features/academic";
 import { toApiError } from "@/lib/api";
-import Card, { CardBody } from "@/components/ui/Card";
+import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -65,32 +65,26 @@ export default function TeacherClassesPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {classes.map((c) => {
           const studentCount = Number(c.students_count) || 0;
-          const slug = c.name.toLowerCase().replace(/\s+/g, "-");
           return (
             <Link
               key={c.id}
               to={`/guru/academic/classes/${c.id}`}
               state={{ className: c.name }}
-              className="group block"
+              className="block h-full"
             >
-              <Card className="h-full transition-shadow group-hover:shadow-md">
-                <CardBody>
+              <Card className="group h-full border border-outline-variant rounded-2xl p-4 flex flex-col gap-2 transition-shadow hover:shadow-md">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-semibold text-primary">{c.name}</h3>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {c.level && <Badge variant="secondary">{c.level}</Badge>}
-                    {c.academic_year && <Badge variant="neutral">{c.academic_year}</Badge>}
-                  </div>
-                  <div className="mt-4 flex items-center gap-5 text-sm text-secondary">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Users className="h-4 w-4" />
-                      {studentCount} siswa
-                    </span>
-                    <span className="font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                      Lihat siswa →
-                    </span>
-                  </div>
-                  <span className="sr-only">{`Buka kelas ${slug}`}</span>
-                </CardBody>
+                  {c.level && <Badge variant="secondary">{c.level}</Badge>}
+                  {c.academic_year && <Badge variant="neutral">{c.academic_year}</Badge>}
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-secondary">{studentCount} siswa</span>
+                  <span className="inline-flex items-center gap-1 font-semibold text-primary">
+                    Lihat siswa
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
+                </div>
               </Card>
             </Link>
           );

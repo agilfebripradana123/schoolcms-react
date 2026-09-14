@@ -40,9 +40,10 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     });
   }, []);
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
   const isGroupActive = (group: (typeof navigation)[number]) =>
-    group.items.some((item) => location.pathname === item.path);
+    group.items.some((item) => location.pathname === item.path || location.pathname.startsWith(item.path + "/"));
 
   const isSuperAdmin = user?.role === "Super Admin";
   const filteredNavigation = isSuperAdmin

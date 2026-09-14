@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, Link } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 import { teacherClassService } from "@/features/academic";
 import type { TeacherClassStudent } from "@/features/academic";
 import { toApiError } from "@/lib/api";
@@ -7,7 +8,6 @@ import Badge from "@/components/ui/Badge";
 import DataTable from "@/components/ui/DataTable";
 import Search from "@/components/ui/Search";
 import PageContainer from "@/components/layout/PageContainer";
-import PageHeader from "@/components/layout/PageHeader";
 import PortalErrorState from "@/portal/components/PortalErrorState";
 import PortalFilterBar from "@/portal/components/PortalFilterBar";
 import Pagination from "../../../components/ui/Pagination";
@@ -61,10 +61,15 @@ export default function TeacherClassDetailPage() {
 
   return (
     <PageContainer>
-      <PageHeader
-        title={`Siswa Kelas ${className ?? id}`}
-        description="Daftar siswa pada kelas yang menjadi scope mengajar Anda."
-      />
+      <div className="mb-6">
+        <Link to="/guru/academic/classes" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-on-surface-variant hover:text-on-surface">
+          <ChevronLeft className="h-4 w-4" /> Kelas Saya
+        </Link>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-on-surface">
+          Siswa Kelas {className ?? id}
+        </h1>
+        <p className="mt-1 text-sm text-on-surface-variant">Daftar siswa pada kelas yang menjadi scope mengajar Anda.</p>
+      </div>
 
       <PortalFilterBar>
         <form onSubmit={handleSearch} className="min-w-[240px] flex-1 max-w-xs">

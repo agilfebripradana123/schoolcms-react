@@ -44,7 +44,7 @@ export default function TeacherSidebarSection({
             key={item.path}
             item={item}
             collapsed={true}
-            active={currentPath === item.path}
+            active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
             onGo={onGo}
           />
         ))}
@@ -77,7 +77,7 @@ export default function TeacherSidebarSection({
                key={item.path}
                item={item}
                collapsed={false}
-               active={currentPath === item.path}
+               active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
                onGo={onGo}
              />
            ))}

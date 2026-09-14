@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { navigation, studentNavigation, studentDashboardItem } from "@/config/navigation";
+import { navigation, studentNavigation, studentDashboardItem, teacherNavigation, teacherDashboardItem } from "@/config/navigation";
 
 interface BreadcrumbSegment {
   label: string;
@@ -13,8 +13,9 @@ export default function Breadcrumb() {
 
   const segments = useMemo((): BreadcrumbSegment[] => {
     const p = location.pathname;
+    const isGuru = p.startsWith("/guru");
     const isSiswa = p.startsWith("/siswa");
-    const basePath = isSiswa ? "/siswa" : "/dashboard";
+    const basePath = isGuru ? "/guru/dashboard" : isSiswa ? "/siswa" : "/dashboard";
     const baseLabel = "Dasbor";
 
     if (p === basePath || p === "/" || p === "/siswa") {
@@ -24,11 +25,11 @@ export default function Breadcrumb() {
     const result: BreadcrumbSegment[] = [{ label: baseLabel, path: basePath, isLast: false }];
 
     // dashboard item itself
-    if (p === studentDashboardItem.path) {
+    if (p === studentDashboardItem.path || p === teacherDashboardItem.path) {
       return [{ label: baseLabel, path: basePath, isLast: true }];
     }
 
-    const nav = isSiswa ? studentNavigation : navigation;
+    const nav = isGuru ? teacherNavigation : isSiswa ? studentNavigation : navigation;
     for (const entry of nav) {
       if ("items" in entry && entry.items) {
         for (const item of entry.items) {
@@ -38,9 +39,9 @@ export default function Breadcrumb() {
             return result;
           }
         }
-      } else if ("path" in entry) {
+      } else if ("path" in entry && typeof entry.path === "string") {
         if (p === entry.path || p.startsWith(entry.path + "/")) {
-          result.push({ label: entry.label, path: entry.path, isLast: true });
+          result.push({ label: entry.label as string, path: entry.path, isLast: true });
           return result;
         }
       }

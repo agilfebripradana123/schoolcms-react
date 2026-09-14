@@ -55,10 +55,13 @@ export default function Sidebar({
     });
   }, []);
 
-  const isActive = useCallback((path: string) => pathname === path, [pathname]);
+  const isActive = useCallback(
+    (path: string) => pathname === path || pathname.startsWith(path + "/"),
+    [pathname],
+  );
   const isGroupActive = useCallback(
     (group: (typeof navigation)[number]) =>
-      group.items.some((item) => pathname === item.path),
+      group.items.some((item) => pathname === item.path || pathname.startsWith(item.path + "/")),
     [pathname],
   );
 

@@ -111,7 +111,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
           <div className="relative" ref={menuRef}>
             <button
               onClick={toggleUserMenu}
-              className="flex items-center gap-2 rounded-2xl border border-outline bg-surface px-2 py-1.5 text-secondary shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
+              className="flex items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-lowest px-2 py-1.5 text-on-surface-variant shadow-sm transition-colors hover:border-primary-container hover:text-primary-container"
               aria-label="Menu pengguna"
               aria-expanded={userMenuOpen}
             >
