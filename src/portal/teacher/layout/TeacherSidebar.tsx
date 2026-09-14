@@ -49,13 +49,22 @@ export default function TeacherSidebar({
     [navigate, onNavigation],
   );
 
-  const isActive = useCallback((path: string) => pathname === path, [pathname]);
+  const isActive = useCallback((path: string) => {
+    const normalized = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+    return normalized === path || normalized === path + "/dashboard";
+  }, [pathname]);
   const isGroupActive = useCallback(
     (entry: (typeof visibleNavigation)[number]) =>
       "items" in entry &&
       entry.items?.some((i) => pathname === i.path),
     [pathname],
   );
+
+  function isGroup(
+    entry: (typeof visibleNavigation)[number]
+  ): entry is Extract<(typeof visibleNavigation)[number], { label: string; items: unknown[] }> {
+    return "items" in entry && Array.isArray((entry as { items?: unknown }).items);
+  }
 
   return (
     <nav className="flex h-full flex-col" style={{ backgroundColor: "var(--sidebar-bg)", color: "var(--sidebar-text)" }}>
@@ -104,7 +113,7 @@ export default function TeacherSidebar({
 
         <div className="mt-4 space-y-1">
           {visibleNavigation.map((entry) => {
-            if ("items" in entry) {
+            if (isGroup(entry)) {
               return (
                 <TeacherSidebarSection
                   key={entry.label}

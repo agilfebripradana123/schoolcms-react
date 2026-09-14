@@ -231,29 +231,29 @@ export const studentNavigation = [
   {
     label: "Akademik",
     items: [
-      { label: "Nilai", path: "/siswa/grades", icon: Award },
-      { label: "Jadwal", path: "/siswa/schedule", icon: CalendarClock },
-      { label: "Kehadiran", path: "/siswa/attendance", icon: ClipboardCheck },
+      { label: "Nilai", path: "/siswa/grades", icon: Award, permission: "view-grades" },
+      { label: "Jadwal", path: "/siswa/schedule", icon: CalendarClock, permission: "view-schedules" },
+      { label: "Kehadiran", path: "/siswa/attendance", icon: ClipboardCheck, permission: "view-attendance" },
     ],
   },
   {
     label: "Keuangan",
     items: [
-      { label: "Ringkasan", path: "/siswa/finance/summary", icon: PiggyBank },
-      { label: "Tagihan", path: "/siswa/finance/billings", icon: Receipt },
-      { label: "Pembayaran", path: "/siswa/finance/payments", icon: Wallet },
-      { label: "Transaksi", path: "/siswa/finance/transactions", icon: DollarSign },
-      { label: "Beasiswa", path: "/siswa/finance/scholarships", icon: BadgePercent },
+      { label: "Ringkasan", path: "/siswa/finance/summary", icon: PiggyBank, permission: "view-finance" },
+      { label: "Tagihan", path: "/siswa/finance/billings", icon: Receipt, permission: "view-billings" },
+      { label: "Pembayaran", path: "/siswa/finance/payments", icon: Wallet, permission: "view-payments" },
+      { label: "Transaksi", path: "/siswa/finance/transactions", icon: DollarSign, permission: "view-transactions" },
+      { label: "Beasiswa", path: "/siswa/finance/scholarships", icon: BadgePercent, permission: "view-scholarships" },
     ],
   },
   {
     label: "Aktivitas",
     items: [
-      { label: "Tugas", path: "/siswa/assignments", icon: ClipboardList },
-      { label: "Ujian", path: "/siswa/exams", icon: BookOpen },
-      { label: "Prestasi", path: "/siswa/achievements", icon: Trophy },
-      { label: "Pelanggaran", path: "/siswa/violations", icon: ShieldAlert },
-      { label: "Ekstrakurikuler", path: "/siswa/extracurricular", icon: Dumbbell },
+      { label: "Tugas", path: "/siswa/assignments", icon: ClipboardList, permission: "view-assignments" },
+      { label: "Ujian", path: "/siswa/exams", icon: BookOpen, permission: "view-exams" },
+      { label: "Prestasi", path: "/siswa/achievements", icon: Trophy, permission: "view-achievements" },
+      { label: "Pelanggaran", path: "/siswa/violations", icon: ShieldAlert, permission: "view-violations" },
+      { label: "Ekstrakurikuler", path: "/siswa/extracurricular", icon: Dumbbell, permission: "view-extracurricular" },
     ],
   },
 ];

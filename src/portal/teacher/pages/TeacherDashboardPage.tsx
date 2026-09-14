@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CalendarClock, School, ClipboardList, BookOpen, Calendar, Bell } from "lucide-react";
 import { useAuth } from "@/features/auth/useAuth";
 import Card, { CardBody } from "@/components/ui/Card";
@@ -29,6 +30,7 @@ function formatTime(t?: string | null) {
 
 export default function TeacherDashboardPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const displayName = user?.name || "Guru";
 
   const [classCount, setClassCount] = useState<number | null>(null);
@@ -87,30 +89,54 @@ export default function TeacherDashboardPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+      <div
+        role="button"
+        onClick={() => navigate("/guru/academic/classes")}
+        className="cursor-pointer hover:opacity-80"
+      >
         <PortalStatCard
           icon={<School className="h-5 w-5 text-primary" />}
           label="Kelas yang diajar"
           value={classCount ?? 0}
           loading={loading}
         />
+      </div>
+      <div
+        role="button"
+        onClick={() => navigate("/guru/academic/schedules")}
+        className="cursor-pointer hover:opacity-80"
+      >
         <PortalStatCard
           icon={<CalendarClock className="h-5 w-5 text-primary" />}
           label="Jadwal hari ini"
           value={todaySchedules.length}
           loading={loading}
         />
+      </div>
+      <div
+        role="button"
+        onClick={() => navigate("/guru/academic/assignments")}
+        className="cursor-pointer hover:opacity-80"
+      >
         <PortalStatCard
           icon={<ClipboardList className="h-5 w-5 text-primary" />}
           label="Tugas aktif"
           value={assignments.length}
           loading={loading}
         />
+      </div>
+      <div
+        role="button"
+        onClick={() => navigate("/guru/examinations")}
+        className="cursor-pointer hover:opacity-80"
+      >
         <PortalStatCard
           icon={<BookOpen className="h-5 w-5 text-primary" />}
           label="Ujian"
           value={exams.length}
           loading={loading}
         />
+      </div>
       </div>
 
       <Card className="mb-6">
@@ -141,7 +167,7 @@ export default function TeacherDashboardPage() {
           ) : (
             <div className="divide-y divide-outline-variant">
               {todaySchedules.map((s) => (
-                <div key={s.id} className="flex flex-wrap items-center gap-4 py-3 first:pt-0 last:pb-0">
+                <div key={s.id} role="button" onClick={() => navigate("/guru/academic/schedules")} className="flex flex-wrap items-center gap-4 py-3 first:pt-0 last:pb-0 cursor-pointer hover:opacity-80">
                   <div className="flex w-24 shrink-0 flex-col">
                     <span className="text-sm font-semibold text-primary">{formatTime(s.period?.start_time)}</span>
                     <span className="text-xs text-secondary">{formatTime(s.period?.end_time)}</span>
@@ -173,7 +199,8 @@ export default function TeacherDashboardPage() {
           ) : (
             <div className="space-y-3">
               {assignments.map((a) => (
-                <Card key={a.id} className="bg-surface-container">
+                <div key={a.id} role="button" onClick={() => navigate("/guru/academic/assignments")} className="cursor-pointer hover:opacity-80">
+                <Card className="bg-surface-container">
                   <CardBody>
                     <p className="text-sm font-semibold text-primary">{a.title}</p>
                     <p className="mt-1 text-xs text-secondary">
@@ -182,6 +209,7 @@ export default function TeacherDashboardPage() {
                     </p>
                   </CardBody>
                 </Card>
+                </div>
               ))}
             </div>
           )}
@@ -204,7 +232,8 @@ export default function TeacherDashboardPage() {
           ) : (
             <div className="space-y-3">
               {exams.map((e) => (
-                <Card key={e.id} className="bg-surface-container">
+                <div key={e.id} role="button" onClick={() => navigate("/guru/examinations")} className="cursor-pointer hover:opacity-80">
+                <Card className="bg-surface-container">
                   <CardBody>
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="min-w-0 flex-1">
@@ -215,6 +244,7 @@ export default function TeacherDashboardPage() {
                     </div>
                   </CardBody>
                 </Card>
+                </div>
               ))}
             </div>
           )}
@@ -228,7 +258,7 @@ export default function TeacherDashboardPage() {
             <h2 className="text-sm font-semibold text-secondary">Kelas Saya</h2>
           </div>
           <p className="text-sm text-secondary mb-3">Kelas yang Anda ajar</p>
-          <Button variant="secondary" size="sm" onClick={loadAll} disabled={loading}>
+          <Button variant="secondary" size="sm" onClick={() => navigate("/guru/academic/classes")} disabled={loading}>
             {loading ? "Memuat..." : "Lihat Semua Kelas"}
           </Button>
         </CardBody>

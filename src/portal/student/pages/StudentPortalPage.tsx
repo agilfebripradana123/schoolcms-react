@@ -312,7 +312,7 @@ export default function StudentPortalPage() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
-            <Card className="transition-shadow hover:shadow-md">
+            <Card className="transition-shadow hover:shadow-md cursor-pointer" onClick={() => navigate("/siswa/grades")}>
               <CardHeader title="Rata-rata Nilai" />
               <CardBody className="text-center">
                 <p className="text-3xl font-bold text-on-surface">
@@ -324,7 +324,7 @@ export default function StudentPortalPage() {
               </CardBody>
             </Card>
 
-            <Card className="transition-shadow hover:shadow-md">
+            <Card className="transition-shadow hover:shadow-md cursor-pointer" onClick={() => navigate("/siswa/attendance")}>
               <CardHeader title="Kehadiran" />
               <CardBody className="text-center">
                 <p className="text-3xl font-bold text-on-surface">
@@ -336,7 +336,7 @@ export default function StudentPortalPage() {
               </CardBody>
             </Card>
 
-            <Card className="transition-shadow hover:shadow-md">
+            <Card className="transition-shadow hover:shadow-md cursor-pointer" onClick={() => navigate("/siswa/schedule")}>
               <CardHeader title="Jadwal Hari Ini" />
               <CardBody>
                 {todaySchedule.length === 0 ? (
@@ -389,7 +389,7 @@ export default function StudentPortalPage() {
                 <p className="text-center text-sm text-secondary py-4">Belum ada tugas</p>
               ) : (
                 recentAssignments.map((a) => (
-                  <div key={a.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
+                  <div key={a.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container cursor-pointer" onClick={() => navigate("/siswa/assignments")}>
                     <div className="flex-shrink-0 mt-0.5">
                       <Calendar className="h-4 w-4 text-on-surface" />
                     </div>
@@ -423,7 +423,7 @@ export default function StudentPortalPage() {
                 <p className="text-center text-sm text-secondary py-4">Belum ada ujian</p>
               ) : (
                 recentExams.map((e) => (
-                  <div key={e.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
+                  <div key={e.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container cursor-pointer" onClick={() => navigate("/siswa/exams")}>
                     <div className="flex-shrink-0 mt-0.5">
                       <FileText className="h-4 w-4 text-on-surface" />
                     </div>
@@ -457,7 +457,7 @@ export default function StudentPortalPage() {
                 <p className="text-center text-sm text-secondary py-4">Belum ada notifikasi</p>
               ) : (
                 recentNotifications.map((n) => (
-                  <div key={n.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container">
+                  <div key={n.id} className="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container cursor-pointer" onClick={() => navigate("/siswa/notifications")}>
                     <div className="flex-shrink-0 mt-0.5">
                       <Bell className={`h-4 w-4 ${n.is_read ? "text-secondary" : "text-on-surface"}`} />
                     </div>

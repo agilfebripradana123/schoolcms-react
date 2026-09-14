@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { navigation, dashboardItem } from "@/config/navigation";
 import SidebarSection from "./SidebarSection";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
+import { useAuth } from "@/features/auth/useAuth";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -16,12 +17,30 @@ export default function Sidebar({
 
 }: SidebarProps) {
   const { appName, faviconUrl } = usePublicSettings();
+  const { user } = useAuth();
 
   const location = useLocation();
   const pathname = location.pathname;
 
+  const isSuperAdmin = user?.role === "Super Admin";
+
+  const filteredNavigation = useMemo(() => {
+    if (isSuperAdmin) return navigation;
+    return navigation.map((group) => {
+      if (group.label !== "Sistem") return group;
+      return {
+        ...group,
+        items: group.items.filter(
+          (item) =>
+            item.path !== "/admin/system/settings" &&
+            item.path !== "/admin/system/audit-logs"
+        ),
+      };
+    });
+  }, [isSuperAdmin]);
+
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
-    const activeGroup = navigation.find((group) =>
+    const activeGroup = filteredNavigation.find((group) =>
       group.items.some((item) => pathname === item.path || pathname.startsWith(item.path + "/")),
     );
     return new Set(activeGroup ? [activeGroup.label] : []);
@@ -64,7 +83,7 @@ export default function Sidebar({
                 <div className="font-display text-base font-bold leading-none">
                   {appName}
                 </div>
-                <div className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: "var(--sidebar-text-muted)" }}>Administrator</div>
+                <div className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: "var(--sidebar-text-muted)" }}>{user?.role}</div>
               </div>
             )}
           </div>
@@ -91,7 +110,7 @@ export default function Sidebar({
           </div>
 
           <div className="mt-4 space-y-1">
-            {navigation.map((group) => (
+            {filteredNavigation.map((group) => (
               <SidebarSection
                 key={group.label}
                 group={group}

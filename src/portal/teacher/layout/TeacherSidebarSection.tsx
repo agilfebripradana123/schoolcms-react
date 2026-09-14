@@ -70,19 +70,19 @@ export default function TeacherSidebarSection({
         </svg>
       </button>
 
-      {expanded && visibleItems.length > 0 && (
-        <div className="ml-2 mt-2 mb-2 space-y-0.5 border-l border-white/10 pl-2">
-          {visibleItems.map((item) => (
-            <TeacherSidebarItem
-              key={item.path}
-              item={item}
-              collapsed={false}
-              active={currentPath === item.path}
-              onGo={onGo}
-            />
-          ))}
-        </div>
-      )}
+       {expanded && visibleItems.length > 0 && (
+         <div className="ml-2 mt-2 mb-2 space-y-0.5 border-l border-white/10 pl-2">
+           {visibleItems.map((item) => (
+             <TeacherSidebarItem
+               key={item.path}
+               item={item}
+               collapsed={false}
+               active={currentPath === item.path}
+               onGo={onGo}
+             />
+           ))}
+         </div>
+       )}
     </div>
   );
 }

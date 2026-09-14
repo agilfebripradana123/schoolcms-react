@@ -87,7 +87,7 @@ export default function UsersPage() {
       })
       .then((res) => {
         if (!active) return;
-        setData(res.data);
+        setData(res.data.filter((u) => u.role?.name !== "Super Admin"));
         setMeta(res.meta);
         setPage(res.meta.current_page);
       })

@@ -116,11 +116,11 @@ export function LoginForm({ mode }: LoginFormProps) {
     setIsLoading(true);
 
     // prevent lintas halaman: jika sudah login role lain, logout dulu
-    const allowed = mode === "admin" ? ["admin", "administrator"] : [mode];
+    const allowed = mode === "admin" ? ["admin", "administrator", "super admin"] : [mode];
     try {
       const user = await login({ login: loginValue.trim(), password, expected_role: mode });
       const actual = (user.role || "").toLowerCase();
-      const ok = allowed.includes(actual) || (mode === "admin" && ["admin", "administrator"].includes(actual));
+      const ok = allowed.includes(actual) || (mode === "admin" && ["admin", "administrator", "super admin"].includes(actual));
       if (!ok) {
         toast.error("Login gagal", { description: `Akun ${user.role} tidak dapat login di halaman ${mode}.` });
         return;

@@ -24,10 +24,9 @@ export default function TeacherSidebarItem({
         : { color: "var(--sidebar-text-muted)" }}
       title={collapsed ? item.label : undefined}
     >
-      <item.icon
-        className="h-5 w-5 shrink-0"
-        style={{ color: active ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }}
-      />
+      <span style={{ color: active ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }}>
+        <item.icon className="h-5 w-5 shrink-0" />
+      </span>
       {!collapsed && <span>{item.label}</span>}
     </button>
   );

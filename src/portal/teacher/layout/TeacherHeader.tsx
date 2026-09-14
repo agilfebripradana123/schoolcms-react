@@ -17,6 +17,24 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [imgFailed, setImgFailed] = useState(false);
+  const [studentPhoto, setStudentPhoto] = useState<string | null>(null);
+
+  // fetch student photo (students.photo) and sync to header; users.photo is separate
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { api } = await import("@/lib/api");
+        const r = await api.get<{ success: boolean; data: { photo?: string | null } }>("/student/profile");
+        if (active && r.data?.photo) setStudentPhoto(r.data.photo as string);
+      } catch {
+        // ignore, fallback to user.photo / initial
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleUserMenu = useCallback(() => {
     setUserMenuOpen((prev) => !prev);
@@ -59,7 +77,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
         onConfirm={handleLogout}
       />
 
-      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-outline bg-surface-container-lowest/90 px-4 backdrop-blur-md lg:px-6">
+      <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-4 backdrop-blur-md lg:px-6">
         <div className="flex items-center gap-3">
           <button
             onClick={onToggleSidebar}
@@ -97,11 +115,11 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
               aria-label="Menu pengguna"
               aria-expanded={userMenuOpen}
             >
-              {user?.photo && !imgFailed ? (
+              {(studentPhoto ?? user?.photo) && !imgFailed ? (
                 <img
-                  src={user.photo as string}
+                  src={(studentPhoto ?? user?.photo) as string}
                   alt={userDisplayName}
-                  className="h-9 w-9 rounded-full object-cover border border-outline"
+                  className="h-9 w-9 rounded-full object-cover border border-outline-variant"
                   onError={() => setImgFailed(true)}
                 />
               ) : (

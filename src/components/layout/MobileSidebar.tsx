@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { navigation, dashboardItem } from "@/config/navigation";
 import SidebarSection from "./SidebarSection";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
+import { useAuth } from "@/features/auth/useAuth";
 
 interface MobileSidebarProps {
   open: boolean;
@@ -11,6 +12,7 @@ interface MobileSidebarProps {
 
 export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const { appName, faviconUrl } = usePublicSettings();
+  const { user } = useAuth();
   const location = useLocation();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = navigation.find((group) =>
@@ -42,6 +44,22 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const isGroupActive = (group: (typeof navigation)[number]) =>
     group.items.some((item) => location.pathname === item.path);
 
+  const isSuperAdmin = user?.role === "Super Admin";
+  const filteredNavigation = isSuperAdmin
+    ? navigation
+    : navigation.map((group) =>
+        group.label !== "Sistem"
+          ? group
+          : {
+              ...group,
+              items: group.items.filter(
+                (item) =>
+                  item.path !== "/admin/system/settings" &&
+                  item.path !== "/admin/system/audit-logs"
+              ),
+            }
+      );
+
   const handleBackdropClick = useCallback(() => onClose(), [onClose]);
 
   if (!open) return null;
@@ -63,7 +81,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               )}
               <div>
                 <div className="font-display text-base font-bold leading-none">{appName}</div>
-                <div className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: "var(--sidebar-text-muted)" }}>Administrator</div>
+                <div className="mt-1 text-xs uppercase tracking-[0.2em]" style={{ color: "var(--sidebar-text-muted)" }}>{user?.role}</div>
               </div>
             </div>
             <button onClick={onClose} className="rounded-2xl border border-white/10 bg-white/5 p-2" style={{ color: "var(--sidebar-text-muted)" }} aria-label="Tutup sidebar">
@@ -86,7 +104,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             </div>
 
             <div className="mt-4 space-y-1">
-              {navigation.map((group) => (
+              {filteredNavigation.map((group) => (
                 <SidebarSection
                   key={group.label}
                   group={group}

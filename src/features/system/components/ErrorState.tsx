@@ -20,7 +20,7 @@ export default function ErrorState({ error, onRetry }: ErrorStateProps) {
       </p>
       {isForbidden && (
         <p className="text-xs text-on-surface-variant">
-          Halaman ini hanya dapat diakses oleh Admin atau Administrator.
+          Halaman ini hanya dapat diakses oleh Admin, Administrator, atau Super Admin.
         </p>
       )}
       {onRetry && (

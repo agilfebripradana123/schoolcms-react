@@ -15,7 +15,7 @@ export default function RoleRoute({ allow }: RoleRouteProps) {
   const role = user?.role?.toLowerCase();
 
   if (allow && role && !allow.map((r) => r.toLowerCase()).includes(role)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   return <Outlet />;

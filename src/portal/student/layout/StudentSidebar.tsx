@@ -4,6 +4,7 @@ import { studentNavigation, studentDashboardItem } from "@/config/navigation";
 import StudentSidebarSection from "./StudentSidebarSection";
 import StudentSidebarItem from "./StudentSidebarItem";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
+import { usePermission } from "@/features/auth/usePermission";
 
 const sidebarBg = "var(--sidebar-bg)";
 const sidebarText = "var(--sidebar-text)";
@@ -20,6 +21,7 @@ export default function StudentSidebar({
   const navigate = useNavigate();
   const location = useLocation();
   const pathname = location.pathname;
+  const { can } = usePermission();
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = studentNavigation.find(
@@ -111,16 +113,17 @@ export default function StudentSidebar({
           {studentNavigation.map((entry) => {
             if (isGroup(entry)) {
               return (
-                <StudentSidebarSection
-                  key={entry.label}
-                  entry={entry}
-                  collapsed={collapsed}
-                  expanded={expandedSections.has(entry.label)}
-                  active={isGroupActive(entry)}
-                  onToggle={() => toggleSection(entry.label)}
-                  onGo={goTo}
-                  currentPath={pathname}
-                />
+                 <StudentSidebarSection
+                   key={entry.label}
+                   entry={entry}
+                   collapsed={collapsed}
+                   expanded={expandedSections.has(entry.label)}
+                   active={isGroupActive(entry)}
+                   can={can}
+                   onToggle={() => toggleSection(entry.label)}
+                   onGo={goTo}
+                   currentPath={pathname}
+                 />
               );
             }
             const item = entry as { path: string; label: string; icon?: React.ComponentType<{ className?: string }> };

@@ -1,10 +1,11 @@
 import StudentSidebarItem from "./StudentSidebarItem";
 
 interface StudentSidebarSectionProps {
-  entry: { label: string; items: { path: string; label: string; icon: React.ComponentType<{ className?: string }> }[] };
+  entry: { label: string; items: { path: string; label: string; icon: React.ComponentType<{ className?: string }>; permission?: string }[] };
   collapsed: boolean;
   expanded: boolean;
   active: boolean;
+  can: (permission?: string) => boolean;
   onToggle: () => void;
   onGo: (path: string) => void;
   currentPath: string;
@@ -15,14 +16,17 @@ export default function StudentSidebarSection({
   collapsed,
   expanded,
   active: _active,
+  can,
   onToggle,
   onGo,
   currentPath,
 }: StudentSidebarSectionProps) {
+  const visibleItems = entry.items.filter((i) => can(i.permission));
+
   if (collapsed) {
     return (
       <div className="mb-1">
-        {entry.items.map((item) => (
+        {visibleItems.map((item) => (
           <StudentSidebarItem
             key={item.path}
             item={item}
@@ -55,7 +59,7 @@ export default function StudentSidebarSection({
 
       {expanded && (
         <div className="ml-2 mt-2 mb-2 space-y-0.5 border-l border-white/10 pl-2">
-          {entry.items.map((item) => (
+          {visibleItems.map((item) => (
             <StudentSidebarItem
               key={item.path}
               item={item}

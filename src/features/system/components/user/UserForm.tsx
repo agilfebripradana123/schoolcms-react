@@ -167,7 +167,7 @@ export default function UserForm({
     }
   };
 
-  const roleOptions = roles.map((r) => ({ value: String(r.id), label: r.name }));
+  const roleOptions = roles.filter((r) => r.id !== 5).map((r) => ({ value: String(r.id), label: r.name }));
 
   return (
     <Modal
