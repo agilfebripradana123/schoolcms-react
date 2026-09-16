@@ -54,7 +54,7 @@ export default function RolesPage() {
       .list({ search: query.q || undefined, page: query.page, per_page: PER_PAGE })
       .then((res) => {
         if (!active) return;
-        setData(res.data.filter((r) => r.name !== "Siswa" && !["Super Admin", "Administrator"].includes(r.name)));
+        setData(res.data.filter((r) => r.name !== "Siswa" && r.name !== "Super Admin"));
         setMeta(res.meta);
         setPage(res.meta.current_page);
       })

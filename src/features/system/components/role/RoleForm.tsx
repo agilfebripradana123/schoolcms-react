@@ -120,15 +120,24 @@ export default function RoleForm({
     );
   };
 
+  const isAdminAssignment =
+    isAssignmentModal &&
+    initialData?.name?.toLowerCase().includes("administrator") === true;
+  const excludedNames = isAdminAssignment
+    ? new Set(["view-audit-logs", "manage-settings"])
+    : new Set<string>();
+
   const filteredPermissions = useMemo(() => {
     const query = permissionSearch.trim().toLowerCase();
-    if (!query) return permissions;
-    return permissions.filter(
-      (permission) =>
-        permission.name.toLowerCase().includes(query) ||
-        permission.description?.toLowerCase().includes(query),
-    );
-  }, [permissions, permissionSearch]);
+    if (!query) return permissions.filter((p) => !excludedNames.has(p.name));
+    return permissions
+      .filter((p) => !excludedNames.has(p.name))
+      .filter(
+        (permission) =>
+          permission.name.toLowerCase().includes(query) ||
+          permission.description?.toLowerCase().includes(query),
+      );
+  }, [permissions, permissionSearch, excludedNames]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
