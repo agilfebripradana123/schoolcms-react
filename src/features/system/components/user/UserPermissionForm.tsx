@@ -63,9 +63,21 @@ export default function UserPermissionForm({
       userManagementService
         .get(initialData.id)
         .then((res) => {
-          const ids = res.data.permissions?.map((p) => p.id) ?? [];
-          setSelectedIds(ids);
-          setRolePermissions(res.data.role?.permissions ?? []);
+          const userPermIds = res.data.permissions?.map((p) => p.id) ?? [];
+          const rolePerms = res.data.role?.permissions ?? [];
+          const isAdmin =
+            initialData.role?.name
+              ?.toLowerCase()
+              .includes("administrator") ?? false;
+          const filteredUserIds = isAdmin
+            ? userPermIds.filter(
+                (id) =>
+                  !rolePerms.find((p) => p.id === id)?.name.startsWith("view-audit-logs") &&
+                  !rolePerms.find((p) => p.id === id)?.name.startsWith("manage-settings"),
+              )
+            : userPermIds;
+          setSelectedIds(filteredUserIds);
+          setRolePermissions(rolePerms);
         })
         .catch(() => {
           setSelectedIds([]);
@@ -84,22 +96,31 @@ export default function UserPermissionForm({
     );
   };
 
+  const rolePermIds = new Set(rolePermissions.map((p) => p.id));
+  const excludedNames = new Set(["view-audit-logs", "manage-settings"]);
+  const additionalPermissions = permissions.filter(
+    (p) => !rolePermIds.has(p.id) && !excludedNames.has(p.name),
+  );
+  const selectedPermissions = permissions.filter(
+    (p) => selectedIds.includes(p.id) && !excludedNames.has(p.name),
+  );
+
   const toggleAll = () => {
-    setSelectedIds((prev) =>
-      prev.length === filteredPermissions.length
-        ? []
-        : filteredPermissions.map((p) => p.id),
-    );
+    setSelectedIds((prev) => {
+      const allAdditionalIds = additionalPermissions.map((p) => p.id);
+      const allSelected = allAdditionalIds.every((id) => prev.includes(id));
+      return allSelected ? prev.filter((id) => !rolePermIds.has(id)) : [...prev, ...allAdditionalIds.filter((id) => !prev.includes(id))];
+    });
   };
 
   const query = search.trim().toLowerCase();
   const filteredPermissions = query
-    ? permissions.filter(
+    ? additionalPermissions.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
           p.description?.toLowerCase().includes(query),
       )
-    : permissions;
+    : additionalPermissions;
 
   const handleSave = async () => {
     if (!initialData) return;
@@ -149,7 +170,7 @@ export default function UserPermissionForm({
         {rolePermissions.length > 0 && (
           <div className="mb-4 rounded-2xl border border-outline-variant bg-surface-container-low p-4">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-outline">
-              Hak akses dari Role{initialData?.role?.name ? ` — ${initialData.role.name}` : ""}
+              Hak akses dari Role{initialData?.role?.name ? ` — ${initialData.role.name}` : ""} ({rolePermissions.length})
             </p>
             <div className="flex flex-wrap gap-2">
               {rolePermissions.map((p) => (
@@ -165,8 +186,26 @@ export default function UserPermissionForm({
         )}
 
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-outline">
-          Hak akses tambahan
+          Hak akses tambahan ({additionalPermissions.length})
         </p>
+
+        {selectedPermissions.length > 0 && (
+          <div className="mb-4 rounded-2xl border border-primary/20 bg-primary-container/10 p-4">
+            <p className="mb-2 text-xs font-medium text-primary">
+              Tercentang ({selectedPermissions.length})
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {selectedPermissions.map((p) => (
+                <span
+                  key={p.id}
+                  className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary-container/20 px-2.5 py-1 text-xs font-medium text-primary"
+                >
+                  {p.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {catalogLoading ? (
           <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
@@ -206,7 +245,7 @@ export default function UserPermissionForm({
                 className="flex w-full items-center justify-between gap-2 border-b border-outline-variant bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low"
               >
                 <span>
-                  Pilih Permission ({selectedIds.length}/{permissions.length})
+                  Pilih Permission ({selectedIds.length}/{additionalPermissions.length})
                 </span>
                 <span className="text-on-surface-variant">Semua</span>
               </button>
