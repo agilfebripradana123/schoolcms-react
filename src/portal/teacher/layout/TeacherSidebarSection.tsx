@@ -62,7 +62,7 @@ export default function TeacherSidebarSection({
       >
         <span>{entry.label}</span>
         <svg
-          className="h-4 w-4 transition-transform"
+          className={`h-4 w-4 transition-transform ${expanded ? "rotate-90" : ""}`}
           style={{ color: "var(--sidebar-text-muted)" }}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
         >

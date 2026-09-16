@@ -198,30 +198,66 @@ export const teacherDashboardItem = {
 // Guru Portal navigation — `navOverlay` pattern like Admin `navigation`
 // and `studentNavigation`. Hanya menu yang relevan untuk role guru.
 export const teacherNavigation = [
+  // ===== AKADEMIK =====
   {
     label: "Akademik",
+    permission: "view-classes",
     items: [
       { label: "Kelas Saya", path: "/guru/academic/classes", permission: "view-classes", icon: School },
       { label: "Jadwal Mengajar", path: "/guru/academic/schedules", permission: "view-schedules", icon: CalendarClock },
       { label: "Kehadiran", path: "/guru/academic/attendance", permission: "view-attendance", icon: ClipboardCheck },
       { label: "Nilai", path: "/guru/academic/grades", permission: "view-grades", icon: Award },
       { label: "Tugas", path: "/guru/academic/assignments", permission: "view-assignments", icon: ClipboardList },
+      { label: "Mata Pelajaran", path: "/guru/subjects", permission: "manage-subjects", icon: Library },
+      { label: "Tahun Ajaran", path: "/guru/academic-years", permission: "manage-academic-years", icon: CalendarDays },
     ],
   },
+  // ===== UJIAN =====
   {
     label: "Ujian",
+    permission: "view-exams",
     items: [
       { label: "Ujian", path: "/guru/examinations", permission: "view-exams", icon: BookOpen },
       { label: "Jadwal Ujian", path: "/guru/examinations/schedules", permission: "view-exam-schedules", icon: CalendarClock },
       { label: "Hasil Ujian", path: "/guru/examinations/results", permission: "view-exam-results", icon: BarChart3 },
       { label: "Monitoring", path: "/guru/exams/monitoring", permission: "view-exam-monitoring", icon: Activity },
+      { label: "Bank Soal", path: "/guru/exams/questions", permission: "manage-exams", icon: BrainCircuit },
     ],
   },
+  // ===== SISWA =====
   {
-    label: "Sarana & Prasarana",
-    permission: "manage-facilities",
+    label: "Siswa",
+    permission: "view-achievements",
     items: [
-      { label: "Sarana & Prasarana", path: "/guru/facilities", icon: Building2 },
+      { label: "Data Siswa", path: "/guru/students", permission: "manage-students", icon: Users },
+      { label: "Prestasi", path: "/guru/students/achievements", permission: "view-achievements", icon: Trophy },
+      { label: "Pelanggaran", path: "/guru/students/violations", permission: "view-violations", icon: ShieldAlert },
+      { label: "Ekstrakurikuler", path: "/guru/students/extracurricular", permission: "view-extracurricular", icon: Dumbbell },
+    ],
+  },
+  // ===== OPERASIONAL =====
+  {
+    label: "Operasional",
+    permission: "manage-announcements",
+    items: [
+      { label: "Pengumuman", path: "/guru/announcements", permission: "manage-announcements", icon: Megaphone },
+      { label: "Kalender", path: "/guru/calendars", permission: "manage-calendars", icon: CalendarDays },
+      { label: "Surat", path: "/guru/letters", permission: "manage-letters", icon: Mail },
+      { label: "Dokumen", path: "/guru/documents", permission: "manage-documents", icon: FileStack },
+      { label: "Laporan", path: "/guru/reports", permission: "view-reports", icon: BarChart3 },
+      { label: "Sarana & Prasarana", path: "/guru/facilities", permission: "manage-facilities", icon: Building2 },
+    ],
+  },
+  // ===== MANAJEMEN =====
+  {
+    label: "Manajemen",
+    permission: "manage-teachers",
+    items: [
+      { label: "Data Guru", path: "/guru/teachers", permission: "manage-teachers", icon: UserCog },
+      { label: "Tenaga Kependidikan", path: "/guru/staff", permission: "manage-staff", icon: Users },
+      { label: "Kelola Kelas", path: "/guru/classes/manage", permission: "manage-classes", icon: School },
+      { label: "Kelola Jadwal", path: "/guru/schedules/manage", permission: "manage-schedules", icon: CalendarClock },
+      { label: "PPDB", path: "/guru/ppdb", permission: "manage-ppdb", icon: UserPlus },
     ],
   },
 ];

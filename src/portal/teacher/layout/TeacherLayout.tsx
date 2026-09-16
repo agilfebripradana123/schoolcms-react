@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import TeacherHeader from "./TeacherHeader";
 import TeacherSidebar from "./TeacherSidebar";
 import { useAppearance } from "@/features/system/hooks/useAppearance";
+import { useAutoRefreshAuth } from "@/features/auth/hooks/useAutoRefreshAuth";
 
 function PageLoadingFallback() {
   return (
@@ -14,6 +15,7 @@ function PageLoadingFallback() {
 }
 
 export default function TeacherLayout() {
+  useAutoRefreshAuth();
   const { sidebarBehavior } = useAppearance();
   const [collapsed, setCollapsed] = useState(() => sidebarBehavior === "collapse");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);

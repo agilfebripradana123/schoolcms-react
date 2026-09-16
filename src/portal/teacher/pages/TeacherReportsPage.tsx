@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Building2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import apiClient from "@/lib/api/axios";
 import { toApiError } from "@/lib/api";
 import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import PortalEmptyState from "@/portal/components/PortalEmptyState";
@@ -13,27 +14,27 @@ import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import type { SelectOption } from "@/components/ui/Select";
 
-interface Room {
+interface Report {
   id: number;
-  name: string;
-  capacity: number;
-  location?: string | null;
+  name?: string | null;
+  type?: string | null;
+  date?: string | null;
 }
 
-const lokasiOptions: SelectOption<string>[] = [
-  { value: "guru", label: "Guru" },
-  { value: "ruangan", label: "Ruangan" },
-  { value: "lab", label: "Laboratorium" },
+const tipeOptions: SelectOption<string>[] = [
+  { value: "akademik", label: "Akademik" },
+  { value: "keuangan", label: "Keuangan" },
+  { value: "kepegawaian", label: "Kepegawaian" },
 ];
 
-export default function TeacherFacilitiesPlaceholderPage() {
-  const [data, setData] = useState<Room[]>([]);
-  const [filtered, setFiltered] = useState<Room[]>([]);
+export default function TeacherReportsPage() {
+  const [reports, setReports] = useState<Report[]>([]);
+  const [filtered, setFiltered] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [lokasi, setLokasi] = useState<string | null>(null);
-  const [query, setQuery] = useState<{ search: string; lokasi: string | null }>({ search: "", lokasi: null });
+  const [tipe, setTipe] = useState<string | null>(null);
+  const [query, setQuery] = useState<{ search: string; tipe: string | null }>({ search: "", tipe: null });
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -41,10 +42,10 @@ export default function TeacherFacilitiesPlaceholderPage() {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Room[] }>("/rooms", { params: { search: query.search || undefined, lokasi: query.lokasi || undefined } })
+      .get<{ data: Report[] }>("/teacher/reports/academic", { params: { search: query.search || undefined, tipe: query.tipe || undefined } })
       .then((res) => {
         const items = res.data.data ?? [];
-        setData(items);
+        setReports(items);
         setFiltered(items);
       })
       .catch((err) => setError(toApiError(err).message))
@@ -65,17 +66,17 @@ export default function TeacherFacilitiesPlaceholderPage() {
     }, 400);
   }, []);
 
-  const handleLokasiChange = useCallback((value: string | null) => {
-    setLokasi(value);
+  const handleTipeChange = useCallback((value: string | null) => {
+    setTipe(value);
     setLoading(true);
     setError(null);
-    setQuery((prev) => ({ ...prev, lokasi: value }));
+    setQuery((prev) => ({ ...prev, tipe: value }));
   }, []);
 
   if (loading) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Laporan" description="Daftar laporan akademik untuk Portal Guru." />
         <PortalLoadingState />
       </PageContainer>
     );
@@ -84,34 +85,34 @@ export default function TeacherFacilitiesPlaceholderPage() {
   if (error) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Laporan" description="Daftar laporan akademik untuk Portal Guru." />
         <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
 
-  if (data.length === 0) {
+  if (reports.length === 0) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
-        <PortalEmptyState icon={<Building2 />} description="Belum ada data ruangan." />
+        <PageHeader title="Laporan" description="Daftar laporan akademik untuk Portal Guru." />
+        <PortalEmptyState icon={<FileText />} description="Belum ada data laporan akademik." />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+      <PageHeader title="Laporan" description="Daftar laporan akademik untuk Portal Guru." />
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
           <div className="w-full md:max-w-xs">
-            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama ruangan, lokasi..." />
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama atau tipe laporan..." />
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end md:flex-1 md:justify-end">
             <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
-              <span className="whitespace-nowrap">Lokasi</span>
-              <AppSelect options={lokasiOptions} value={lokasi} onChange={handleLokasiChange} placeholder="Pilih Lokasi" isSearchable={false} className="min-w-[180px]" />
+              <span className="whitespace-nowrap">Tipe</span>
+              <AppSelect options={tipeOptions} value={tipe} onChange={handleTipeChange} placeholder="Pilih Tipe" isSearchable={false} className="min-w-[180px]" />
             </label>
           </div>
         </div>
@@ -120,9 +121,14 @@ export default function TeacherFacilitiesPlaceholderPage() {
         <div className="hidden md:block">
           <DataTable
             columns={[
-              { accessor: "name" as keyof Room, header: "Nama Ruangan", render: (_val, row) => row.name },
-              { accessor: "capacity" as keyof Room, header: "Kapasitas", render: (_val, row) => row.capacity },
-              { accessor: "location" as keyof Room, header: "Lokasi", render: (_val, row) => row.location ?? "—" },
+              { accessor: "name" as keyof Report, header: "Nama Laporan", render: (_val, r) => r.name ?? "—" },
+              {
+                accessor: "type" as keyof Report,
+                header: "Tipe",
+                render: (_val, r) =>
+                  r.type ? <Badge variant="secondary">{r.type}</Badge> : <span className="text-secondary">—</span>,
+              },
+              { accessor: "date" as keyof Report, header: "Tanggal", render: (_val, r) => r.date ?? "—" },
             ]}
             data={filtered}
           />
@@ -130,26 +136,21 @@ export default function TeacherFacilitiesPlaceholderPage() {
 
         {/* Mobile cards */}
         <div className="md:hidden space-y-3">
-          {filtered.map((d) => (
-            <Card key={d.id} className="p-4 rounded-2xl border border-outline-variant">
+          {filtered.map((r) => (
+            <Card key={r.id} className="p-4 rounded-2xl border border-outline-variant">
               <div className="space-y-2">
-                <p className="font-semibold text-primary">{d.name}</p>
-                <div className="flex items-center gap-2 text-sm text-secondary">
-                  <span>Kapasitas: {d.capacity}</span>
-                  {d.location && (
-                    <>
-                      <span>•</span>
-                      <span>{d.location}</span>
-                    </>
-                  )}
+                <div className="flex items-start justify-between">
+                  <p className="font-semibold text-primary">{r.name ?? "—"}</p>
+                  {r.type && <Badge variant="secondary">{r.type}</Badge>}
                 </div>
+                <p className="text-sm text-secondary">Tanggal: {r.date ?? "—"}</p>
               </div>
             </Card>
           ))}
         </div>
 
-        {filtered.length === 0 && data.length > 0 && (
-          <PortalEmptyState icon={<Building2 />} description="Tidak ada ruangan yang sesuai dengan pencarian." />
+        {filtered.length === 0 && reports.length > 0 && (
+          <PortalEmptyState icon={<FileText />} description="Tidak ada laporan yang sesuai dengan pencarian." />
         )}
       </Card>
     </PageContainer>

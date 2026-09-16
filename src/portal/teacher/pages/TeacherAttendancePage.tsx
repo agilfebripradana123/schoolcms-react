@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarCheck, Save, Calendar } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CalendarCheck, Save } from "lucide-react";
 import { toast } from "sonner";
 import AppSelect from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import Search from "@/components/ui/Search";
 import PortalEmptyState from "@/portal/components/PortalEmptyState";
 import PortalErrorState from "@/portal/components/PortalErrorState";
-import PortalFilterBar from "@/portal/components/PortalFilterBar";
 import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -31,12 +32,15 @@ export default function TeacherAttendancePage() {
   const [classes, setClasses] = useState<TeacherClass[]>([]);
   const [classId, setClassId] = useState<number | null>(null);
   const [date, setDate] = useState<string>(() => new Date().toISOString().slice(0, 10));
+  const [search, setSearch] = useState("");
 
   const [rows, setRows] = useState<TeacherAttendanceStudent[]>([]);
   const [statusById, setStatusById] = useState<Record<number, StatusKey>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const searchTimeout = useRef<number | null>(null);
 
   const loadClasses = useCallback(() => {
     teacherClassService
@@ -75,6 +79,27 @@ export default function TeacherAttendancePage() {
 
   const hasSelection = !!classId && !!date;
 
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(
+      (r) =>
+        r.name?.toLowerCase().includes(q) ||
+        r.nis?.toLowerCase().includes(q) ||
+        r.nisn?.toLowerCase().includes(q),
+    );
+  }, [rows, search]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
+    searchTimeout.current = window.setTimeout(() => {
+      setLoading(true);
+      setError(null);
+      loadRoster();
+    }, 400);
+  }, [loadRoster]);
+
   const handleSave = async () => {
     if (!classId || !date) return;
     const items = rows.map((r) => {
@@ -106,94 +131,104 @@ export default function TeacherAttendancePage() {
         description="Input kehadiran siswa pada kelas yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar>
-          <Calendar className="h-4 w-4 text-secondary" />
-          <label className="text-sm font-medium text-secondary">Tanggal:</label>
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="rounded-xl border border-outline bg-surface px-3 py-2 text-sm text-primary focus:border-primary-container focus:outline-none"
-          />
-          <label className="text-sm font-medium text-secondary">Kelas:</label>
-          <div className="min-w-[200px]">
-            <AppSelect<number>
-              options={classOptions}
-              value={classId}
-              onChange={setClassId}
-              placeholder="Pilih kelas"
-            />
+      <Card>
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
+          <div className="w-full md:max-w-xs">
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama / NIS / NISN..." />
           </div>
-          <Button onClick={loadRoster} disabled={!hasSelection || loading}>
-            Tampilkan
-          </Button>
-      </PortalFilterBar>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end md:flex-1 md:justify-end">
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Kelas</span>
+              <AppSelect<number>
+                options={classOptions}
+                value={classId}
+                onChange={setClassId}
+                placeholder="Pilih kelas"
+                isSearchable={false}
+                className="min-w-[180px]"
+              />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Tanggal</span>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="min-w-[180px] rounded-xl border border-outline bg-surface px-3 py-2 text-sm text-primary focus:border-primary-container focus:outline-none"
+              />
+            </label>
+            <Button onClick={loadRoster} disabled={!hasSelection || loading}>
+              Tampilkan
+            </Button>
+          </div>
+        </div>
 
-      {!hasSelection ? (
-        <PortalEmptyState icon={<CalendarCheck className="h-10 w-10" />} description="Pilih tanggal dan kelas untuk melihat kehadiran." />
-      ) : error ? (
-        <PortalErrorState message={error} />
-      ) : loading ? (
-        <PortalLoadingState />
-      ) : rows.length === 0 ? (
-        <PortalEmptyState icon={<CalendarCheck className="h-10 w-10" />} description="Tidak ada siswa aktif pada kelas ini." />
-      ) : (
-        <>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-secondary">{rows.length} siswa aktif</p>
-            {canManage && (
-              <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
-                Simpan Kehadiran
-              </Button>
-            )}
-          </div>
-          <DataTable<TeacherAttendanceStudent>
-            loading={loading}
-            emptyMessage="Tidak ada data kehadiran."
-            columns={[
-              {
-                header: "No",
-                accessor: "student_id",
-                render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
-              },
-              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-on-surface">{String(v ?? "-")}</span> },
-              { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
-              { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
-              {
-                header: "Status",
-                accessor: "student_id",
-                render: (_v, row) => {
-                  const cur = statusById[row.student_id] as AttendanceStatus | "";
-                  if (!canManage) {
-                    const cls: Record<string, "success" | "warning" | "danger" | "neutral"> = {
-                      hadir: "success",
-                      sakit: "warning",
-                      izin: "danger",
-                      alpa: "neutral",
-                    };
-                    return <Badge variant={cur ? cls[cur] : "neutral"}>{cur ? ATTENDANCE_STATUS_LABELS[cur] : "—"}</Badge>;
-                  }
-                  return (
-                    <AppSelect
-                      size="sm"
-                      options={ATTENDANCE_STATUSES.map((s) => ({ value: s, label: ATTENDANCE_STATUS_LABELS[s] }))}
-                      value={cur || null}
-                      onChange={(v) => setStatusById((prev) => ({ ...prev, [row.student_id]: v as StatusKey }))}
-                      placeholder="Pilih"
-                      isSearchable={false}
-                      className="min-w-[140px]"
-                    />
-                  );
+        {!hasSelection ? (
+          <PortalEmptyState icon={<CalendarCheck className="h-10 w-10" />} description="Pilih tanggal dan kelas untuk melihat kehadiran." />
+        ) : error ? (
+          <PortalErrorState message={error} />
+        ) : loading ? (
+          <PortalLoadingState />
+        ) : filteredRows.length === 0 ? (
+          <PortalEmptyState icon={<CalendarCheck className="h-10 w-10" />} description="Tidak ada siswa aktif pada kelas ini." />
+        ) : (
+          <>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-secondary">{filteredRows.length} siswa aktif</p>
+              {canManage && (
+                <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
+                  Simpan Kehadiran
+                </Button>
+              )}
+            </div>
+            <DataTable<TeacherAttendanceStudent>
+              loading={loading}
+              emptyMessage="Tidak ada data kehadiran."
+              columns={[
+                {
+                  header: "No",
+                  accessor: "student_id",
+                  render: (_v, row) => filteredRows.findIndex((r) => r.student_id === row.student_id) + 1,
                 },
-              },
-            ]}
-            data={rows}
-          />
-          {canManage && hasAnyMissing && (
-            <p className="mt-3 text-xs text-error">Beberapa siswa belum dipilih statusnya.</p>
-          )}
-        </>
-      )}
+                { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-on-surface">{String(v ?? "-")}</span> },
+                { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
+                { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
+                {
+                  header: "Status",
+                  accessor: "student_id",
+                  render: (_v, row) => {
+                    const cur = statusById[row.student_id] as AttendanceStatus | "";
+                    if (!canManage) {
+                      const cls: Record<string, "success" | "warning" | "danger" | "neutral"> = {
+                        hadir: "success",
+                        sakit: "warning",
+                        izin: "danger",
+                        alpa: "neutral",
+                      };
+                      return <Badge variant={cur ? cls[cur] : "neutral"}>{cur ? ATTENDANCE_STATUS_LABELS[cur] : "—"}</Badge>;
+                    }
+                    return (
+                      <AppSelect
+                        size="sm"
+                        options={ATTENDANCE_STATUSES.map((s) => ({ value: s, label: ATTENDANCE_STATUS_LABELS[s] }))}
+                        value={cur || null}
+                        onChange={(v) => setStatusById((prev) => ({ ...prev, [row.student_id]: v as StatusKey }))}
+                        placeholder="Pilih"
+                        isSearchable={false}
+                        className="min-w-[140px]"
+                      />
+                    );
+                  },
+                },
+              ]}
+              data={filteredRows}
+            />
+            {canManage && hasAnyMissing && (
+              <p className="mt-3 text-xs text-error">Beberapa siswa belum dipilih statusnya.</p>
+            )}
+          </>
+        )}
+      </Card>
     </PageContainer>
   );
 }

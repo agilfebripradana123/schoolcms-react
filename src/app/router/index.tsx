@@ -14,6 +14,7 @@ import StudentLayout from "@/portal/student/layout/StudentLayout";
 import GuruLayout from "@/portal/teacher/layout/TeacherLayout";
 import TeacherDashboardPage from "@/portal/teacher/pages/TeacherDashboardPage";
 import TeacherProfilePage from "@/portal/teacher/pages/TeacherProfilePage";
+import TeacherTeachersPage from "@/portal/teacher/pages/TeacherTeachersPage";
 import TeacherClassesPage from "@/portal/teacher/pages/TeacherClassesPage";
 import TeacherClassDetailPage from "@/portal/teacher/pages/TeacherClassDetailPage";
 import TeacherSchedulesPage from "@/portal/teacher/pages/TeacherSchedulesPage";
@@ -26,6 +27,22 @@ import TeacherExamResultsPage from "@/portal/teacher/pages/TeacherExamResultsPag
 import TeacherExamMonitoringPage from "@/portal/teacher/pages/TeacherExamMonitoringPage";
 import TeacherExamMonitoringDetailPage from "@/portal/teacher/pages/TeacherExamMonitoringDetailPage";
 import TeacherFacilitiesPlaceholderPage from "@/portal/teacher/pages/TeacherFacilitiesPlaceholderPage";
+import TeacherStaffPage from "@/portal/teacher/pages/TeacherStaffPage";
+import TeacherQuestionsPage from "@/portal/teacher/pages/TeacherQuestionsPage";
+import TeacherDevelopmentPage from "@/portal/teacher/pages/TeacherDevelopmentPage";
+import TeacherAnnouncementsPage from "@/portal/teacher/pages/TeacherAnnouncementsPage";
+import TeacherCalendarsPage from "@/portal/teacher/pages/TeacherCalendarsPage";
+import TeacherLettersPage from "@/portal/teacher/pages/TeacherLettersPage";
+import TeacherDocumentsPage from "@/portal/teacher/pages/TeacherDocumentsPage";
+import TeacherStudentsPage from "@/portal/teacher/pages/TeacherStudentsPage";
+import TeacherStudentAchievementsPage from "@/portal/teacher/pages/TeacherStudentAchievementsPage";
+import TeacherStudentViolationsPage from "@/portal/teacher/pages/TeacherStudentViolationsPage";
+import TeacherStudentExtracurricularPage from "@/portal/teacher/pages/TeacherStudentExtracurricularPage";
+import TeacherPpdbPage from "@/portal/teacher/pages/TeacherPpdbPage";
+import TeacherManageSchedulesPage from "@/portal/teacher/pages/TeacherManageSchedulesPage";
+import TeacherManageClassesPage from "@/portal/teacher/pages/TeacherManageClassesPage";
+import TeacherSubjectsPage from "@/portal/teacher/pages/TeacherSubjectsPage";
+import TeacherAcademicYearsPage from "@/portal/teacher/pages/TeacherAcademicYearsPage";
 import { NotificationsPage } from "@/features/notifications";
 import {
   AcademicYearPage,
@@ -274,6 +291,12 @@ const router = createBrowserRouter([
               { index: true, element: <Navigate to="/guru/dashboard" replace /> },
               { path: "dashboard", element: <TeacherDashboardPage /> },
               { path: "profile", element: <TeacherProfilePage /> },
+              {
+                element: <PermissionRoute permission="manage-teachers" />,
+                children: [
+                  { path: "teachers", element: <TeacherTeachersPage /> },
+                ],
+              },
               { path: "notifications", element: <NotificationsPage /> },
               {
                 element: <PermissionRoute permission="view-classes" />,
@@ -338,6 +361,108 @@ const router = createBrowserRouter([
                     path: "facilities",
                     element: <TeacherFacilitiesPlaceholderPage />,
                   },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-staff" />,
+                children: [
+                  { path: "staff", element: <TeacherStaffPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-exams" />,
+                children: [
+                  { path: "exams/questions", element: <TeacherQuestionsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-development" />,
+                children: [
+                  { path: "development", element: <TeacherDevelopmentPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-announcements" />,
+                children: [
+                  { path: "announcements", element: <TeacherAnnouncementsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-calendars" />,
+                children: [
+                  { path: "calendars", element: <TeacherCalendarsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-letters" />,
+                children: [
+                  { path: "letters", element: <TeacherLettersPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-documents" />,
+                children: [
+                  { path: "documents", element: <TeacherDocumentsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-reports" />,
+                children: [
+                  { path: "reports", element: <TeacherReportsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-students" />,
+                children: [
+                  { path: "students", element: <TeacherStudentsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-achievements" />,
+                children: [
+                  { path: "students/achievements", element: <TeacherStudentAchievementsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-violations" />,
+                children: [
+                  { path: "students/violations", element: <TeacherStudentViolationsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="view-extracurricular" />,
+                children: [
+                  { path: "students/extracurricular", element: <TeacherStudentExtracurricularPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-ppdb" />,
+                children: [
+                  { path: "ppdb", element: <TeacherPpdbPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-schedules" />,
+                children: [
+                  { path: "schedules/manage", element: <TeacherManageSchedulesPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-classes" />,
+                children: [
+                  { path: "classes/manage", element: <TeacherManageClassesPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-subjects" />,
+                children: [
+                  { path: "subjects", element: <TeacherSubjectsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-academic-years" />,
+                children: [
+                  { path: "academic-years", element: <TeacherAcademicYearsPage /> },
                 ],
               },
             ],

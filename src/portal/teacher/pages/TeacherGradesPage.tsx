@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Save, Award, Filter } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Save, Award } from "lucide-react";
 import { toast } from "sonner";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
+import Search from "@/components/ui/Search";
 import PortalEmptyState from "@/portal/components/PortalEmptyState";
 import PortalErrorState from "@/portal/components/PortalErrorState";
-import PortalFilterBar from "@/portal/components/PortalFilterBar";
 import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -38,9 +39,12 @@ export default function TeacherGradesPage() {
 
   const [rows, setRows] = useState<TeacherGradeStudent[]>([]);
   const [scoreById, setScoreById] = useState<Record<number, string>>({});
+  const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "empty">("idle");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const searchTimeout = useRef<number | null>(null);
 
   const loadAssignments = useCallback(() => {
     myAssignmentService
@@ -117,6 +121,27 @@ export default function TeacherGradesPage() {
 
   const canLoad = classId !== null && subjectId !== null && semesterId !== null && academicYearId !== null;
 
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(
+      (r) =>
+        r.name?.toLowerCase().includes(q) ||
+        r.nis?.toLowerCase().includes(q) ||
+        r.nisn?.toLowerCase().includes(q),
+    );
+  }, [rows, search]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
+    searchTimeout.current = window.setTimeout(() => {
+      setStatus("loading");
+      setError(null);
+      loadRoster();
+    }, 400);
+  }, [loadRoster]);
+
   const loadRoster = useCallback(() => {
     if (classId === null || subjectId === null || semesterId === null || academicYearId === null) return;
     setStatus("loading");
@@ -179,92 +204,98 @@ export default function TeacherGradesPage() {
         description="Input nilai siswa pada kelas & mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar>
-          <Filter className="h-4 w-4 text-secondary" />
-          <label className="text-sm font-medium text-secondary">Kelas:</label>
-          <div className="min-w-[180px]">
-            <Select<number> options={classOptions} value={classId} onChange={setClassId} placeholder="Pilih kelas" />
+      <Card>
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
+          <div className="w-full md:max-w-xs">
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama / NIS / NISN..." />
           </div>
-          <label className="text-sm font-medium text-secondary">Mapel:</label>
-          <div className="min-w-[180px]">
-            <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Pilih mapel" />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end md:flex-1 md:justify-end md:flex-wrap">
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Kelas</span>
+              <Select<number> options={classOptions} value={classId} onChange={setClassId} placeholder="Pilih kelas" isSearchable={false} className="min-w-[180px]" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Mapel</span>
+              <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Pilih mapel" isSearchable={false} className="min-w-[180px]" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Komponen</span>
+              <Select<GradeType> options={typeOptions} value={type} onChange={(v) => v && setType(v)} isSearchable={false} className="min-w-[150px]" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Tahun</span>
+              <Select<number> options={yearOptions} value={academicYearId} onChange={(v) => { setAcademicYearId(v); setSemesterId(null); }} placeholder="Tahun" isClearable isSearchable={false} className="min-w-[150px]" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Semester</span>
+              <Select<number> options={semesterOptions} value={semesterId} onChange={setSemesterId} placeholder="Semester" isClearable isSearchable={false} className="min-w-[150px]" />
+            </label>
+            <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
+              Tampilkan
+            </Button>
           </div>
-          <label className="text-sm font-medium text-secondary">Komponen:</label>
-          <div className="min-w-[150px]">
-            <Select<GradeType> options={typeOptions} value={type} onChange={(v) => v && setType(v)} />
-          </div>
-          <label className="text-sm font-medium text-secondary">Tahun:</label>
-          <div className="min-w-[150px]">
-            <Select<number> options={yearOptions} value={academicYearId} onChange={(v) => { setAcademicYearId(v); setSemesterId(null); }} placeholder="Tahun" isClearable />
-          </div>
-          <label className="text-sm font-medium text-secondary">Semester:</label>
-          <div className="min-w-[150px]">
-            <Select<number> options={semesterOptions} value={semesterId} onChange={setSemesterId} placeholder="Semester" isClearable />
-          </div>
-          <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
-            Tampilkan
-          </Button>
-      </PortalFilterBar>
+        </div>
 
-      {!canLoad ? (
-        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Pilih kelas, mata pelajaran, tahun, dan semester terlebih dahulu." />
-      ) : error ? (
-        <PortalErrorState message={error} />
-      ) : status === "loading" ? (
-        <PortalLoadingState />
-      ) : status === "empty" ? (
-        <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Belum ada data nilai." />
-      ) : (
-        <>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-secondary">{rows.length} siswa</p>
-            {canManage && (
-              <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
-                Simpan Nilai
-              </Button>
-            )}
-          </div>
-          <DataTable<TeacherGradeStudent>
-            loading={false}
-            emptyMessage="Belum ada data nilai."
-            columns={[
-              {
-                header: "No",
-                accessor: "student_id",
-                render: (_v, row) => rows.findIndex((r) => r.student_id === row.student_id) + 1,
-              },
-              { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-on-surface">{String(v ?? "-")}</span> },
-              { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
-              { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
-              {
-                header: "Nilai",
-                accessor: "student_id",
-                render: (_v, row) =>
-                  canManage ? (
-                    <input
-                      type="number"
-                      min={0}
-                      max={100}
-                      step="0.01"
-                      value={scoreById[row.student_id] ?? ""}
-                      onChange={(e) =>
-                        setScoreById((prev) => ({ ...prev, [row.student_id]: e.target.value }))
-                      }
-                      className="w-24 rounded-xl border border-outline bg-surface px-3 py-1.5 text-sm text-primary focus:border-primary-container focus:outline-none"
-                    />
-                  ) : (
-                    <span className="text-sm text-primary">
-                      {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
-                        ? scoreById[row.student_id]
-                        : "---"}
-                    </span>
-                  ),
-              },
-            ]}
-            data={rows}
-          />
-        </>
-      )}
+        {!canLoad ? (
+          <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Pilih kelas, mata pelajaran, tahun, dan semester terlebih dahulu." />
+        ) : error ? (
+          <PortalErrorState message={error} />
+        ) : status === "loading" ? (
+          <PortalLoadingState />
+        ) : status === "empty" ? (
+          <PortalEmptyState icon={<Award className="h-10 w-10" />} description="Belum ada data nilai." />
+        ) : (
+          <>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-secondary">{filteredRows.length} siswa</p>
+              {canManage && (
+                <Button onClick={handleSave} loading={saving} leftIcon={<Save className="h-4 w-4" />}>
+                  Simpan Nilai
+                </Button>
+              )}
+            </div>
+            <DataTable<TeacherGradeStudent>
+              loading={false}
+              emptyMessage="Belum ada data nilai."
+              columns={[
+                {
+                  header: "No",
+                  accessor: "student_id",
+                  render: (_v, row) => filteredRows.findIndex((r) => r.student_id === row.student_id) + 1,
+                },
+                { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-on-surface">{String(v ?? "-")}</span> },
+                { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
+                { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
+                {
+                  header: "Nilai",
+                  accessor: "student_id",
+                  render: (_v, row) =>
+                    canManage ? (
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step="0.01"
+                        value={scoreById[row.student_id] ?? ""}
+                        onChange={(e) =>
+                          setScoreById((prev) => ({ ...prev, [row.student_id]: e.target.value }))
+                        }
+                        className="w-24 rounded-xl border border-outline bg-surface px-3 py-1.5 text-sm text-primary focus:border-primary-container focus:outline-none"
+                      />
+                    ) : (
+                      <span className="text-sm text-primary">
+                        {scoreById[row.student_id] !== undefined && scoreById[row.student_id] !== ""
+                          ? scoreById[row.student_id]
+                          : "---"}
+                      </span>
+                    ),
+                },
+              ]}
+              data={filteredRows}
+            />
+          </>
+        )}
+      </Card>
     </PageContainer>
   );
 }
