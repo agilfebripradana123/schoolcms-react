@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
 import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
@@ -8,7 +9,6 @@ import Search from "@/components/ui/Search";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import PortalErrorState from "@/portal/components/PortalErrorState";
-import PortalFilterBar from "@/portal/components/PortalFilterBar";
 import Pagination from "../../../components/ui/Pagination";
 import { myExamService } from "@/features/examinations";
 import type { Exam, ExamStatus } from "@/features/examinations/api/types";
@@ -43,6 +43,8 @@ export default function TeacherExamsPage() {
   const [page, setPage] = useState(1);
 
   const [subjectOptions, setSubjectOptions] = useState<SelectOption<number>[]>([]);
+
+  const searchTimeout = useRef<number | null>(null);
 
   const load = useCallback(
     (pageNum: number, q: string, subject: number | null, st: ExamStatus | null) => {
@@ -80,10 +82,26 @@ export default function TeacherExamsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const applyFilters = () => {
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
+    searchTimeout.current = window.setTimeout(() => {
+      setPage(1);
+      load(1, value, subjectId, status);
+    }, 400);
+  }, [load, subjectId, status]);
+
+  const handleSubjectChange = useCallback((value: number | null) => {
+    setSubjectId(value);
     setPage(1);
-    load(1, search, subjectId, status);
-  };
+    load(1, search, value, status);
+  }, [load, search, status]);
+
+  const handleStatusChange = useCallback((value: ExamStatus | null) => {
+    setStatus(value);
+    setPage(1);
+    load(1, search, subjectId, value);
+  }, [load, search, subjectId]);
 
   const statusOptions = useMemo<SelectOption<ExamStatus>[]>(
     () =>
@@ -103,71 +121,71 @@ export default function TeacherExamsPage() {
         description="Ujian pada mata pelajaran yang menjadi scope mengajar Anda."
       />
 
-      <PortalFilterBar>
-          <label className="text-sm font-medium text-secondary">Cari:</label>
-          <div className="min-w-[200px]">
-            <Search value={search} onChange={setSearch} placeholder="Cari judul..." />
+      <Card>
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
+          <div className="w-full md:max-w-xs">
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari judul..." />
           </div>
-          <label className="text-sm font-medium text-secondary">Mapel:</label>
-          <div className="min-w-[180px]">
-            <Select<number> options={subjectOptions} value={subjectId} onChange={setSubjectId} placeholder="Semua mapel" isClearable />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end md:flex-1 md:justify-end">
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Mapel</span>
+              <Select<number> options={subjectOptions} value={subjectId} onChange={handleSubjectChange} placeholder="Semua mapel" isClearable isSearchable={false} className="min-w-[180px]" />
+            </label>
+            <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
+              <span className="whitespace-nowrap">Status</span>
+              <Select<ExamStatus> options={statusOptions} value={status} onChange={handleStatusChange} placeholder="Semua status" isClearable isSearchable={false} className="min-w-[180px]" />
+            </label>
           </div>
-          <label className="text-sm font-medium text-secondary">Status:</label>
-          <div className="min-w-[180px]">
-            <Select<ExamStatus> options={statusOptions} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
-          </div>
-          <Button onClick={applyFilters} disabled={loading}>
-            Tampilkan
-          </Button>
-      </PortalFilterBar>
-
-      {error ? (
-        <PortalErrorState message={error} />
-      ) : (
-        <DataTable<Exam>
-          loading={loading}
-          emptyMessage="Belum ada ujian pada scope mengajar Anda."
-          columns={[
-            { header: "No", accessor: "id", render: (_v, row) => exams.findIndex((e) => e.id === row.id) + 1 },
-            {
-              header: "Judul",
-              accessor: "title",
-              render: (v, row) => (
-                <button
-                  type="button"
-                  onClick={() => setDetail(row)}
-                  className="font-semibold text-primary hover:underline"
-                >
-                  {String(v ?? "-")}
-                </button>
-              ),
-            },
-            { header: "Mata Pelajaran", accessor: "id", render: (_v, row) => row.subject?.name ?? "-" },
-            { header: "Durasi", accessor: "duration_minutes", render: (v) => `${String(v ?? "-")} menit` },
-            { header: "Soal", accessor: "total_questions", render: (v) => String(v ?? "-") },
-            { header: "KKM", accessor: "passing_score", render: (v) => String(v ?? "-") },
-            {
-              header: "Status",
-              accessor: "status",
-              render: (v) => {
-                const st = v as ExamStatus;
-                return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
-              },
-            },
-          ]}
-          data={exams}
-        />
-      )}
-      {meta && !error && (
-        <div className="mt-4">
-          <Pagination
-            meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 15, total: meta.total }}
-            onPageChange={(n) => { setPage(n); load(n, search, subjectId, status); }}
-            loading={loading}
-            error={error}
-          />
         </div>
-      )}
+
+        {error ? (
+          <PortalErrorState message={error} />
+        ) : (
+          <DataTable<Exam>
+            loading={loading}
+            emptyMessage="Belum ada ujian pada scope mengajar Anda."
+            columns={[
+              { header: "No", accessor: "id", render: (_v, row) => exams.findIndex((e) => e.id === row.id) + 1 },
+              {
+                header: "Judul",
+                accessor: "title",
+                render: (v, row) => (
+                  <button
+                    type="button"
+                    onClick={() => setDetail(row)}
+                    className="font-semibold text-primary hover:underline"
+                  >
+                    {String(v ?? "-")}
+                  </button>
+                ),
+              },
+              { header: "Mata Pelajaran", accessor: "id", render: (_v, row) => row.subject?.name ?? "-" },
+              { header: "Durasi", accessor: "duration_minutes", render: (v) => `${String(v ?? "-")} menit` },
+              { header: "Soal", accessor: "total_questions", render: (v) => String(v ?? "-") },
+              { header: "KKM", accessor: "passing_score", render: (v) => String(v ?? "-") },
+              {
+                header: "Status",
+                accessor: "status",
+                render: (v) => {
+                  const st = v as ExamStatus;
+                  return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
+                },
+              },
+            ]}
+            data={exams}
+          />
+        )}
+        {meta && !error && (
+          <div className="mt-4">
+            <Pagination
+              meta={{ current_page: meta.current_page, last_page: meta.last_page, per_page: 15, total: meta.total }}
+              onPageChange={(n) => { setPage(n); load(n, search, subjectId, status); }}
+              loading={loading}
+              error={error}
+            />
+          </div>
+        )}
+      </Card>
 
       <Modal
         open={!!detail}

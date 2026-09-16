@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Building2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import apiClient from "@/lib/api/axios";
 import { toApiError } from "@/lib/api";
 import Card from "@/components/ui/Card";
@@ -13,27 +13,27 @@ import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import type { SelectOption } from "@/components/ui/Select";
 
-interface Room {
+interface Question {
   id: number;
-  name: string;
-  capacity: number;
-  location?: string | null;
+  question: string;
+  type: string;
+  subject_name: string;
 }
 
-const lokasiOptions: SelectOption<string>[] = [
-  { value: "guru", label: "Guru" },
-  { value: "ruangan", label: "Ruangan" },
-  { value: "lab", label: "Laboratorium" },
+const tipeOptions: SelectOption<string>[] = [
+  { value: "pilihan ganda", label: "Pilihan Ganda" },
+  { value: "esai", label: "Esai" },
+  { value: "uraian", label: "Uraian" },
 ];
 
-export default function TeacherFacilitiesPlaceholderPage() {
-  const [data, setData] = useState<Room[]>([]);
-  const [filtered, setFiltered] = useState<Room[]>([]);
+export default function TeacherQuestionsPage() {
+  const [data, setData] = useState<Question[]>([]);
+  const [filtered, setFiltered] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [lokasi, setLokasi] = useState<string | null>(null);
-  const [query, setQuery] = useState<{ search: string; lokasi: string | null }>({ search: "", lokasi: null });
+  const [tipe, setTipe] = useState<string | null>(null);
+  const [query, setQuery] = useState<{ search: string; tipe: string | null }>({ search: "", tipe: null });
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -41,7 +41,7 @@ export default function TeacherFacilitiesPlaceholderPage() {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Room[] }>("/rooms", { params: { search: query.search || undefined, lokasi: query.lokasi || undefined } })
+      .get<{ data: Question[] }>("/teacher/exams/questions", { params: { search: query.search || undefined, tipe: query.tipe || undefined } })
       .then((res) => {
         const items = res.data.data ?? [];
         setData(items);
@@ -65,17 +65,17 @@ export default function TeacherFacilitiesPlaceholderPage() {
     }, 400);
   }, []);
 
-  const handleLokasiChange = useCallback((value: string | null) => {
-    setLokasi(value);
+  const handleTipeChange = useCallback((value: string | null) => {
+    setTipe(value);
     setLoading(true);
     setError(null);
-    setQuery((prev) => ({ ...prev, lokasi: value }));
+    setQuery((prev) => ({ ...prev, tipe: value }));
   }, []);
 
   if (loading) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Bank Soal" description="Daftar soal ujian." />
         <PortalLoadingState />
       </PageContainer>
     );
@@ -84,7 +84,7 @@ export default function TeacherFacilitiesPlaceholderPage() {
   if (error) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Bank Soal" description="Daftar soal ujian." />
         <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
@@ -93,25 +93,25 @@ export default function TeacherFacilitiesPlaceholderPage() {
   if (data.length === 0) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
-        <PortalEmptyState icon={<Building2 />} description="Belum ada data ruangan." />
+        <PageHeader title="Bank Soal" description="Daftar soal ujian." />
+        <PortalEmptyState icon={<FileText />} description="Belum ada data soal." />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+      <PageHeader title="Bank Soal" description="Daftar soal ujian." />
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
           <div className="w-full md:max-w-xs">
-            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama ruangan, lokasi..." />
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari pertanyaan, tipe, mata pelajaran..." />
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end md:flex-1 md:justify-end">
             <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
-              <span className="whitespace-nowrap">Lokasi</span>
-              <AppSelect options={lokasiOptions} value={lokasi} onChange={handleLokasiChange} placeholder="Pilih Lokasi" isSearchable={false} className="min-w-[180px]" />
+              <span className="whitespace-nowrap">Tipe Soal</span>
+              <AppSelect options={tipeOptions} value={tipe} onChange={handleTipeChange} placeholder="Pilih Tipe Soal" isSearchable={false} className="min-w-[180px]" />
             </label>
           </div>
         </div>
@@ -120,9 +120,9 @@ export default function TeacherFacilitiesPlaceholderPage() {
         <div className="hidden md:block">
           <DataTable
             columns={[
-              { accessor: "name" as keyof Room, header: "Nama Ruangan", render: (_val, row) => row.name },
-              { accessor: "capacity" as keyof Room, header: "Kapasitas", render: (_val, row) => row.capacity },
-              { accessor: "location" as keyof Room, header: "Lokasi", render: (_val, row) => row.location ?? "—" },
+              { accessor: "question" as keyof Question, header: "Pertanyaan", render: (_val, row) => row.question },
+              { accessor: "type" as keyof Question, header: "Tipe", render: (_val, row) => row.type },
+              { accessor: "subject_name" as keyof Question, header: "Mata Pelajaran", render: (_val, row) => row.subject_name },
             ]}
             data={filtered}
           />
@@ -133,15 +133,11 @@ export default function TeacherFacilitiesPlaceholderPage() {
           {filtered.map((d) => (
             <Card key={d.id} className="p-4 rounded-2xl border border-outline-variant">
               <div className="space-y-2">
-                <p className="font-semibold text-primary">{d.name}</p>
+                <p className="font-semibold text-primary">{d.question}</p>
                 <div className="flex items-center gap-2 text-sm text-secondary">
-                  <span>Kapasitas: {d.capacity}</span>
-                  {d.location && (
-                    <>
-                      <span>•</span>
-                      <span>{d.location}</span>
-                    </>
-                  )}
+                  <span>{d.type}</span>
+                  <span>•</span>
+                  <span>{d.subject_name}</span>
                 </div>
               </div>
             </Card>
@@ -149,7 +145,7 @@ export default function TeacherFacilitiesPlaceholderPage() {
         </div>
 
         {filtered.length === 0 && data.length > 0 && (
-          <PortalEmptyState icon={<Building2 />} description="Tidak ada ruangan yang sesuai dengan pencarian." />
+          <PortalEmptyState icon={<FileText />} description="Tidak ada soal yang sesuai dengan pencarian." />
         )}
       </Card>
     </PageContainer>

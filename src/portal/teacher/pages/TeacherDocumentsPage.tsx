@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Building2 } from "lucide-react";
+import { FileText } from "lucide-react";
 import apiClient from "@/lib/api/axios";
 import { toApiError } from "@/lib/api";
 import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import PortalEmptyState from "@/portal/components/PortalEmptyState";
@@ -13,27 +14,26 @@ import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import type { SelectOption } from "@/components/ui/Select";
 
-interface Room {
+interface Document {
   id: number;
   name: string;
-  capacity: number;
-  location?: string | null;
+  category?: string | null;
+  upload_date: string;
 }
 
-const lokasiOptions: SelectOption<string>[] = [
-  { value: "guru", label: "Guru" },
-  { value: "ruangan", label: "Ruangan" },
-  { value: "lab", label: "Laboratorium" },
+const kategoriOptions: SelectOption<string>[] = [
+  { value: " Akademik", label: "Akademik" },
+  { value: "Non-Akademik", label: "Non-Akademik" },
 ];
 
-export default function TeacherFacilitiesPlaceholderPage() {
-  const [data, setData] = useState<Room[]>([]);
-  const [filtered, setFiltered] = useState<Room[]>([]);
+export default function TeacherDocumentsPage() {
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [filtered, setFiltered] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [lokasi, setLokasi] = useState<string | null>(null);
-  const [query, setQuery] = useState<{ search: string; lokasi: string | null }>({ search: "", lokasi: null });
+  const [kategori, setKategori] = useState<string | null>(null);
+  const [query, setQuery] = useState<{ search: string; kategori: string | null }>({ search: "", kategori: null });
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -41,11 +41,11 @@ export default function TeacherFacilitiesPlaceholderPage() {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Room[] }>("/rooms", { params: { search: query.search || undefined, lokasi: query.lokasi || undefined } })
+      .get<{ data: Document[] }>("/teacher/documents", { params: { search: query.search || undefined, kategori: query.kategori || undefined } })
       .then((res) => {
-        const items = res.data.data ?? [];
-        setData(items);
-        setFiltered(items);
+        const data = res.data.data ?? [];
+        setDocuments(data);
+        setFiltered(data);
       })
       .catch((err) => setError(toApiError(err).message))
       .finally(() => setLoading(false));
@@ -65,17 +65,17 @@ export default function TeacherFacilitiesPlaceholderPage() {
     }, 400);
   }, []);
 
-  const handleLokasiChange = useCallback((value: string | null) => {
-    setLokasi(value);
+  const handleKategoriChange = useCallback((value: string | null) => {
+    setKategori(value);
     setLoading(true);
     setError(null);
-    setQuery((prev) => ({ ...prev, lokasi: value }));
+    setQuery((prev) => ({ ...prev, kategori: value }));
   }, []);
 
   if (loading) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Dokumen" description="Daftar dokumen sekolah." />
         <PortalLoadingState />
       </PageContainer>
     );
@@ -84,34 +84,34 @@ export default function TeacherFacilitiesPlaceholderPage() {
   if (error) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Dokumen" description="Daftar dokumen sekolah." />
         <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
   }
 
-  if (data.length === 0) {
+  if (documents.length === 0) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
-        <PortalEmptyState icon={<Building2 />} description="Belum ada data ruangan." />
+        <PageHeader title="Dokumen" description="Daftar dokumen sekolah." />
+        <PortalEmptyState icon={<FileText />} description="Belum ada dokumen." />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+      <PageHeader title="Dokumen" description="Daftar dokumen sekolah." />
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
           <div className="w-full md:max-w-xs">
-            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama ruangan, lokasi..." />
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama atau kategori dokumen..." />
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end md:flex-1 md:justify-end">
             <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
-              <span className="whitespace-nowrap">Lokasi</span>
-              <AppSelect options={lokasiOptions} value={lokasi} onChange={handleLokasiChange} placeholder="Pilih Lokasi" isSearchable={false} className="min-w-[180px]" />
+              <span className="whitespace-nowrap">Kategori</span>
+              <AppSelect options={kategoriOptions} value={kategori} onChange={handleKategoriChange} placeholder="Pilih Kategori" isSearchable={false} className="min-w-[180px]" />
             </label>
           </div>
         </div>
@@ -120,9 +120,17 @@ export default function TeacherFacilitiesPlaceholderPage() {
         <div className="hidden md:block">
           <DataTable
             columns={[
-              { accessor: "name" as keyof Room, header: "Nama Ruangan", render: (_val, row) => row.name },
-              { accessor: "capacity" as keyof Room, header: "Kapasitas", render: (_val, row) => row.capacity },
-              { accessor: "location" as keyof Room, header: "Lokasi", render: (_val, row) => row.location ?? "—" },
+              { accessor: "name" as keyof Document, header: "Nama", render: (_val, d) => d.name },
+              { 
+                accessor: "category" as keyof Document, 
+                header: "Kategori", 
+                render: (_val, d) => d.category ? <Badge variant="secondary">{d.category}</Badge> : <span className="text-secondary">—</span>
+              },
+              { 
+                accessor: "upload_date" as keyof Document, 
+                header: "Tanggal Upload", 
+                render: (_val, d) => new Date(d.upload_date).toLocaleDateString("id-ID") 
+              },
             ]}
             data={filtered}
           />
@@ -133,23 +141,18 @@ export default function TeacherFacilitiesPlaceholderPage() {
           {filtered.map((d) => (
             <Card key={d.id} className="p-4 rounded-2xl border border-outline-variant">
               <div className="space-y-2">
-                <p className="font-semibold text-primary">{d.name}</p>
-                <div className="flex items-center gap-2 text-sm text-secondary">
-                  <span>Kapasitas: {d.capacity}</span>
-                  {d.location && (
-                    <>
-                      <span>•</span>
-                      <span>{d.location}</span>
-                    </>
-                  )}
+                <div className="flex items-start justify-between">
+                  <p className="font-semibold text-primary">{d.name}</p>
+                  {d.category && <Badge variant="secondary">{d.category}</Badge>}
                 </div>
+                <p className="text-sm text-secondary">{new Date(d.upload_date).toLocaleDateString("id-ID")}</p>
               </div>
             </Card>
           ))}
         </div>
 
-        {filtered.length === 0 && data.length > 0 && (
-          <PortalEmptyState icon={<Building2 />} description="Tidak ada ruangan yang sesuai dengan pencarian." />
+        {filtered.length === 0 && documents.length > 0 && (
+          <PortalEmptyState icon={<FileText />} description="Tidak ada dokumen yang sesuai dengan pencarian." />
         )}
       </Card>
     </PageContainer>

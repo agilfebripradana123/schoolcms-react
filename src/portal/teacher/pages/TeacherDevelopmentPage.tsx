@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Building2 } from "lucide-react";
+import { Trophy } from "lucide-react";
 import apiClient from "@/lib/api/axios";
 import { toApiError } from "@/lib/api";
 import Card from "@/components/ui/Card";
@@ -13,27 +13,29 @@ import Search from "@/components/ui/Search";
 import AppSelect from "@/components/ui/Select";
 import type { SelectOption } from "@/components/ui/Select";
 
-interface Room {
+interface Achievement {
   id: number;
-  name: string;
-  capacity: number;
-  location?: string | null;
+  student_name: string;
+  achievement: string;
+  date: string;
+  description?: string | null;
 }
 
-const lokasiOptions: SelectOption<string>[] = [
-  { value: "guru", label: "Guru" },
-  { value: "ruangan", label: "Ruangan" },
-  { value: "lab", label: "Laboratorium" },
+const jenisOptions: SelectOption<string>[] = [
+  { value: "prestasi", label: "Prestasi" },
+  { value: "pelanggaran", label: "Pelanggaran" },
+  { value: "konseling", label: "Konseling" },
+  { value: "ekskul", label: "Ekskul" },
 ];
 
-export default function TeacherFacilitiesPlaceholderPage() {
-  const [data, setData] = useState<Room[]>([]);
-  const [filtered, setFiltered] = useState<Room[]>([]);
+export default function TeacherDevelopmentPage() {
+  const [data, setData] = useState<Achievement[]>([]);
+  const [filtered, setFiltered] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [lokasi, setLokasi] = useState<string | null>(null);
-  const [query, setQuery] = useState<{ search: string; lokasi: string | null }>({ search: "", lokasi: null });
+  const [jenis, setJenis] = useState<string | null>(null);
+  const [query, setQuery] = useState<{ search: string; jenis: string | null }>({ search: "", jenis: null });
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -41,7 +43,7 @@ export default function TeacherFacilitiesPlaceholderPage() {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Room[] }>("/rooms", { params: { search: query.search || undefined, lokasi: query.lokasi || undefined } })
+      .get<{ data: Achievement[] }>("/teacher/development/achievements", { params: { search: query.search || undefined, jenis: query.jenis || undefined } })
       .then((res) => {
         const items = res.data.data ?? [];
         setData(items);
@@ -65,17 +67,17 @@ export default function TeacherFacilitiesPlaceholderPage() {
     }, 400);
   }, []);
 
-  const handleLokasiChange = useCallback((value: string | null) => {
-    setLokasi(value);
+  const handleJenisChange = useCallback((value: string | null) => {
+    setJenis(value);
     setLoading(true);
     setError(null);
-    setQuery((prev) => ({ ...prev, lokasi: value }));
+    setQuery((prev) => ({ ...prev, jenis: value }));
   }, []);
 
   if (loading) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Pengembangan Siswa" description="Daftar prestasi siswa." />
         <PortalLoadingState />
       </PageContainer>
     );
@@ -84,7 +86,7 @@ export default function TeacherFacilitiesPlaceholderPage() {
   if (error) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+        <PageHeader title="Pengembangan Siswa" description="Daftar prestasi siswa." />
         <PortalErrorState message={error} onRetry={load} />
       </PageContainer>
     );
@@ -93,25 +95,25 @@ export default function TeacherFacilitiesPlaceholderPage() {
   if (data.length === 0) {
     return (
       <PageContainer>
-        <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
-        <PortalEmptyState icon={<Building2 />} description="Belum ada data ruangan." />
+        <PageHeader title="Pengembangan Siswa" description="Daftar prestasi siswa." />
+        <PortalEmptyState icon={<Trophy />} description="Belum ada data prestasi." />
       </PageContainer>
     );
   }
 
   return (
     <PageContainer>
-      <PageHeader title="Sarana & Prasarana" description="Daftar ruangan dan fasilitas." />
+      <PageHeader title="Pengembangan Siswa" description="Daftar prestasi siswa." />
 
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
           <div className="w-full md:max-w-xs">
-            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama ruangan, lokasi..." />
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama siswa, prestasi..." />
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end md:flex-1 md:justify-end">
             <label className="flex flex-col gap-1 text-sm text-on-surface-variant">
-              <span className="whitespace-nowrap">Lokasi</span>
-              <AppSelect options={lokasiOptions} value={lokasi} onChange={handleLokasiChange} placeholder="Pilih Lokasi" isSearchable={false} className="min-w-[180px]" />
+              <span className="whitespace-nowrap">Jenis</span>
+              <AppSelect options={jenisOptions} value={jenis} onChange={handleJenisChange} placeholder="Pilih Jenis" isSearchable={false} className="min-w-[180px]" />
             </label>
           </div>
         </div>
@@ -120,9 +122,10 @@ export default function TeacherFacilitiesPlaceholderPage() {
         <div className="hidden md:block">
           <DataTable
             columns={[
-              { accessor: "name" as keyof Room, header: "Nama Ruangan", render: (_val, row) => row.name },
-              { accessor: "capacity" as keyof Room, header: "Kapasitas", render: (_val, row) => row.capacity },
-              { accessor: "location" as keyof Room, header: "Lokasi", render: (_val, row) => row.location ?? "—" },
+              { accessor: "student_name" as keyof Achievement, header: "Nama Siswa", render: (_val, row) => row.student_name },
+              { accessor: "achievement" as keyof Achievement, header: "Prestasi", render: (_val, row) => row.achievement },
+              { accessor: "date" as keyof Achievement, header: "Tanggal", render: (_val, row) => row.date },
+              { accessor: "description" as keyof Achievement, header: "Keterangan", render: (_val, row) => row.description ?? "—" },
             ]}
             data={filtered}
           />
@@ -133,23 +136,21 @@ export default function TeacherFacilitiesPlaceholderPage() {
           {filtered.map((d) => (
             <Card key={d.id} className="p-4 rounded-2xl border border-outline-variant">
               <div className="space-y-2">
-                <p className="font-semibold text-primary">{d.name}</p>
-                <div className="flex items-center gap-2 text-sm text-secondary">
-                  <span>Kapasitas: {d.capacity}</span>
-                  {d.location && (
-                    <>
-                      <span>•</span>
-                      <span>{d.location}</span>
-                    </>
-                  )}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-semibold text-primary">{d.student_name}</p>
+                    <p className="text-sm text-secondary">{d.achievement}</p>
+                  </div>
+                  <span className="text-xs text-secondary">{d.date}</span>
                 </div>
+                <p className="text-sm text-secondary">{d.description ?? "—"}</p>
               </div>
             </Card>
           ))}
         </div>
 
         {filtered.length === 0 && data.length > 0 && (
-          <PortalEmptyState icon={<Building2 />} description="Tidak ada ruangan yang sesuai dengan pencarian." />
+          <PortalEmptyState icon={<Trophy />} description="Tidak ada prestasi yang sesuai dengan pencarian." />
         )}
       </Card>
     </PageContainer>
