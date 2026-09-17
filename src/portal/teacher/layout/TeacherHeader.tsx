@@ -19,13 +19,13 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const [studentPhoto, setStudentPhoto] = useState<string | null>(null);
 
-  // fetch student photo (students.photo) and sync to header; users.photo is separate
+  // fetch teacher photo from general profile endpoint
   useEffect(() => {
     let active = true;
     (async () => {
       try {
         const { api } = await import("@/lib/api");
-        const r = await api.get<{ success: boolean; data: { photo?: string | null } }>("/student/profile");
+        const r = await api.get<{ success: boolean; data: { photo?: string | null } }>("/profile");
         if (active && r.data?.photo) setStudentPhoto(r.data.photo as string);
       } catch {
         // ignore, fallback to user.photo / initial

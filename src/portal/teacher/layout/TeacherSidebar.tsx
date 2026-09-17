@@ -55,7 +55,9 @@ export default function TeacherSidebar({
   const isGroupActive = useCallback(
     (entry: (typeof visibleNavigation)[number]) =>
       "items" in entry &&
-      entry.items?.some((i) => pathname === i.path),
+      entry.items?.some(
+        (i) => pathname.startsWith(i.path + "/") && pathname !== i.path,
+      ),
     [pathname],
   );
 

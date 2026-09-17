@@ -49,7 +49,7 @@ export default function TeacherStudentViolationsPage() {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Violation[] }>("/teacher/violations", { params: { search: query.search || undefined, tahun: query.tahun || undefined, tingkat: query.tingkat || undefined } })
+      .get<{ data: Violation[] }>("/teacher/development/violations", { params: { search: query.search || undefined, tahun: query.tahun || undefined, tingkat: query.tingkat || undefined } })
       .then((res) => {
         const items = res.data.data ?? [];
         setViolations(items);

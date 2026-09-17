@@ -40,7 +40,7 @@ export default function TeacherStudentExtracurricularPage() {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Extracurricular[] }>("/teacher/extracurriculars", { params: { search: query.search || undefined, tahun: query.tahun || undefined } })
+      .get<{ data: Extracurricular[] }>("/teacher/development/extracurriculars", { params: { search: query.search || undefined, tahun: query.tahun || undefined } })
       .then((res) => {
         const items = res.data.data ?? [];
         setExtracurriculars(items);

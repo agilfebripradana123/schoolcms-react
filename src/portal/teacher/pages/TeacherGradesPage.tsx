@@ -80,6 +80,11 @@ export default function TeacherGradesPage() {
     loadSemesters();
   }, [loadAssignments, loadSemesters]);
 
+  useEffect(() => {
+    if (canLoad) loadRoster();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classId, subjectId, type, semesterId, academicYearId]);
+
   const classOptions = useMemo<SelectOption<number>[]>(() => {
     const seen = new Map<number, string>();
     for (const a of assignments) {
@@ -132,16 +137,6 @@ export default function TeacherGradesPage() {
     );
   }, [rows, search]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
-    searchTimeout.current = window.setTimeout(() => {
-      setStatus("loading");
-      setError(null);
-      loadRoster();
-    }, 400);
-  }, [loadRoster]);
-
   const loadRoster = useCallback(() => {
     if (classId === null || subjectId === null || semesterId === null || academicYearId === null) return;
     setStatus("loading");
@@ -165,6 +160,16 @@ export default function TeacherGradesPage() {
       .catch((err) => setError(toApiError(err).message))
       .finally(() => {});
   }, [classId, subjectId, type, semesterId, academicYearId]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
+    searchTimeout.current = window.setTimeout(() => {
+      setStatus("loading");
+      setError(null);
+      loadRoster();
+    }, 400);
+  }, [loadRoster]);
 
   const handleSave = async () => {
     if (classId === null || subjectId === null || semesterId === null || academicYearId === null) return;
@@ -230,9 +235,6 @@ export default function TeacherGradesPage() {
               <span className="whitespace-nowrap">Semester</span>
               <Select<number> options={semesterOptions} value={semesterId} onChange={setSemesterId} placeholder="Semester" isClearable isSearchable={false} className="min-w-[150px]" />
             </label>
-            <Button onClick={loadRoster} disabled={!canLoad || status === "loading"}>
-              Tampilkan
-            </Button>
           </div>
         </div>
 

@@ -46,7 +46,7 @@ export default function TeacherStudentAchievementsPage() {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Achievement[] }>("/teacher/achievements", { params: { search: query.search || undefined, tahun: query.tahun || undefined, jenis: query.jenis || undefined } })
+      .get<{ data: Achievement[] }>("/teacher/development/achievements", { params: { search: query.search || undefined, tahun: query.tahun || undefined, jenis: query.jenis || undefined } })
       .then((res) => {
         const items = res.data.data ?? [];
         setAchievements(items);

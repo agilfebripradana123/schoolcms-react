@@ -62,7 +62,7 @@ export default function TeacherSchedulesPage() {
   useEffect(() => {
     loadSchedules({ day, academicYearId, semesterId });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [day, academicYearId, semesterId]);
 
   useEffect(() => {
     setYearsLoading(true);
@@ -181,9 +181,6 @@ export default function TeacherSchedulesPage() {
                 className="min-w-[180px]"
               />
             </label>
-            <Button type="button" onClick={applyFilters} disabled={loading}>
-              Tampilkan
-            </Button>
           </div>
         </div>
 

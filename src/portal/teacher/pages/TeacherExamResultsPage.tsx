@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BarChart3 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
@@ -83,6 +83,13 @@ export default function TeacherExamResultsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) { isInitialMount.current = false; return; }
+    applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examId, status]);
+
   const applyFilters = () => {
     setPage(1);
     load(1, examId, status);
@@ -116,9 +123,6 @@ export default function TeacherExamResultsPage() {
           <div className="min-w-[180px]">
             <Select<ExamResultStatus> options={statusOptions()} value={status} onChange={setStatus} placeholder="Semua status" isClearable />
           </div>
-          <Button onClick={applyFilters} disabled={loading}>
-            Tampilkan
-          </Button>
       </PortalFilterBar>
 
       {error ? (

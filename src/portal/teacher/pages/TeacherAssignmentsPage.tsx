@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -95,6 +95,13 @@ export default function TeacherAssignmentsPage() {
     load(page, search, classFilter, subjectFilter, yearFilter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) { isInitialMount.current = false; return; }
+    applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [classFilter, subjectFilter, yearFilter]);
 
   const applyFilters = () => {
     setPage(1);
@@ -249,9 +256,6 @@ export default function TeacherAssignmentsPage() {
             </label>
             <Select<number> options={yearOptions} value={yearFilter} onChange={setYearFilter} placeholder="Semua tahun" isClearable />
           </div>
-          <Button onClick={applyFilters} disabled={loading}>
-            Tampilkan
-          </Button>
         </div>
 
         {error ? (

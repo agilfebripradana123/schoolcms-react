@@ -73,7 +73,7 @@ export default function TeacherExamMonitoringPage() {
   useEffect(() => {
     fetchAttempts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, statusFilter]);
+  }, [currentPage, statusFilter, searchQuery]);
 
   const handleSearch = () => {
     setCurrentPage(1);
@@ -209,9 +209,6 @@ export default function TeacherExamMonitoringPage() {
               isClearable
             />
           </div>
-          <Button onClick={handleSearch}>
-            Tampilkan
-          </Button>
       </PortalFilterBar>
 
       {error ? (

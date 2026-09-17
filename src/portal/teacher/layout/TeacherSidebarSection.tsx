@@ -39,15 +39,18 @@ export default function TeacherSidebarSection({
   if (collapsed) {
     return (
       <div className="mb-1">
-        {visibleItems.map((item) => (
-          <TeacherSidebarItem
-            key={item.path}
-            item={item}
-            collapsed={true}
-            active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
-            onGo={onGo}
-          />
-        ))}
+        {visibleItems.map((item) => {
+          const isActive = currentPath === item.path;
+          return (
+            <TeacherSidebarItem
+              key={item.path}
+              item={item}
+              collapsed={true}
+              active={isActive}
+              onGo={onGo}
+            />
+          );
+        })}
       </div>
     );
   }
@@ -77,7 +80,7 @@ export default function TeacherSidebarSection({
                key={item.path}
                item={item}
                collapsed={false}
-               active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
+                active={currentPath === item.path}
                onGo={onGo}
              />
            ))}

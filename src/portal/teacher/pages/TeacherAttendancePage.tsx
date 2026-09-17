@@ -53,10 +53,7 @@ export default function TeacherAttendancePage() {
     loadClasses();
   }, [loadClasses]);
 
-  const classOptions = useMemo<SelectOption<number>[]>(
-    () => classes.map((c) => ({ value: c.id, label: c.name })),
-    [classes],
-  );
+  const hasSelection = !!classId && !!date;
 
   const loadRoster = useCallback(() => {
     if (!classId || !date) return;
@@ -77,7 +74,14 @@ export default function TeacherAttendancePage() {
       .finally(() => setLoading(false));
   }, [classId, date]);
 
-  const hasSelection = !!classId && !!date;
+  useEffect(() => {
+    if (hasSelection) loadRoster();
+  }, [classId, date, hasSelection, loadRoster]);
+
+  const classOptions = useMemo<SelectOption<number>[]>(
+    () => classes.map((c) => ({ value: c.id, label: c.name })),
+    [classes],
+  );
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -157,9 +161,6 @@ export default function TeacherAttendancePage() {
                 className="min-w-[180px] rounded-xl border border-outline bg-surface px-3 py-2 text-sm text-primary focus:border-primary-container focus:outline-none"
               />
             </label>
-            <Button onClick={loadRoster} disabled={!hasSelection || loading}>
-              Tampilkan
-            </Button>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Calendar, BookOpen } from "lucide-react";
 import Button from "@/components/ui/Button";
 import DataTable from "@/components/ui/DataTable";
@@ -60,6 +60,13 @@ export default function TeacherExamSchedulesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) { isInitialMount.current = false; return; }
+    applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examId, examDate]);
+
   const applyFilters = () => {
     setPage(1);
     load(1, examId, examDate);
@@ -89,9 +96,6 @@ export default function TeacherExamSchedulesPage() {
           <div className="min-w-[200px]">
             <Select<number> options={examOptions} value={examId} onChange={setExamId} placeholder="Semua ujian" isClearable />
           </div>
-          <Button onClick={applyFilters} disabled={loading}>
-            Tampilkan
-          </Button>
       </PortalFilterBar>
 
       {error ? (

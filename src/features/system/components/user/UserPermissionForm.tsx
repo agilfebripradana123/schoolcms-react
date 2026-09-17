@@ -59,23 +59,20 @@ export default function UserPermissionForm({
 
     // Fetch the user's current direct permissions (the list row does not
     // include them; `show` eager-loads role + permissions).
-    if (initialData) {
+if (initialData) {
       userManagementService
         .get(initialData.id)
         .then((res) => {
-          const userPermIds = res.data.permissions?.map((p) => p.id) ?? [];
+          const userPerms = res.data.permissions ?? [];
           const rolePerms = res.data.role?.permissions ?? [];
-          const isAdmin =
-            initialData.role?.name
-              ?.toLowerCase()
-              .includes("administrator") ?? false;
-          const filteredUserIds = isAdmin
-            ? userPermIds.filter(
-                (id) =>
-                  !rolePerms.find((p) => p.id === id)?.name.startsWith("view-audit-logs") &&
-                  !rolePerms.find((p) => p.id === id)?.name.startsWith("manage-settings"),
-              )
-            : userPermIds;
+          // UserResource injects GURU_DEFAULT_PERMISSIONS (and the admin
+          // catalog) into role.permissions, so inherited grants must drop out
+          // of the "additional" list — even when stale direct rows still exist
+          // in permission_user from before they became defaults.
+          const rolePermIds = new Set(rolePerms.map((p) => p.id));
+          const filteredUserIds = userPerms
+            .filter((p) => !rolePermIds.has(p.id))
+            .map((p) => p.id);
           setSelectedIds(filteredUserIds);
           setRolePermissions(rolePerms);
         })

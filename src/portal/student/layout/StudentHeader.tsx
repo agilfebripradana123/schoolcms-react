@@ -25,7 +25,7 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
     (async () => {
       try {
         const { api } = await import("@/lib/api");
-        const r = await api.get<{ success: boolean; data: { photo?: string | null } }>("/student/profile");
+        const r = await api.get<{ success: boolean; data: { photo?: string | null } }>("/profile");
         if (active && r.data?.photo) setStudentPhoto(r.data.photo as string);
       } catch {
         // ignore, fallback to user.photo / initial
