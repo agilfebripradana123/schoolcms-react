@@ -4,6 +4,7 @@ import { navigation, dashboardItem } from "@/config/navigation";
 import SidebarSection from "./SidebarSection";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 import { useAuth } from "@/features/auth/useAuth";
+import { usePermission } from "@/features/auth/usePermission";
 
 interface MobileSidebarProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface MobileSidebarProps {
 export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const { appName, faviconUrl } = usePublicSettings();
   const { user } = useAuth();
+  const { can } = usePermission();
   const location = useLocation();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = navigation.find((group) =>
@@ -45,21 +47,12 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const isGroupActive = (group: (typeof navigation)[number]) =>
     group.items.some((item) => location.pathname === item.path || location.pathname.startsWith(item.path + "/"));
 
-  const isSuperAdmin = user?.role === "Super Admin";
-  const filteredNavigation = isSuperAdmin
-    ? navigation
-    : navigation.map((group) =>
-        group.label !== "Sistem"
-          ? group
-          : {
-              ...group,
-              items: group.items.filter(
-                (item) =>
-                  item.path !== "/admin/system/settings" &&
-                  item.path !== "/admin/system/audit-logs"
-              ),
-            }
-      );
+  const filteredNavigation = navigation.map((group) => ({
+    ...group,
+    items: group.items.filter(
+      (item) => !item.permission || can(item.permission),
+    ),
+  }));
 
   const handleBackdropClick = useCallback(() => onClose(), [onClose]);
 

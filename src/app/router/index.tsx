@@ -235,9 +235,14 @@ const router = createBrowserRouter([
               { path: "system/permissions", element: <PermissionsPage /> },
               { path: "system/users", element: <UsersPage /> },
               {
-                element: <RoleRoute allow={["super admin"]} />,
+                element: <PermissionRoute permission="view-audit-logs" />,
                 children: [
                   { path: "system/audit-logs", element: <AuditLogsPage /> },
+                ],
+              },
+              {
+                element: <PermissionRoute permission="manage-settings" />,
+                children: [
                   { path: "system/settings", element: <SettingsPage /> },
                   { path: "system/settings/general", element: <SettingsGeneralPage /> },
                   { path: "system/settings/notifications", element: <SettingsNotificationsPage /> },

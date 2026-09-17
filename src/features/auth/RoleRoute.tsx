@@ -14,7 +14,7 @@ export default function RoleRoute({ allow }: RoleRouteProps) {
   const { user } = useAuth();
   const role = user?.role?.toLowerCase();
 
-  if (allow && role && !allow.map((r) => r.toLowerCase()).includes(role)) {
+  if (allow && (!role || !allow.map((r) => r.toLowerCase()).includes(role))) {
     return <Navigate to="/admin/dashboard" replace />;
   }
 

@@ -171,8 +171,8 @@ export const navigation: NavigationGroup[] = [
       { label: "Peran", path: "/admin/system/roles", icon: Shield },
       { label: "Hak Akses", path: "/admin/system/permissions", icon: KeyRound },
       { label: "Pengguna", path: "/admin/system/users", icon: Users },
-      { label: "Log Aktivitas", path: "/admin/system/audit-logs", icon: ScrollText },
-      { label: "Pengaturan", path: "/admin/system/settings", icon: Cog },
+      { label: "Log Aktivitas", path: "/admin/system/audit-logs", icon: ScrollText, permission: "view-audit-logs" },
+      { label: "Pengaturan", path: "/admin/system/settings", icon: Cog, permission: "manage-settings" },
     ],
   },
 ];

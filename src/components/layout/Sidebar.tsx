@@ -4,6 +4,7 @@ import { navigation, dashboardItem } from "@/config/navigation";
 import SidebarSection from "./SidebarSection";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 import { useAuth } from "@/features/auth/useAuth";
+import { usePermission } from "@/features/auth/usePermission";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -18,26 +19,19 @@ export default function Sidebar({
 }: SidebarProps) {
   const { appName, faviconUrl } = usePublicSettings();
   const { user } = useAuth();
+  const { can } = usePermission();
 
   const location = useLocation();
   const pathname = location.pathname;
 
-  const isSuperAdmin = user?.role === "Super Admin";
-
   const filteredNavigation = useMemo(() => {
-    if (isSuperAdmin) return navigation;
-    return navigation.map((group) => {
-      if (group.label !== "Sistem") return group;
-      return {
-        ...group,
-        items: group.items.filter(
-          (item) =>
-            item.path !== "/admin/system/settings" &&
-            item.path !== "/admin/system/audit-logs"
-        ),
-      };
-    });
-  }, [isSuperAdmin]);
+    return navigation.map((group) => ({
+      ...group,
+      items: group.items.filter(
+        (item) => !item.permission || can(item.permission),
+      ),
+    }));
+  }, [can]);
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = filteredNavigation.find((group) =>
