@@ -118,7 +118,7 @@ export default function StudentGradesPage() {
       {
         header: "Nilai Akhir",
         accessor: "final_score" as const,
-        render: (v: unknown) => (v != null ? String(v) : "-"),
+        render: (v: unknown) => (v != null ? Number(v).toFixed(1) : "-"),
         className: "px-6 py-4 text-sm font-semibold text-on-surface",
       },
     ],
