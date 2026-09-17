@@ -49,6 +49,7 @@ export default function ReportCardForm({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const isPublished = initialData?.status === "published";
 
   const [students, setStudents] = useState<Student[]>([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
@@ -186,7 +187,7 @@ export default function ReportCardForm({
       academic_year_id: Number(academicYearId),
       semester_id: Number(semesterId),
       teacher_notes: teacherNotes.trim() || undefined,
-      status,
+      status: isPublished ? "published" : status,
     };
 
     try {
@@ -277,7 +278,7 @@ export default function ReportCardForm({
                 onChange={(v) => setStudentId(v ?? "")}
                 options={studentOptions}
                 placeholder="Pilih Siswa"
-                isDisabled={submitting}
+                isDisabled={submitting || isPublished}
               />
             )}
           </FormField>
@@ -315,7 +316,7 @@ export default function ReportCardForm({
                 onChange={(v) => setClassId(v ?? "")}
                 options={classOptions}
                 placeholder="Pilih Kelas"
-                isDisabled={submitting}
+                isDisabled={submitting || isPublished}
               />
             )}
           </FormField>
@@ -353,7 +354,7 @@ export default function ReportCardForm({
                 onChange={(v) => setAcademicYearId(v ?? "")}
                 options={yearOptions}
                 placeholder="Pilih Tahun Ajaran"
-                isDisabled={submitting}
+                isDisabled={submitting || isPublished}
               />
             )}
           </FormField>
@@ -391,7 +392,7 @@ export default function ReportCardForm({
                 onChange={(v) => setSemesterId(v ?? "")}
                 options={semesterOptions}
                 placeholder="Pilih Semester"
-                isDisabled={submitting}
+                isDisabled={submitting || isPublished}
               />
             )}
           </FormField>
@@ -411,13 +412,19 @@ export default function ReportCardForm({
         </FormField>
 
         <FormField label="Status" required error={fieldErrors.status?.[0]}>
-          <AppSelect
-            value={status}
-            onChange={(v) => setStatus((v ?? "draft") as ReportCardStatus)}
-            options={STATUS_OPTIONS}
-            isSearchable={false}
-            isDisabled={submitting}
-          />
+          {isPublished ? (
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface-variant">
+              Terbit
+            </p>
+          ) : (
+            <AppSelect
+              value={status}
+              onChange={(v) => setStatus((v ?? "draft") as ReportCardStatus)}
+              options={STATUS_OPTIONS}
+              isSearchable={false}
+              isDisabled={submitting || isPublished}
+            />
+          )}
         </FormField>
 
         {error && !error.errors && (

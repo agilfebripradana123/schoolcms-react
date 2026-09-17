@@ -301,14 +301,16 @@ export default function ReportCardsPage() {
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
             </button>
-            <button
-              type="button"
-              onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
-              aria-label="Hapus rapor"
-            >
-              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
-            </button>
+            {row.status !== "published" && (
+              <button
+                type="button"
+                onClick={() => openDelete(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
+                aria-label="Hapus rapor"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
           </div>
         ),
       },
