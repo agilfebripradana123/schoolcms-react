@@ -506,6 +506,8 @@ export interface TeacherGradeStudent {
   name: string;
   gender?: "L" | "P" | null;
   score: number | null;
+  grade_id?: number | null;
+  is_final?: boolean;
 }
 
 export interface TeacherGradeRoster {

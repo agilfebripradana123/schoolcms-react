@@ -234,6 +234,15 @@ export const teacherNavigation = [
       { label: "Ekstrakurikuler", path: "/guru/students/extracurricular", permission: "view-extracurricular", icon: Dumbbell },
     ],
   },
+  // ===== KEUANGAN =====
+  {
+    label: "Keuangan",
+    permission: "view-scholarships",
+    items: [
+      { label: "Beasiswa", path: "/guru/finance/scholarships", permission: "view-scholarships", icon: PiggyBank },
+      { label: "Transaksi", path: "/guru/finance/transactions", permission: "view-transactions", icon: DollarSign },
+    ],
+  },
   // ===== OPERASIONAL =====
   {
     label: "Operasional",

@@ -139,10 +139,10 @@ export default function TeacherManageSchedulesPage() {
         <div className="hidden md:block">
           <DataTable
             columns={[
-              { accessor: "day" as keyof Schedule, header: "Hari", render: (_val, s) => s.day ?? "—" },
-              { accessor: "time" as keyof Schedule, header: "Jam", render: (_val, s) => s.time ?? "—" },
-              { accessor: "class" as keyof Schedule, header: "Kelas", render: (_val, s) => s.class ?? "—" },
-              { accessor: "subject" as keyof Schedule, header: "Mata Pelajaran", render: (_val, s) => s.subject ?? "—" },
+               { accessor: "day" as keyof Schedule, header: "Hari", render: (_val, s) => s.day ?? "—" },
+               { accessor: "time" as keyof Schedule, header: "Jam", render: (_val, s) => s.time ?? "—" },
+               { accessor: "class" as keyof Schedule, header: "Kelas", render: (_val, s) => (typeof s.class === "object" ? s.class?.name ?? "—" : s.class ?? "—") },
+               { accessor: "subject" as keyof Schedule, header: "Mata Pelajaran", render: (_val, s) => (typeof s.subject === "object" ? s.subject?.name ?? "—" : s.subject ?? "—") },
               {
                 accessor: "id" as keyof Schedule,
                 header: "Aksi",
@@ -163,8 +163,8 @@ export default function TeacherManageSchedulesPage() {
             <Card key={s.id} className="p-4 rounded-2xl border border-outline-variant">
               <div className="space-y-2">
                 <p className="font-semibold text-primary">{s.day ?? "—"} - {s.time ?? "—"}</p>
-                <p className="text-sm text-secondary">Kelas: {s.class ?? "—"}</p>
-                <p className="text-sm text-secondary">Mapel: {s.subject ?? "—"}</p>
+                <p className="text-sm text-secondary">Kelas: {typeof s.class === "object" ? s.class?.name ?? "—" : s.class ?? "—"}</p>
+                <p className="text-sm text-secondary">Mapel: {typeof s.subject === "object" ? s.subject?.name ?? "—" : s.subject ?? "—"}</p>
                 <div className="flex gap-2 pt-2">
                   <Button variant="ghost" size="sm" onClick={() => openEdit(s)}><Pencil className="h-4 w-4 mr-1" />Edit</Button>
                   <Button variant="ghost" size="sm" onClick={() => openDelete(s)}><Trash2 className="h-4 w-4 mr-1 text-error" />Hapus</Button>
