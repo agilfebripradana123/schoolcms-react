@@ -473,6 +473,68 @@ export interface ExamAttemptOption {
 }
 
 // ---------------------------------------------------------------------
+// Exam reports (B15)
+// ---------------------------------------------------------------------
+export interface ExamReportExamInfo {
+  id: number;
+  title: string;
+  subject_id: number;
+  subject_name: string | null;
+  status: string;
+}
+
+export interface ExamReportSummary {
+  participant_count: number;
+  attempt_count: number;
+  submitted_attempt_count: number;
+  effective_attempt_count: number;
+  incomplete_attempt_count: number;
+  average_percentage: number | null;
+  minimum_percentage: number | null;
+  maximum_percentage: number | null;
+}
+
+export interface ExamReportData {
+  exam: ExamReportExamInfo;
+  summary: ExamReportSummary;
+}
+
+export interface ExamOptionDistribution {
+  option_id: number;
+  option_text: string;
+  position: number;
+  selected_count: number;
+}
+
+export interface ExamEssayAggregate {
+  pending_manual: number;
+  manually_graded: number;
+  average_score: number | null;
+}
+
+export interface ExamReportQuestion {
+  question_id: number;
+  source_question_id: number | null;
+  position: number;
+  question_text: string;
+  type: QuestionType | string;
+  points: number;
+  attempts_total: number;
+  answered: number;
+  unanswered: number;
+  correct: number | null;
+  incorrect: number | null;
+  correctness_percentage: number | null;
+  option_distribution: ExamOptionDistribution[];
+  essay: ExamEssayAggregate | null;
+}
+
+export interface ExamQuestionReport {
+  exam_id: number;
+  questions: ExamReportQuestion[];
+}
+
+// ---------------------------------------------------------------------
 // List params
 // Backend filterable fields (per controller index methods)
 // ---------------------------------------------------------------------

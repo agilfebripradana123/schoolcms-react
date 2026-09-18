@@ -77,6 +77,7 @@ export const TEACHER = {
   EXAM_GRADING_ATTEMPTS: "/teacher/exam-grading/attempts/{attempt}",
   EXAM_GRADING_ANSWERS: "/teacher/exam-grading/answers/{examAnswer}",
   EXAM_GRADING_RESULTS_SYNC: "/teacher/exam-grading/results/{result}/grade-sync",
+  EXAM_REPORTS: "/teacher/exam-reports",
 } as const;
 
 export const PPDB = {
@@ -143,6 +144,7 @@ export const EXAMINATION = {
   EXAM_RESULTS: "/exam-results",
   EXAM_ATTEMPTS: "/exam-attempts",
   EXAM_ANSWERS: "/exam-answers",
+  EXAM_REPORTS: "/exam-reports",
 } as const;
 
 export const DEVELOPMENT = {

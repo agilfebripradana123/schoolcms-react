@@ -16,6 +16,7 @@ import { semesterService } from "@/features/academic/api/semester.service";
 import type { AcademicYear, SchoolClass, Semester } from "@/features/academic/api/types";
 import type { Exam, ExamStatus } from "../api/types";
 import ExamComposition from "../components/exam/ExamComposition";
+import ExamReportView from "../components/report/ExamReportView";
 
 const STATUS_LABEL: Record<ExamStatus, string> = {
   draft: "Draft",
@@ -332,6 +333,8 @@ export default function ExamDetailPage() {
         mutable={isDraft}
         onCountChange={handleCompositionChange}
       />
+
+      <ExamReportView examId={exam.id} scope="admin" />
     </PageContainer>
   );
 }

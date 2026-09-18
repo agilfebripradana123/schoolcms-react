@@ -12,6 +12,7 @@ import PortalErrorState from "@/portal/components/PortalErrorState";
 import Pagination from "../../../components/ui/Pagination";
 import { myExamService } from "@/features/examinations";
 import type { Exam, ExamStatus } from "@/features/examinations/api/types";
+import ExamReportView from "@/features/examinations/components/report/ExamReportView";
 import { toApiError } from "@/lib/api";
 import type { SelectOption } from "@/components/ui/Select";
 
@@ -226,6 +227,9 @@ export default function TeacherExamsPage() {
               <Badge variant="neutral">Acak soal: {detail.shuffle_questions ? "Ya" : "Tidak"}</Badge>
               <Badge variant="neutral">Acak opsi: {detail.shuffle_options ? "Ya" : "Tidak"}</Badge>
               <Badge variant="neutral">Tampilkan hasil: {detail.show_result ? "Ya" : "Tidak"}</Badge>
+            </div>
+            <div className="border-t border-outline-variant pt-4">
+              <ExamReportView examId={detail.id} scope="teacher" />
             </div>
           </div>
         )}
