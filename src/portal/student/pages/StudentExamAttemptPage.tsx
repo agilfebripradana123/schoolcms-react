@@ -279,24 +279,26 @@ export default function StudentExamAttemptPage() {
           <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
           <h1 className="mt-4 text-xl font-bold text-on-surface">Ujian Selesai</h1>
           <p className="mt-1 text-sm text-on-surface-variant">Terima kasih. Jawaban Anda telah dikumpulkan.</p>
-          <div className="mt-6 grid grid-cols-2 gap-3 text-left">
-            <div className="rounded-xl bg-surface-container-high p-3">
-              <p className="text-xs text-on-surface-variant">Nilai</p>
-              <p className="text-lg font-bold text-on-surface">{result.total_score}</p>
+          {result && (
+            <div className="mt-6 grid grid-cols-2 gap-3 text-left">
+              <div className="rounded-xl bg-surface-container-high p-3">
+                <p className="text-xs text-on-surface-variant">Nilai</p>
+                <p className="text-lg font-bold text-on-surface">{result.total_score}</p>
+              </div>
+              <div className="rounded-xl bg-surface-container-high p-3">
+                <p className="text-xs text-on-surface-variant">Huruf</p>
+                <p className="text-lg font-bold text-on-surface">{result.grade ?? "-"}</p>
+              </div>
+              <div className="rounded-xl bg-surface-container-high p-3">
+                <p className="text-xs text-on-surface-variant">Benar</p>
+                <p className="text-lg font-bold text-success">{result.correct_count}</p>
+              </div>
+              <div className="rounded-xl bg-surface-container-high p-3">
+                <p className="text-xs text-on-surface-variant">Salah / Kosong</p>
+                <p className="text-lg font-bold text-error">{result.wrong_count + result.unanswered_count}</p>
+              </div>
             </div>
-            <div className="rounded-xl bg-surface-container-high p-3">
-              <p className="text-xs text-on-surface-variant">Huruf</p>
-              <p className="text-lg font-bold text-on-surface">{result.grade ?? "-"}</p>
-            </div>
-            <div className="rounded-xl bg-surface-container-high p-3">
-              <p className="text-xs text-on-surface-variant">Benar</p>
-              <p className="text-lg font-bold text-success">{result.correct_count}</p>
-            </div>
-            <div className="rounded-xl bg-surface-container-high p-3">
-              <p className="text-xs text-on-surface-variant">Salah / Kosong</p>
-              <p className="text-lg font-bold text-error">{result.wrong_count + result.unanswered_count}</p>
-            </div>
-          </div>
+          )}
           <Button className="mt-6" onClick={() => navigate("/siswa/exams")}>
             Lihat Hasil
           </Button>

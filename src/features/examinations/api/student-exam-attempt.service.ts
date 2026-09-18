@@ -60,16 +60,18 @@ export interface SecureExamAttemptData {
   answers: AttemptAnswersMap;
 }
 
+export interface SecureExamSubmitResult {
+  total_score: number;
+  correct_count: number;
+  wrong_count: number;
+  unanswered_count: number;
+  grade: string | null;
+  status: string;
+}
+
 export interface SecureExamSubmitData {
   attempt: ExamAttemptInfo;
-  result: {
-    total_score: number;
-    correct_count: number;
-    wrong_count: number;
-    unanswered_count: number;
-    grade: string | null;
-    status: string;
-  };
+  result?: SecureExamSubmitResult | null;
 }
 
 const BASE = STUDENTS.EXAM_ATTEMPTS;
