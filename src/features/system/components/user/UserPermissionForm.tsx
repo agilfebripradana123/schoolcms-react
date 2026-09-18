@@ -112,7 +112,7 @@ if (initialData) {
   };
 
   const rolePermIds = new Set(rolePermissions.map((p) => p.id));
-  const excludedNames = new Set(["view-audit-logs", "manage-settings"]);
+  const excludedNames = new Set(["view-audit-logs", "manage-settings", "manage-users", "manage-roles", "manage-ppdb"]);
   const additionalPermissions = permissions.filter(
     (p) => !rolePermIds.has(p.id) && !excludedNames.has(p.name),
   );
