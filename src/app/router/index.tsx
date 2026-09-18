@@ -43,6 +43,8 @@ import TeacherManageSchedulesPage from "@/portal/teacher/pages/TeacherManageSche
 import TeacherManageClassesPage from "@/portal/teacher/pages/TeacherManageClassesPage";
 import TeacherSubjectsPage from "@/portal/teacher/pages/TeacherSubjectsPage";
 import TeacherAcademicYearsPage from "@/portal/teacher/pages/TeacherAcademicYearsPage";
+import TeacherScholarshipsPage from "@/portal/teacher/pages/TeacherScholarshipsPage";
+import TeacherTransactionsPage from "@/portal/teacher/pages/TeacherTransactionsPage";
 import { NotificationsPage } from "@/features/notifications";
 import {
   AcademicYearPage,
@@ -459,18 +461,30 @@ const router = createBrowserRouter([
                   { path: "subjects", element: <TeacherSubjectsPage /> },
                 ],
               },
-              {
-                element: <PermissionRoute permission="manage-academic-years" />,
-                children: [
-                  { path: "academic-years", element: <TeacherAcademicYearsPage /> },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
+               {
+                 element: <PermissionRoute permission="manage-academic-years" />,
+                 children: [
+                   { path: "academic-years", element: <TeacherAcademicYearsPage /> },
+                 ],
+               },
+               {
+                 element: <PermissionRoute permission="view-scholarships" />,
+                 children: [
+                   { path: "finance/scholarships", element: <TeacherScholarshipsPage /> },
+                 ],
+               },
+               {
+                 element: <PermissionRoute permission="view-transactions" />,
+                 children: [
+                   { path: "finance/transactions", element: <TeacherTransactionsPage /> },
+                 ],
+               },
+             ],
+           },
+         ],
+       },
+     ],
+   },
 
   // =========================
   // SISWA PORTAL (/siswa) — Siswa, default home

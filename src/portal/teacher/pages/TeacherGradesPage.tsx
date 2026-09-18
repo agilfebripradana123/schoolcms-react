@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Save, Award } from "lucide-react";
+import { Lock, Save, Unlock, Award } from "lucide-react";
 import { toast } from "sonner";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
@@ -43,6 +43,9 @@ export default function TeacherGradesPage() {
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "empty">("idle");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [finalizingId, setFinalizingId] = useState<number | null>(null);
+
+  const canFinalize = can("finalize-grades");
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -63,6 +66,7 @@ export default function TeacherGradesPage() {
         const first = data[0];
         if (!first) return;
         setClassId(first.class_id);
+        setSubjectId(first.subject_id);
         setAcademicYearId(first.academic_year_id);
       })
       .catch(() => setAssignments([]));
@@ -71,7 +75,13 @@ export default function TeacherGradesPage() {
   const loadSemesters = useCallback(() => {
     semesterService
       .list({ per_page: 100 })
-      .then((res) => setSemesters(res.data))
+      .then((res) => {
+        setSemesters(res.data);
+        // Auto-select first semester so the roster can load without manual
+        // picking once class/subject/academic year are chosen.
+        const first = res.data[0];
+        if (first) setSemesterId(first.id);
+      })
       .catch(() => setSemesters([]));
   }, []);
 
@@ -197,6 +207,32 @@ export default function TeacherGradesPage() {
     }
   };
 
+  const handleFinalize = async (gradeId: number) => {
+    setFinalizingId(gradeId);
+    try {
+      await teacherGradeService.finalize(gradeId);
+      toast.success("Nilai berhasil dikunci.");
+      loadRoster();
+    } catch (err) {
+      toast.error("Gagal mengunci nilai", { description: toApiError(err).message });
+    } finally {
+      setFinalizingId(null);
+    }
+  };
+
+  const handleUnfinalize = async (gradeId: number) => {
+    setFinalizingId(gradeId);
+    try {
+      await teacherGradeService.unfinalize(gradeId);
+      toast.success("Nilai berhasil dibuka.");
+      loadRoster();
+    } catch (err) {
+      toast.error("Gagal membuka nilai", { description: toApiError(err).message });
+    } finally {
+      setFinalizingId(null);
+    }
+  };
+
   return (
     <PageContainer>
       <PageHeader
@@ -266,11 +302,11 @@ export default function TeacherGradesPage() {
                 { header: "Nama", accessor: "name", render: (v) => <span className="font-medium text-on-surface">{String(v ?? "-")}</span> },
                 { header: "NIS", accessor: "nis", render: (v) => String(v ?? "-") },
                 { header: "NISN", accessor: "nisn", render: (v) => String(v ?? "-") },
-                {
+{
                   header: "Nilai",
                   accessor: "student_id",
                   render: (_v, row) =>
-                    canManage ? (
+                    canManage && !row.is_final ? (
                       <input
                         type="number"
                         min={0}
@@ -290,6 +326,44 @@ export default function TeacherGradesPage() {
                       </span>
                     ),
                 },
+                ...(canFinalize
+                  ? [
+                      {
+                        header: "Status",
+                        accessor: "grade_id" as const,
+                        render: (_v: number | null | undefined, row: TeacherGradeStudent) => {
+                          if (!row.grade_id) return <span className="text-xs text-on-surface-variant">Belum ada nilai</span>;
+                          const loading = finalizingId === row.grade_id;
+                          if (row.is_final) {
+                            return (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleUnfinalize(row.grade_id!)}
+                                loading={loading}
+                                leftIcon={<Unlock className="h-3.5 w-3.5" />}
+                                className="text-xs"
+                              >
+                                Dikunci
+                              </Button>
+                            );
+                          }
+                          return (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleFinalize(row.grade_id!)}
+                              loading={loading}
+                              leftIcon={<Lock className="h-3.5 w-3.5" />}
+                              className="text-xs"
+                            >
+                              Kunci
+                            </Button>
+                          );
+                        },
+                      },
+                    ]
+                  : []),
               ]}
               data={filteredRows}
             />

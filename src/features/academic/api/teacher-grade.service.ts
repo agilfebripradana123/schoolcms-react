@@ -7,6 +7,15 @@ import type {
   TeacherGradeRoster,
 } from "./types";
 
+export interface GradeResource {
+  id: number;
+  student_id: number;
+  score: number | null;
+  is_final: boolean;
+  finalized_at: string | null;
+  finalized_by: number | null;
+}
+
 export interface TeacherGradeRosterParams extends ListParams {
   class_id: number;
   subject_id: number;
@@ -31,5 +40,13 @@ export const teacherGradeService = {
 
   async bulkSave(payload: TeacherGradeBulkPayload): Promise<ApiMessage> {
     return api.post<ApiMessage>(TEACHER.GRADES_BULK, payload);
+  },
+
+  async finalize(gradeId: number): Promise<ApiEnvelope<GradeResource>> {
+    return api.post<ApiEnvelope<GradeResource>>(`${ACADEMIC.GRADES}/${gradeId}/finalize`);
+  },
+
+  async unfinalize(gradeId: number): Promise<ApiEnvelope<GradeResource>> {
+    return api.post<ApiEnvelope<GradeResource>>(`${ACADEMIC.GRADES}/${gradeId}/unfinalize`);
   },
 };
