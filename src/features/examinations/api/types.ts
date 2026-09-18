@@ -414,6 +414,8 @@ export type ExamResultStatus = "pending" | "graded";
 export interface ExamResult {
   id: number;
   participant_id: number;
+  exam_attempt_id?: number | null;
+  attempt_number?: number | null;
   participant?: ExamParticipant;
   total_score: number;
   correct_count: number;
@@ -427,17 +429,48 @@ export interface ExamResult {
 }
 
 export interface CreateExamResultPayload {
-  participant_id: number;
-  total_score?: number;
-  correct_count?: number;
-  wrong_count?: number;
-  unanswered_count?: number;
-  grade?: string | null;
-  status: ExamResultStatus;
-  graded_at?: string | null;
+  exam_attempt_id: number;
 }
 
 export interface UpdateExamResultPayload extends Partial<CreateExamResultPayload> {}
+
+// ---------------------------------------------------------------------
+// Admin attempt options (exam-attempts selector for result creation)
+// ---------------------------------------------------------------------
+export interface ExamAttemptOptionSubject {
+  id: number;
+  name: string;
+}
+
+export interface ExamAttemptOptionExam {
+  id: number;
+  title: string;
+  subject: ExamAttemptOptionSubject | null;
+}
+
+export interface ExamAttemptOptionStudent {
+  id: number;
+  name: string;
+  nis: string;
+}
+
+export interface ExamAttemptOptionParticipant {
+  id: number;
+  exam_card_number: string;
+  student: ExamAttemptOptionStudent | null;
+}
+
+export interface ExamAttemptOption {
+  id: number;
+  attempt_number: number;
+  status: string;
+  started_at: string | null;
+  submitted_at: string | null;
+  expires_at: string | null;
+  has_result: boolean;
+  exam: ExamAttemptOptionExam | null;
+  participant: ExamAttemptOptionParticipant | null;
+}
 
 // ---------------------------------------------------------------------
 // List params

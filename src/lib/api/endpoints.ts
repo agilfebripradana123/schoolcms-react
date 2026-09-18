@@ -141,6 +141,7 @@ export const EXAMINATION = {
   EXAM_INSTRUCTIONS: "/exam-instructions",
   EXAM_PARTICIPANTS: "/exam-participants",
   EXAM_RESULTS: "/exam-results",
+  EXAM_ATTEMPTS: "/exam-attempts",
   EXAM_ANSWERS: "/exam-answers",
 } as const;
 

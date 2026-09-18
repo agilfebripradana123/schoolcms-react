@@ -205,6 +205,19 @@ export default function ExamResultsPage() {
         ),
       },
       {
+        header: "Percobaan",
+        accessor: "exam_attempt_id" as keyof Row,
+        className: "px-6 py-4 text-center text-sm text-on-surface",
+        render: (_value: Row[keyof Row], row: Row) =>
+          row.attempt_number != null ? (
+            <span>{`Percobaan #${row.attempt_number}`}</span>
+          ) : row.exam_attempt_id != null ? (
+            <span>{`#${row.exam_attempt_id}`}</span>
+          ) : (
+            <Badge variant="secondary">Legacy</Badge>
+          ),
+      },
+      {
         header: "Nilai",
         accessor: "total_score" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => (
@@ -373,6 +386,13 @@ export default function ExamResultsPage() {
                             Nilai {row.total_score ?? "-"}
                           </p>
                           <p className="mt-1 flex flex-wrap gap-3 text-xs text-on-surface-variant">
+                            <span>
+                              {row.attempt_number != null
+                                ? `Percobaan #${row.attempt_number}`
+                                : row.exam_attempt_id != null
+                                  ? `#${row.exam_attempt_id}`
+                                  : "Legacy"}
+                            </span>
                             <span>Benar {row.correct_count ?? "-"}</span>
                             <span>Salah {row.wrong_count ?? "-"}</span>
                             <span>Tidak Dijawab {row.unanswered_count ?? "-"}</span>

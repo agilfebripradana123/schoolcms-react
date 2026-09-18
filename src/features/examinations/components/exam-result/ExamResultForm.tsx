@@ -1,18 +1,13 @@
 ﻿import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
-import { FormField, Input } from "@/components/ui/Form";
+import { FormField } from "@/components/ui/Form";
 import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { examParticipantService } from "../../api/exam-participant.service";
-import type {
-  CreateExamResultPayload,
-  ExamParticipant,
-  ExamResult,
-  ExamResultStatus,
-} from "../../api/types";
+import { examAttemptService } from "../../api/exam-attempt.service";
+import type { ExamAttemptOption, ExamResult } from "../../api/types";
 import { examResultService } from "../../api/exam-result.service";
 
 interface ExamResultFormProps {
@@ -22,18 +17,18 @@ interface ExamResultFormProps {
   initialData?: ExamResult | null;
 }
 
-const STATUS_OPTIONS: { value: ExamResultStatus; label: string }[] = [
-  { value: "pending", label: "Menunggu" },
-  { value: "graded", label: "Dinilai" },
-];
-
-function participantLabel(p: ExamParticipant): string {
-  const student = p.student?.name;
-  const exam = p.exam?.title;
-  if (student && exam) return `${student} — ${exam}`;
-  if (student) return student;
-  if (p.exam_card_number) return p.exam_card_number;
-  return `#${p.id}`;
+function attemptLabel(a: ExamAttemptOption): string {
+  const student = a.participant?.student?.name;
+  const exam = a.exam?.title;
+  const segments = [`Percobaan #${a.attempt_number}`];
+  if (student && a.participant?.student?.nis) {
+    segments.push(`${student} (${a.participant.student.nis})`);
+  } else if (student) {
+    segments.push(student);
+  }
+  if (exam) segments.push(exam);
+  segments.push(a.status === "submitted" ? "Selesai" : "Waktu Habis");
+  return segments.join(" · ");
 }
 
 export default function ExamResultForm({
@@ -42,58 +37,42 @@ export default function ExamResultForm({
   onSaved,
   initialData,
 }: ExamResultFormProps) {
-  const [participantId, setParticipantId] = useState<string>("");
-  const [totalScore, setTotalScore] = useState<string>("");
-  const [correctCount, setCorrectCount] = useState<string>("");
-  const [wrongCount, setWrongCount] = useState<string>("");
-  const [unansweredCount, setUnansweredCount] = useState<string>("");
-  const [grade, setGrade] = useState("");
-  const [status, setStatus] = useState<ExamResultStatus>("pending");
+  const [attemptId, setAttemptId] = useState<string>("");
+  const [attempts, setAttempts] = useState<ExamAttemptOption[]>([]);
+  const [loadingAttempts, setLoadingAttempts] = useState(false);
+  const [attemptsError, setAttemptsError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  const [participants, setParticipants] = useState<ExamParticipant[]>([]);
-  const [participantsError, setParticipantsError] = useState(false);
-
   const isEdit = Boolean(initialData);
 
-  const loadParticipants = useCallback(() => {
-    setParticipantsError(false);
-    examParticipantService
-      .list({ per_page: 100 })
-      .then((res) => setParticipants(res.data))
-      .catch(() => setParticipantsError(true));
-  }, []);
+  const loadAttempts = useCallback(() => {
+    if (isEdit) return;
+    setAttemptsError(false);
+    setLoadingAttempts(true);
+    examAttemptService
+      .listEligible({ per_page: 200 })
+      .then((res) => setAttempts(res.data))
+      .catch(() => setAttemptsError(true))
+      .finally(() => setLoadingAttempts(false));
+  }, [isEdit]);
 
   useEffect(() => {
     if (open) {
       setError(null);
       setFieldErrors({});
-      loadParticipants();
-
-      if (initialData) {
-        setParticipantId(String(initialData.participant_id));
-        setTotalScore(initialData.total_score != null ? String(initialData.total_score) : "");
-        setCorrectCount(initialData.correct_count != null ? String(initialData.correct_count) : "");
-        setWrongCount(initialData.wrong_count != null ? String(initialData.wrong_count) : "");
-        setUnansweredCount(
-          initialData.unanswered_count != null ? String(initialData.unanswered_count) : "",
-        );
-        setGrade(initialData.grade ?? "");
-        setStatus(initialData.status);
-      } else {
-        setParticipantId("");
-        setTotalScore("");
-        setCorrectCount("");
-        setWrongCount("");
-        setUnansweredCount("");
-        setGrade("");
-        setStatus("pending");
-      }
+      setAttemptId("");
+      loadAttempts();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialData]);
+
+  const eligibleOptions = attempts.filter((a) => !a.has_result);
+  const attemptOptions = eligibleOptions.map((a) => ({
+    value: String(a.id),
+    label: attemptLabel(a),
+  }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,22 +80,20 @@ export default function ExamResultForm({
     setError(null);
     setFieldErrors({});
 
-    const payload: CreateExamResultPayload = {
-      participant_id: Number(participantId),
-      total_score: totalScore === "" ? undefined : Number(totalScore),
-      correct_count: correctCount === "" ? undefined : Number(correctCount),
-      wrong_count: wrongCount === "" ? undefined : Number(wrongCount),
-      unanswered_count: unansweredCount === "" ? undefined : Number(unansweredCount),
-      grade: grade.trim() || null,
-      status,
-    };
+    if (!isEdit && !attemptId) {
+      setError({ message: "Pilih attempt terlebih dahulu." });
+      setSubmitting(false);
+      return;
+    }
 
     try {
       if (initialData) {
-        await examResultService.update(initialData.id, payload);
-        toast.success("Hasil ujian berhasil diperbarui.");
+        // Update recomputes the bound attempt through the authoritative
+        // scoring service; no manual score fields exist.
+        await examResultService.update(initialData.id, {});
+        toast.success("Hasil ujian berhasil dihitung ulang.");
       } else {
-        await examResultService.create(payload);
+        await examResultService.create({ exam_attempt_id: Number(attemptId) });
         toast.success("Hasil ujian berhasil ditambahkan.");
       }
       onSaved();
@@ -134,17 +111,12 @@ export default function ExamResultForm({
     }
   };
 
-  const participantOptions = participants.map((p) => ({
-    value: String(p.id),
-    label: participantLabel(p),
-  }));
-
   return (
     <Modal
       open={open}
       onClose={onClose}
       title={isEdit ? "Edit Hasil Ujian" : "Tambah Hasil Ujian"}
-      size="lg"
+      size="md"
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={submitting}>
@@ -162,109 +134,64 @@ export default function ExamResultForm({
         className="space-y-6"
         noValidate
       >
-        <FormField label="Peserta" required error={fieldErrors.participant_id?.[0]}>
-          {participantsError ? (
-            <div className="flex w-full items-center justify-between gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
-              <span>Gagal memuat data peserta.</span>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={loadParticipants}
-              >
-                Muat Ulang
-              </Button>
-            </div>
-          ) : participants.length === 0 && !participantsError ? (
-            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
-              Memuat data...
+        {isEdit && initialData ? (
+          <div className="rounded-2xl bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
+            <p>
+              Attempt:{" "}
+              <span className="font-semibold text-on-surface">
+                {initialData.attempt_number != null
+                  ? `Percobaan #${initialData.attempt_number}`
+                  : initialData.exam_attempt_id != null
+                    ? `#${initialData.exam_attempt_id}`
+                    : "Legacy"}
+              </span>
             </p>
-          ) : (
-            <AppSelect
-              value={participantId}
-              onChange={(v) => setParticipantId(v ?? "")}
-              options={participantOptions}
-              placeholder="Pilih Peserta"
-              isDisabled={submitting}
-            />
-          )}
-        </FormField>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-          <FormField label="Total Nilai" error={fieldErrors.total_score?.[0]}>
-            <Input
-              type="number"
-              min={0}
-              step="0.01"
-              value={totalScore}
-              onChange={(e) => setTotalScore(e.target.value)}
-              placeholder="0"
-              disabled={submitting}
-            />
+            <p className="mt-1">
+              Nilai dihitung ulang oleh sistem saat disimpan. Input manual skor
+              tidak didukung.
+            </p>
+          </div>
+        ) : (
+          <FormField label="Attempt Ujian" required error={fieldErrors.exam_attempt_id?.[0]}>
+            {attemptsError ? (
+              <div className="flex w-full items-center justify-between gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
+                <span>Gagal memuat daftar attempt.</span>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={loadAttempts}
+                >
+                  Muat Ulang
+                </Button>
+              </div>
+            ) : (
+              <AppSelect
+                value={attemptId}
+                onChange={(v) => setAttemptId(v ?? "")}
+                options={attemptOptions}
+                placeholder="Pilih attempt yang sudah selesai"
+                isSearchable
+                isLoading={loadingAttempts}
+                noOptionsMessage={
+                  loadingAttempts
+                    ? "Memuat data..."
+                    : attempts.length === 0
+                      ? "Belum ada attempt yang tersedia."
+                      : "Semua attempt yang tersedia sudah memiliki hasil."
+                }
+                isDisabled={submitting}
+              />
+            )}
           </FormField>
+        )}
 
-          <FormField label="Benar" error={fieldErrors.correct_count?.[0]}>
-            <Input
-              type="number"
-              min={0}
-              step={1}
-              value={correctCount}
-              onChange={(e) => setCorrectCount(e.target.value)}
-              placeholder="0"
-              disabled={submitting}
-            />
-          </FormField>
-
-          <FormField label="Salah" error={fieldErrors.wrong_count?.[0]}>
-            <Input
-              type="number"
-              min={0}
-              step={1}
-              value={wrongCount}
-              onChange={(e) => setWrongCount(e.target.value)}
-              placeholder="0"
-              disabled={submitting}
-            />
-          </FormField>
-
-          <FormField label="Tidak Dijawab" error={fieldErrors.unanswered_count?.[0]}>
-            <Input
-              type="number"
-              min={0}
-              step={1}
-              value={unansweredCount}
-              onChange={(e) => setUnansweredCount(e.target.value)}
-              placeholder="0"
-              disabled={submitting}
-            />
-          </FormField>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <FormField
-            label="Grade"
-            hint="Opsional, mis. A, B, C, dll."
-            error={fieldErrors.grade?.[0]}
-          >
-            <Input
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              placeholder="A"
-              maxLength={5}
-              disabled={submitting}
-            />
-          </FormField>
-
-          <FormField label="Status" required error={fieldErrors.status?.[0]}>
-            <AppSelect
-              value={status}
-              onChange={(v) => setStatus((v ?? "pending") as ExamResultStatus)}
-              options={STATUS_OPTIONS}
-              isSearchable={false}
-              isDisabled={submitting}
-            />
-          </FormField>
-        </div>
+        {!isEdit && (
+          <p className="rounded-xl bg-surface-container-low px-3 py-2 text-xs text-on-surface-variant">
+            Nilai hasil dihitung otomatis oleh sistem berdasarkan attempt yang
+            dipilih. Input manual skor tidak didukung.
+          </p>
+        )}
 
         {error && !error.errors && (
           <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">
