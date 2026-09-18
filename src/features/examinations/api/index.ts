@@ -13,4 +13,5 @@ export {
   myExamScheduleService,
   myExamResultService,
 } from "./my-exam.service";
+export { teacherExamGradingService } from "./teacher-exam-grading.service";
 export * from "./my-exam-monitoring.service";

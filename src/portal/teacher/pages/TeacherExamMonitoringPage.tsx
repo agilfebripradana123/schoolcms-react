@@ -15,7 +15,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import PortalErrorState from "@/portal/components/PortalErrorState";
 import PortalFilterBar from "@/portal/components/PortalFilterBar";
-import { Eye, RefreshCw, BarChart3 } from "lucide-react";
+import { Eye, RefreshCw, BarChart3, ClipboardPenLine } from "lucide-react";
 import { toast } from "sonner";
 import type { SelectOption } from "@/components/ui/Select";
 
@@ -82,6 +82,10 @@ export default function TeacherExamMonitoringPage() {
 
   const handleViewDetail = (attemptId: number) => {
     navigate(`/guru/exams/monitoring/${attemptId}`);
+  };
+
+  const handleGrading = (attemptId: number) => {
+    navigate(`/guru/examinations/grading/${attemptId}`);
   };
 
   const formatDuration = (seconds: number | null) => {
@@ -159,14 +163,26 @@ export default function TeacherExamMonitoringPage() {
       header: "Aksi",
       accessor: "id" as keyof ExamAttemptMonitoring,
       render: (_: unknown, row: ExamAttemptMonitoring) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => handleViewDetail(row.id)}
-        >
-          <Eye className="h-4 w-4 mr-1" />
-          Detail
-        </Button>
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleViewDetail(row.id)}
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            Detail
+          </Button>
+          {(row.status === "submitted" || row.status === "expired") && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleGrading(row.id)}
+            >
+              <ClipboardPenLine className="h-4 w-4 mr-1" />
+              Nilai Essay
+            </Button>
+          )}
+        </div>
       ),
     },
   ];

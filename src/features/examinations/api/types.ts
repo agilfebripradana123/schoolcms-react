@@ -158,6 +158,64 @@ export interface UpdateExamQuestionPayload {
 }
 
 // ---------------------------------------------------------------------
+// Teacher essay grading (exam-grading)
+// ---------------------------------------------------------------------
+export interface TeacherEssayStudent {
+  id: number;
+  name: string | null;
+  nis: string | null;
+}
+
+export interface TeacherEssayItem {
+  exam_answer_id: number;
+  attempt_question_id: number;
+  question_text: string;
+  max_points: number;
+  student: TeacherEssayStudent;
+  essay_answer: string | null;
+  score: number | null;
+  grade_status: string | null;
+  feedback: string | null;
+  graded_at: string | null;
+}
+
+export interface TeacherEssayGradingData {
+  attempt_id: number;
+  attempt_status: string;
+  essays: TeacherEssayItem[];
+}
+
+export interface GradeEssayPayload {
+  score: number;
+  feedback?: string | null;
+}
+
+export interface GradeResultSummary {
+  total_score: number;
+  correct_count: number;
+  wrong_count: number;
+  unanswered_count: number;
+  grade: string | null;
+  percentage: number;
+  status: string;
+}
+
+export interface GradeEssayResponse {
+  attempt_question_id: number;
+  score: number;
+  feedback: string | null;
+  grade_status: string;
+  graded_by: number;
+  graded_at: string | null;
+  result: GradeResultSummary;
+}
+
+export interface GradeSyncResultData {
+  grade_id: number;
+  grade?: unknown;
+}
+
+// ---------------------------------------------------------------------
 // QuestionBank
 // ---------------------------------------------------------------------
 export type QuestionType = "multiple_choice" | "true_false" | "essay";

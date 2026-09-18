@@ -11,10 +11,11 @@ import PortalEmptyState from "@/portal/components/PortalEmptyState";
 import PortalErrorState from "@/portal/components/PortalErrorState";
 import PortalFilterBar from "@/portal/components/PortalFilterBar";
 import Pagination from "../../../components/ui/Pagination";
-import { myExamResultService } from "@/features/examinations";
+import { myExamResultService, teacherExamGradingService } from "@/features/examinations";
 import type { ExamResult, ExamResultStatus } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
 import type { SelectOption } from "@/components/ui/Select";
+import { toast } from "sonner";
 
 const STATUS_LABELS: Record<ExamResultStatus, string> = {
   pending: "Pending",
@@ -105,6 +106,45 @@ export default function TeacherExamResultsPage() {
   );
 
   const [detail, setDetail] = useState<ExamResult | null>(null);
+  const [syncing, setSyncing] = useState<number | null>(null);
+
+  const syncEligibility = (row: ExamResult) => {
+    const exam = row.participant?.exam;
+    const examType = exam?.exam_type;
+    const statusOk = row.status === "graded";
+    const typeOk = examType === "uts" || examType === "uas";
+    const contextOk = Boolean(exam?.academic_year_id && exam?.semester_id);
+    return { statusOk, typeOk, contextOk, examType, eligible: statusOk && typeOk && contextOk };
+  };
+
+  const handleSync = async (row: ExamResult) => {
+    setSyncing(row.id);
+    try {
+      const res = await teacherExamGradingService.syncGrade(row.id);
+      toast.success(res.message || "Nilai berhasil disinkronkan ke nilai akademik.");
+      setSyncing(null);
+      setDetail(null);
+      load(page, examId, status);
+    } catch (err) {
+      setSyncing(null);
+      const apiError = toApiError(err);
+      toast.error("Gagal sinkronisasi nilai", { description: apiError.message });
+    }
+  };
+
+  const syncReasonText = (row: ExamResult) => {
+    const el = syncEligibility(row);
+    if (!el.statusOk) {
+      return el.examType ? "Esai belum selesai dinilai" : "Belum dinilai";
+    }
+    if (!el.typeOk) {
+      return `Tipe ujian tidak sinkron (${el.examType ?? "-"})`;
+    }
+    if (!el.contextOk) {
+      return "Konteks akademik belum lengkap";
+    }
+    return null;
+  };
 
   return (
     <PageContainer>
@@ -159,6 +199,27 @@ export default function TeacherExamResultsPage() {
               render: (v) => {
                 const st = v as ExamResultStatus;
                 return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
+              },
+            },
+            {
+              header: "Aksi",
+              accessor: "id",
+              render: (_v, row) => {
+                const reason = syncReasonText(row);
+                if (reason) {
+                  return <span className="text-xs text-secondary">{reason}</span>;
+                }
+                return (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleSync(row)}
+                    loading={syncing === row.id}
+                    disabled={syncing !== null && syncing !== row.id}
+                  >
+                    Sinkronkan ke Nilai
+                  </Button>
+                );
               },
             },
           ]}
@@ -224,11 +285,43 @@ export default function TeacherExamResultsPage() {
                 <p className="mt-1 text-sm font-semibold text-primary">{detail.unanswered_count}</p>
               </div>
             </div>
+            {detail.status === "graded" && (
+              <div className="rounded-xl bg-surface-container p-3">
+                <p className="text-xs text-secondary">Tipe Ujian</p>
+                <p className="mt-1 text-sm font-semibold text-primary">
+                  {syncEligibility(detail).examType ?? "-"}
+                </p>
+              </div>
+            )}
             {detail.graded_at && (
               <p className="text-xs text-secondary">
                 Dinilai pada {String(detail.graded_at)}
               </p>
             )}
+            <div className="pt-2">
+              {(() => {
+                const reason = syncReasonText(detail);
+                if (reason) {
+                  return (
+                    <p className="rounded-xl bg-surface-container px-3 py-2 text-xs text-secondary">
+                      Belum dapat disinkronkan: {reason}
+                    </p>
+                  );
+                }
+                return (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleSync(detail)}
+                    loading={syncing === detail.id}
+                    disabled={syncing !== null && syncing !== detail.id}
+                    className="w-full"
+                  >
+                    Sinkronkan ke Nilai
+                  </Button>
+                );
+              })()}
+            </div>
           </div>
         )}
       </Modal>

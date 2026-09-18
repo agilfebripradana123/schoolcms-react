@@ -24,6 +24,7 @@ import TeacherMyAssignmentsPage from "@/portal/teacher/pages/TeacherAssignmentsP
 import TeacherExamsPage from "@/portal/teacher/pages/TeacherExamsPage";
 import TeacherExamSchedulesPage from "@/portal/teacher/pages/TeacherExamSchedulesPage";
 import TeacherExamResultsPage from "@/portal/teacher/pages/TeacherExamResultsPage";
+import TeacherExamGradingPage from "@/portal/teacher/pages/TeacherExamGradingPage";
 import TeacherExamMonitoringPage from "@/portal/teacher/pages/TeacherExamMonitoringPage";
 import TeacherExamMonitoringDetailPage from "@/portal/teacher/pages/TeacherExamMonitoringDetailPage";
 import TeacherFacilitiesPlaceholderPage from "@/portal/teacher/pages/TeacherFacilitiesPlaceholderPage";
@@ -352,6 +353,7 @@ const router = createBrowserRouter([
                 element: <PermissionRoute permission="view-exam-results" />,
                 children: [
                   { path: "examinations/results", element: <TeacherExamResultsPage /> },
+                  { path: "examinations/grading/:attemptId", element: <TeacherExamGradingPage /> },
                 ],
               },
               {

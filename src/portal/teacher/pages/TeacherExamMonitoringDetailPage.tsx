@@ -12,7 +12,11 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import PortalEmptyState from "@/portal/components/PortalEmptyState";
 import PortalLoadingState from "@/portal/components/PortalLoadingState";
-import { ArrowLeft, AlertTriangle } from "lucide-react";
+import {
+  ArrowLeft,
+  AlertTriangle,
+  ClipboardPenLine,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const statusVariants: Record<ExamAttemptStatus, "primary" | "success" | "danger"> = {
@@ -102,10 +106,21 @@ export default function TeacherExamMonitoringDetailPage() {
         title="Detail Monitoring Attempt"
         description={`${attempt.student.name} - ${attempt.exam.title}`}
         actions={
-          <Button variant="ghost" onClick={() => navigate("/guru/exams/monitoring")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali
-          </Button>
+          <>
+            {(attempt.status === "submitted" || attempt.status === "expired") && (
+              <Button
+                variant="secondary"
+                onClick={() => navigate(`/guru/examinations/grading/${attempt.id}`)}
+              >
+                <ClipboardPenLine className="h-4 w-4 mr-2" />
+                Nilai Essay
+              </Button>
+            )}
+            <Button variant="ghost" onClick={() => navigate("/guru/exams/monitoring")}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Kembali
+            </Button>
+          </>
         }
       />
 
