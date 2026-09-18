@@ -47,6 +47,8 @@ interface ExamParticipantRow {
 interface ExamResultRow {
   id: number;
   participant_id: number;
+  exam_attempt_id?: number | null;
+  attempt_number?: number | null;
   total_score?: number | null;
   grade?: string | null;
   status?: string | null;
@@ -234,6 +236,9 @@ export default function StudentExamsPage() {
               {results.map((r) => (
                 <div key={r.id} className="flex items-center justify-between rounded-xl border border-outline p-3">
                   <div className="text-sm text-secondary">
+                    {r.attempt_number != null && (
+                      <span className="mr-2 font-semibold">Percobaan #{r.attempt_number}</span>
+                    )}
                     <span className="font-semibold">Nilai: {r.total_score ?? "-"}</span>
                     {r.grade && <span className="ml-2 text-secondary">({r.grade})</span>}
                   </div>
