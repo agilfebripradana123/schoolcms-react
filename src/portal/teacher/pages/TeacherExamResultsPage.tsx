@@ -189,6 +189,7 @@ export default function TeacherExamResultsPage() {
               ),
             },
             { header: "Ujian", accessor: "id", render: (_v, row) => row.participant?.exam?.title ?? "-" },
+            { header: "Percobaan", accessor: "id", render: (_v, row) => row.attempt_number != null ? <span>{`Percobaan #${row.attempt_number}`}</span> : <Badge variant="secondary">Legacy</Badge> },
             { header: "Mapel", accessor: "id", render: (_v, row) => row.participant?.exam?.subject?.name ?? "-" },
             { header: "Skor", accessor: "total_score", render: (v) => String(v ?? "-") },
             { header: "Benar", accessor: "correct_count", render: (v) => String(v ?? "0") },
