@@ -29,7 +29,6 @@ import TeacherExamMonitoringPage from "@/portal/teacher/pages/TeacherExamMonitor
 import TeacherExamMonitoringDetailPage from "@/portal/teacher/pages/TeacherExamMonitoringDetailPage";
 import TeacherFacilitiesPlaceholderPage from "@/portal/teacher/pages/TeacherFacilitiesPlaceholderPage";
 import TeacherStaffPage from "@/portal/teacher/pages/TeacherStaffPage";
-import TeacherQuestionsPage from "@/portal/teacher/pages/TeacherQuestionsPage";
 import TeacherDevelopmentPage from "@/portal/teacher/pages/TeacherDevelopmentPage";
 import TeacherAnnouncementsPage from "@/portal/teacher/pages/TeacherAnnouncementsPage";
 import TeacherCalendarsPage from "@/portal/teacher/pages/TeacherCalendarsPage";
@@ -376,12 +375,6 @@ const router = createBrowserRouter([
                 element: <PermissionRoute permission="manage-staff" />,
                 children: [
                   { path: "staff", element: <TeacherStaffPage /> },
-                ],
-              },
-              {
-                element: <PermissionRoute permission="manage-exams" />,
-                children: [
-                  { path: "exams/questions", element: <TeacherQuestionsPage /> },
                 ],
               },
               {
