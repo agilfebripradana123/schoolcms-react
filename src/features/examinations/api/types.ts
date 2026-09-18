@@ -66,10 +66,23 @@ export interface StudentRef {
 // Exam
 // ---------------------------------------------------------------------
 export type ExamStatus = "draft" | "published" | "ongoing" | "completed" | "archived";
+export type ExamType =
+  | "formatif"
+  | "sumatif"
+  | "uts"
+  | "uas"
+  | "ujian_sekolah"
+  | "remedial"
+  | "other";
 
 export interface Exam {
   id: number;
   subject_id: number;
+  class_id?: number | null;
+  academic_year_id?: number | null;
+  semester_id?: number | null;
+  teacher_id?: number | null;
+  exam_type?: ExamType | null;
   title: string;
   description?: string | null;
   duration_minutes: number;
@@ -88,6 +101,10 @@ export interface Exam {
 
 export interface CreateExamPayload {
   subject_id: number;
+  class_id?: number | null;
+  academic_year_id?: number | null;
+  semester_id?: number | null;
+  exam_type?: ExamType | null;
   title: string;
   description?: string | null;
   duration_minutes: number;
@@ -101,6 +118,44 @@ export interface CreateExamPayload {
 }
 
 export interface UpdateExamPayload extends Partial<CreateExamPayload> {}
+
+// ---------------------------------------------------------------------
+// Exam composition (exam_questions)
+// ---------------------------------------------------------------------
+export type QuestionStatus = "draft" | "approved" | "archived";
+
+export interface ExamQuestionRef {
+  id: number;
+  code?: string | null;
+  question_text: string;
+  type: QuestionType;
+  difficulty?: QuestionDifficulty | null;
+  points?: number;
+  status?: QuestionStatus | null;
+}
+
+export interface ExamQuestion {
+  id: number;
+  exam_id: number;
+  question_id: number;
+  blueprint_item_id?: number | null;
+  position: number;
+  points: number;
+  question?: ExamQuestionRef | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AddExamQuestionPayload {
+  question_id: number;
+  position?: number;
+  points?: number;
+}
+
+export interface UpdateExamQuestionPayload {
+  position?: number;
+  points?: number;
+}
 
 // ---------------------------------------------------------------------
 // QuestionBank
@@ -134,6 +189,7 @@ export interface QuestionBank {
   difficulty: QuestionDifficulty;
   explanation?: string | null;
   points: number;
+  status?: QuestionStatus | null;
   subject?: SubjectRef;
   options?: QuestionOption[];
   created_at?: string;
@@ -149,6 +205,7 @@ export interface CreateQuestionPayload {
   difficulty: QuestionDifficulty;
   explanation?: string | null;
   points: number;
+  status?: QuestionStatus | null;
   options?: QuestionOptionPayload[];
 }
 

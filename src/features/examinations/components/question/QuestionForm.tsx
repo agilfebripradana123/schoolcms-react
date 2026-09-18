@@ -16,6 +16,7 @@ import type {
   ExamInstruction,
   QuestionBank,
   QuestionDifficulty,
+  QuestionStatus,
   QuestionType,
 } from "../../api/types";
 
@@ -45,6 +46,12 @@ const DIFFICULTY_OPTIONS = [
   { value: "hard", label: "Sulit" },
 ];
 
+const STATUS_OPTIONS = [
+  { value: "draft", label: "Draft" },
+  { value: "approved", label: "Disetujui" },
+  { value: "archived", label: "Diarsipkan" },
+];
+
 let optionCounter = 0;
 
 function createEmptyOption(): OptionDraft {
@@ -69,6 +76,7 @@ export default function QuestionForm({
   const [questionImage, setQuestionImage] = useState("");
   const [type, setType] = useState<QuestionType>("multiple_choice");
   const [difficulty, setDifficulty] = useState<QuestionDifficulty>("easy");
+  const [status, setStatus] = useState<QuestionStatus>("draft");
   const [explanation, setExplanation] = useState("");
   const [points, setPoints] = useState<string>("");
   const [options, setOptions] = useState<OptionDraft[]>([]);
@@ -115,6 +123,7 @@ export default function QuestionForm({
         setQuestionImage(initialData.question_image ?? "");
         setType(initialData.type);
         setDifficulty(initialData.difficulty);
+        setStatus(initialData.status ?? "draft");
         setExplanation(initialData.explanation ?? "");
         setPoints(String(initialData.points));
         setOptions(
@@ -132,6 +141,7 @@ export default function QuestionForm({
         setQuestionImage("");
         setType("multiple_choice");
         setDifficulty("easy");
+        setStatus("draft");
         setExplanation("");
         setPoints("");
         setOptions([createEmptyOption(), createEmptyOption()]);
@@ -206,6 +216,7 @@ export default function QuestionForm({
       difficulty,
       explanation: explanation.trim() || null,
       points: Number(points || 0),
+      status,
       options: isEssay ? [] : optionPayloads,
     };
 
@@ -384,6 +395,20 @@ export default function QuestionForm({
             />
           </FormField>
         </div>
+
+        <FormField
+          label="Status"
+          hint="Soal harus berstatus 'Disetujui' agar dapat masuk komposisi ujian."
+          error={fieldErrors.status?.[0]}
+        >
+          <AppSelect
+            value={status}
+            onChange={(v) => setStatus((v ?? "draft") as QuestionStatus)}
+            options={STATUS_OPTIONS}
+            isSearchable={false}
+            isDisabled={submitting}
+          />
+        </FormField>
 
         {requireOptions && (
           <div>

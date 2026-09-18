@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Textarea } from "@/components/ui/Form";
@@ -8,8 +8,12 @@ import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import { subjectService } from "@/features/academic/api/subject.service";
 import type { Subject } from "@/features/academic/api/types";
+import { classService } from "@/features/academic/api/class.service";
+import { academicYearService } from "@/features/academic/api/academic-year.service";
+import { semesterService } from "@/features/academic/api/semester.service";
+import type { AcademicYear, SchoolClass, Semester } from "@/features/academic/api/types";
 import { examService } from "../../api/exam.service";
-import type { CreateExamPayload, Exam, ExamStatus } from "../../api/types";
+import type { CreateExamPayload, Exam, ExamStatus, ExamType } from "../../api/types";
 
 interface ExamFormProps {
   open: boolean;
@@ -26,6 +30,16 @@ const STATUS_OPTIONS = [
   { value: "archived", label: "Diarsipkan" },
 ];
 
+const EXAM_TYPE_OPTIONS = [
+  { value: "uts", label: "UTS" },
+  { value: "uas", label: "UAS" },
+  { value: "formatif", label: "Formatif" },
+  { value: "sumatif", label: "Sumatif" },
+  { value: "ujian_sekolah", label: "Ujian Sekolah" },
+  { value: "remedial", label: "Remedial" },
+  { value: "other", label: "Lainnya" },
+];
+
 export default function ExamForm({
   open,
   onClose,
@@ -33,6 +47,10 @@ export default function ExamForm({
   initialData,
 }: ExamFormProps) {
   const [subjectId, setSubjectId] = useState<string>("");
+  const [classId, setClassId] = useState<string>("");
+  const [academicYearId, setAcademicYearId] = useState<string>("");
+  const [semesterId, setSemesterId] = useState<string>("");
+  const [examType, setExamType] = useState<string>("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [durationMinutes, setDurationMinutes] = useState<string>("");
@@ -49,6 +67,9 @@ export default function ExamForm({
 
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [subjectsError, setSubjectsError] = useState(false);
+  const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
+  const [semesters, setSemesters] = useState<Semester[]>([]);
 
   const isEdit = Boolean(initialData);
 
@@ -60,14 +81,36 @@ export default function ExamForm({
       .catch(() => setSubjectsError(true));
   }, []);
 
+  const loadContext = useCallback(() => {
+    classService
+      .list()
+      .then((res) => setClasses(res.data))
+      .catch(() => setClasses([]));
+    academicYearService
+      .list({ per_page: 100 })
+      .then((res) => setAcademicYears(res.data))
+      .catch(() => setAcademicYears([]));
+    semesterService
+      .list({ per_page: 100 })
+      .then((res) => setSemesters(res.data))
+      .catch(() => setSemesters([]));
+  }, []);
+
   useEffect(() => {
     if (open) {
       setError(null);
       setFieldErrors({});
       loadSubjects();
+      loadContext();
 
       if (initialData) {
         setSubjectId(String(initialData.subject_id));
+        setClassId(initialData.class_id != null ? String(initialData.class_id) : "");
+        setAcademicYearId(
+          initialData.academic_year_id != null ? String(initialData.academic_year_id) : "",
+        );
+        setSemesterId(initialData.semester_id != null ? String(initialData.semester_id) : "");
+        setExamType(initialData.exam_type ?? "");
         setTitle(initialData.title);
         setDescription(initialData.description ?? "");
         setDurationMinutes(String(initialData.duration_minutes));
@@ -80,6 +123,10 @@ export default function ExamForm({
         setStatus(initialData.status);
       } else {
         setSubjectId("");
+        setClassId("");
+        setAcademicYearId("");
+        setSemesterId("");
+        setExamType("");
         setTitle("");
         setDescription("");
         setDurationMinutes("");
@@ -103,6 +150,10 @@ export default function ExamForm({
 
     const payload: CreateExamPayload = {
       subject_id: Number(subjectId),
+      class_id: classId ? Number(classId) : null,
+      academic_year_id: academicYearId ? Number(academicYearId) : null,
+      semester_id: semesterId ? Number(semesterId) : null,
+      exam_type: examType ? (examType as ExamType) : null,
       title: title.trim(),
       description: description.trim() || null,
       duration_minutes: Number(durationMinutes || 0),
@@ -142,6 +193,25 @@ export default function ExamForm({
     value: String(s.id),
     label: s.name,
   }));
+  const classOptions = classes.map((c) => ({
+    value: String(c.id),
+    label: c.name,
+  }));
+  const yearOptions = academicYears.map((y) => ({
+    value: String(y.id),
+    label: y.name,
+  }));
+  const semesterOptions = useMemo(() => {
+    const yearId = academicYearId ? Number(academicYearId) : null;
+    const scoped = yearId != null
+      ? semesters.filter((s) => Number(s.academic_year_id) === yearId)
+      : semesters;
+    const list = yearId != null && scoped.length > 0 ? scoped : semesters;
+    return list.map((s) => ({
+      value: String(s.id),
+      label: s.name,
+    }));
+  }, [academicYearId, semesters]);
 
   return (
     <Modal
@@ -204,6 +274,71 @@ export default function ExamForm({
             />
           )}
         </FormField>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <FormField
+            label="Kelas"
+            hint="Opsional."
+            error={fieldErrors.class_id?.[0]}
+          >
+            <AppSelect
+              value={classId}
+              onChange={(v) => setClassId(v ?? "")}
+              options={classOptions}
+              placeholder="Pilih Kelas"
+              isClearable
+              isDisabled={submitting}
+            />
+          </FormField>
+
+          <FormField
+            label="Tahun Ajaran"
+            hint="Opsional."
+            error={fieldErrors.academic_year_id?.[0]}
+          >
+            <AppSelect
+              value={academicYearId}
+              onChange={(v) => {
+                setAcademicYearId(v ?? "");
+                setSemesterId("");
+              }}
+              options={yearOptions}
+              placeholder="Pilih Tahun Ajaran"
+              isClearable
+              isDisabled={submitting}
+            />
+          </FormField>
+
+          <FormField
+            label="Semester"
+            hint="Opsional."
+            error={fieldErrors.semester_id?.[0]}
+          >
+            <AppSelect
+              value={semesterId}
+              onChange={(v) => setSemesterId(v ?? "")}
+              options={semesterOptions}
+              placeholder="Pilih Semester"
+              isClearable
+              isDisabled={submitting}
+            />
+          </FormField>
+
+          <FormField
+            label="Tipe Ujian"
+            hint="Opsional. 'UTS' dan 'UAS' dapat disinkronkan ke nilai akademik."
+            error={fieldErrors.exam_type?.[0]}
+          >
+            <AppSelect
+              value={examType}
+              onChange={(v) => setExamType(v ?? "")}
+              options={EXAM_TYPE_OPTIONS}
+              placeholder="Pilih Tipe Ujian"
+              isClearable
+              isDisabled={submitting}
+            />
+          </FormField>
+        </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <FormField

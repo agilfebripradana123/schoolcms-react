@@ -1,5 +1,6 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ListChecks, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -54,6 +55,7 @@ interface QueryState {
 }
 
 export default function ExamsPage() {
+  const navigate = useNavigate();
   const [data, setData] = useState<Exam[]>([]);
   const [meta, setMeta] = useState({
     current_page: 1,
@@ -295,6 +297,14 @@ export default function ExamsPage() {
           <div className="flex items-center justify-center gap-4">
             <button
               type="button"
+              onClick={() => navigate(`/admin/examinations/exams/${row.id}`)}
+              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
+              aria-label={`Atur soal ujian ${row.title}`}
+            >
+              <ListChecks className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+            <button
+              type="button"
               onClick={() => openEdit(row)}
               className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
               aria-label={`Edit ${row.title}`}
@@ -313,7 +323,7 @@ export default function ExamsPage() {
         ),
       },
     ];
-  }, [subjectName, openEdit, openDelete]);
+  }, [subjectName, openEdit, openDelete, navigate]);
 
 
   const subjectFilterOptions = useMemo(
@@ -425,6 +435,13 @@ export default function ExamsPage() {
                       <span>Percobaan: {row.max_attempts}x</span>
                     </div>
                     <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => navigate(`/admin/examinations/exams/${row.id}`)}
+                      >
+                        <ListChecks className="h-4 w-4" /> Soal
+                      </Button>
                       <Button
                         variant="secondary"
                         size="sm"

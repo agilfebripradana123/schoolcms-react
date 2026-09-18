@@ -1,5 +1,6 @@
 export * from "./types";
 export { examService } from "./exam.service";
+export { examQuestionService } from "./exam-question.service";
 export { questionBankService } from "./question.service";
 export { examSessionService } from "./exam-session.service";
 export { examScheduleService } from "./exam-schedule.service";

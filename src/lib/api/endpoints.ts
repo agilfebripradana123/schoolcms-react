@@ -130,6 +130,8 @@ export const NOTIFICATION = {
 
 export const EXAMINATION = {
   EXAMS: "/exams",
+  EXAM_QUESTIONS: "/exams/{exam}/questions",
+  EXAM_QUESTIONS_REORDER: "/exams/{exam}/questions/reorder",
   QUESTIONS: "/questions",
   EXAM_SESSIONS: "/exam-sessions",
   EXAM_SCHEDULES: "/exam-schedules",

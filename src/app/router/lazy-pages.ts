@@ -44,6 +44,7 @@ export const FinancialReportsPage = lazy(() => import("@/features/finance/pages/
 
 export const QuestionsPage = lazy(() => import("@/features/examinations/pages/QuestionsPage"));
 export const ExamsPage = lazy(() => import("@/features/examinations/pages/ExamsPage"));
+export const ExamDetailPage = lazy(() => import("@/features/examinations/pages/ExamDetailPage"));
 export const ExamSchedulesPage = lazy(() => import("@/features/examinations/pages/ExamSchedulesPage"));
 export const ExamSessionsPage = lazy(() => import("@/features/examinations/pages/ExamSessionsPage"));
 export const ExamParticipantsPage = lazy(() => import("@/features/examinations/pages/ExamParticipantsPage"));

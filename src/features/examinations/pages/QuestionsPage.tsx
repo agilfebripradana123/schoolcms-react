@@ -49,6 +49,18 @@ const DIFFICULTY_BADGE: Record<QuestionDifficulty, string> = {
   hard: "danger",
 };
 
+const STATUS_LABEL: Record<string, string> = {
+  draft: "Draft",
+  approved: "Disetujui",
+  archived: "Diarsipkan",
+};
+
+const STATUS_BADGE: Record<string, "neutral" | "success" | "secondary"> = {
+  draft: "neutral",
+  approved: "success",
+  archived: "secondary",
+};
+
 const TYPE_FILTER_OPTIONS = [
   { value: "all", label: "Semua Tipe" },
   { value: "multiple_choice", label: "Pilihan Ganda" },
@@ -310,6 +322,21 @@ export default function QuestionsPage() {
         ),
       },
       {
+        header: "Status",
+        accessor: "status" as keyof Row,
+        headerClassName:
+          "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center text-sm text-on-surface",
+        render: (_value: Row[keyof Row], row: Row) => (
+          <Badge
+            variant={STATUS_BADGE[row.status ?? "draft"] ?? "neutral"}
+            className="px-2.5 py-1 text-xs leading-4"
+          >
+            {STATUS_LABEL[row.status ?? "draft"] ?? row.status ?? "-"}
+          </Badge>
+        ),
+      },
+      {
         header: "Pilihan",
         accessor: "type" as keyof Row,
         headerClassName:
@@ -471,6 +498,12 @@ export default function QuestionsPage() {
                         className="px-2.5 py-1 text-xs leading-4"
                       >
                         {DIFFICULTY_LABEL[row.difficulty]}
+                      </Badge>
+                      <Badge
+                        variant={STATUS_BADGE[row.status ?? "draft"] ?? "neutral"}
+                        className="px-2.5 py-1 text-xs leading-4"
+                      >
+                        {STATUS_LABEL[row.status ?? "draft"] ?? row.status ?? "-"}
                       </Badge>
                       <span className="text-xs text-on-surface-variant">
                         Bobot: {row.points}
