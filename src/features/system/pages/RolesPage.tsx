@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Pencil, Trash2, ShieldCheck } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -32,18 +32,15 @@ export default function RolesPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState<QueryState>({ q: "", page: 1 });
-  const [reloadTick, setReloadTick] = useState(0);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Role | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toDelete, setToDelete] = useState<Role | null>(null);
 
-  // permission assignment modal
+  // permission assignment modal (read-only)
   const [assignOpen, setAssignOpen] = useState(false);
   const [assignRole, setAssignRole] = useState<Role | null>(null);
-  const [assignLoading, setAssignLoading] = useState(false);
-  const [assignError, setAssignError] = useState<string | null>(null);
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -73,7 +70,7 @@ export default function RolesPage() {
     return () => {
       active = false;
     };
-  }, [query, reloadTick]);
+  }, [query]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
@@ -131,36 +128,8 @@ export default function RolesPage() {
 
   const openAssign = useCallback((row: Role) => {
     setAssignRole(row);
-    setAssignError(null);
     setAssignOpen(true);
   }, []);
-
-  const handleSyncPermissions = useCallback(
-    async (permissionIds: number[]) => {
-      if (!assignRole) return;
-      setAssignLoading(true);
-      setAssignError(null);
-
-      try {
-        await roleService.syncPermissions(assignRole.id, {
-          permission_ids: permissionIds,
-        });
-        toast.success("Hak akses peran berhasil diperbarui.");
-        setAssignOpen(false);
-        setAssignRole(null);
-        setReloadTick((t) => t + 1);
-      } catch (err) {
-        const apiError = toApiError(err);
-        setAssignError(apiError.message);
-        toast.error("Gagal memperbarui hak akses", {
-          description: apiError.message,
-        });
-      } finally {
-        setAssignLoading(false);
-      }
-    },
-    [assignRole],
-  );
 
   const columns = useMemo(() => {
     type Row = Role;
@@ -180,7 +149,7 @@ export default function RolesPage() {
         ),
       },
       {
-        header: "Jumlah Permission",
+        header: "Default Permission",
         accessor: "permissions" as keyof Row,
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
         className: "px-6 py-4 text-center text-sm text-on-surface",
@@ -199,10 +168,10 @@ export default function RolesPage() {
               type="button"
               onClick={() => openAssign(row)}
               className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
-              aria-label={`Atur hak akses ${row.name}`}
-              title="Atur Hak Akses"
+              aria-label={`Lihat hak akses ${row.name}`}
+              title="Lihat Hak Akses"
             >
-              <ShieldCheck className="h-4 w-4" strokeWidth={1.75} />
+              <Eye className="h-4 w-4" strokeWidth={1.75} />
             </button>
             <button
               type="button"
@@ -299,7 +268,7 @@ export default function RolesPage() {
                         size="sm"
                         onClick={() => openAssign(row)}
                       >
-                        <ShieldCheck className="h-4 w-4" /> Hak Akses
+                        <Eye className="h-4 w-4" /> Lihat Hak Akses
                       </Button>
                       <Button
                         variant="secondary"
@@ -350,15 +319,11 @@ export default function RolesPage() {
         onClose={() => {
           setAssignOpen(false);
           setAssignRole(null);
-          setAssignError(null);
         }}
         onSaved={() => {}}
         initialData={assignRole}
         isAssignmentModal
         defaultPermissionIds={assignRole?.permissions?.map((p) => p.id) ?? []}
-        onSyncPermissions={handleSyncPermissions}
-        syncLoading={assignLoading}
-        syncError={assignError}
       />
 
       <RoleDeleteDialog
