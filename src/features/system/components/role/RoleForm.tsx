@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { RefreshCw, ChevronDown } from "lucide-react";
+import { RefreshCw, ChevronDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Textarea } from "@/components/ui/Form";
@@ -9,6 +9,7 @@ import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import { roleService } from "../../api/role.service";
 import { permissionService } from "../../api/permission.service";
+import { PERMISSION_GROUPS } from "../../constants/permissionGroups";
 import type { Permission, Role } from "../../api/types";
 
 interface RoleFormProps {
@@ -18,9 +19,6 @@ interface RoleFormProps {
   initialData?: Role | null;
   isAssignmentModal?: boolean;
   defaultPermissionIds?: number[];
-  onSyncPermissions?: (ids: number[]) => void;
-  syncLoading?: boolean;
-  syncError?: string | null;
 }
 
 export default function RoleForm({
@@ -30,9 +28,6 @@ export default function RoleForm({
   initialData,
   isAssignmentModal = false,
   defaultPermissionIds = [],
-  onSyncPermissions,
-  syncLoading = false,
-  syncError = null,
 }: RoleFormProps) {
   const isEdit = Boolean(initialData);
 
@@ -45,6 +40,9 @@ export default function RoleForm({
   const [permissionsError, setPermissionsError] = useState(false);
 
   const [permissionSearch, setPermissionSearch] = useState("");
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
+    () => new Set(PERMISSION_GROUPS.map((g) => g.label)),
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
@@ -106,20 +104,6 @@ export default function RoleForm({
     }
   }, [open, loadPermissions]);
 
-  const togglePermission = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
-  };
-
-  const toggleAll = () => {
-    setSelectedIds((prev) =>
-      prev.length === permissions.length
-        ? []
-        : permissions.map((p) => p.id),
-    );
-  };
-
   const isAdminAssignment =
     isAssignmentModal &&
     initialData?.name?.toLowerCase().includes("administrator") === true;
@@ -127,17 +111,49 @@ export default function RoleForm({
     ? new Set(["view-audit-logs", "manage-settings"])
     : new Set<string>();
 
+  const availablePermissions = useMemo(
+    () => permissions.filter((p) => !excludedNames.has(p.name)),
+    [permissions, excludedNames],
+  );
+
+  const query = permissionSearch.trim().toLowerCase();
+
   const filteredPermissions = useMemo(() => {
-    const query = permissionSearch.trim().toLowerCase();
-    if (!query) return permissions.filter((p) => !excludedNames.has(p.name));
-    return permissions
-      .filter((p) => !excludedNames.has(p.name))
-      .filter(
-        (permission) =>
-          permission.name.toLowerCase().includes(query) ||
-          permission.description?.toLowerCase().includes(query),
-      );
-  }, [permissions, permissionSearch, excludedNames]);
+    if (!query) return availablePermissions;
+    return availablePermissions.filter(
+      (permission) =>
+        permission.name.toLowerCase().includes(query) ||
+        permission.description?.toLowerCase().includes(query),
+    );
+  }, [availablePermissions, query]);
+
+  const permByName = useMemo(
+    () => new Map(availablePermissions.map((p) => [p.name, p])),
+    [availablePermissions],
+  );
+
+  const groupsWithPerms = useMemo(() => {
+    const grouped = PERMISSION_GROUPS.map((g) => ({
+      ...g,
+      perms: g.names
+        .map((n) => permByName.get(n))
+        .filter((p): p is Permission => !!p),
+    }));
+    const groupedNames = new Set(grouped.flatMap((g) => g.perms.map((p) => p.name)));
+    const sisa = availablePermissions.filter((p) => !groupedNames.has(p.name));
+    if (sisa.length > 0) {
+      grouped.push({ label: "Sistem", names: [], perms: sisa });
+    }
+    return grouped;
+  }, [permByName, availablePermissions]);
+
+  const groupOf = useMemo(() => {
+    const map = new Map<string, string>();
+    groupsWithPerms.forEach((g) =>
+      g.perms.forEach((p) => map.set(p.name, g.label)),
+    );
+    return map;
+  }, [groupsWithPerms]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,19 +190,7 @@ export default function RoleForm({
     }
   };
 
-  const handleSubmitAssignment = () => {
-    if (onSyncPermissions) {
-      onSyncPermissions(selectedIds);
-    }
-  };
-
   const isLoadingPermissions = permissionsLoading;
-  const showAssignmentError =
-    isAssignmentModal && syncError
-      ? syncError
-      : error && !error.errors
-        ? error.message
-        : null;
 
   return (
     <Modal
@@ -194,7 +198,7 @@ export default function RoleForm({
       onClose={onClose}
       title={
         isAssignmentModal
-          ? `Atur Hak Akses — ${initialData?.name ?? "Peran"}`
+          ? `Lihat Hak Akses — ${initialData?.name ?? "Peran"}`
           : isEdit
             ? "Edit Peran"
             : "Tambah Peran"
@@ -202,18 +206,9 @@ export default function RoleForm({
       size="lg"
       footer={
         isAssignmentModal ? (
-          <>
-            <Button variant="ghost" onClick={onClose} disabled={syncLoading}>
-              Batal
-            </Button>
-            <Button
-              type="button"
-              onClick={handleSubmitAssignment}
-              loading={syncLoading}
-            >
-              Simpan Hak Akses
-            </Button>
-          </>
+          <Button variant="ghost" onClick={onClose}>
+            Tutup
+          </Button>
         ) : (
           <>
             <Button variant="ghost" onClick={onClose} disabled={submitting}>
@@ -257,11 +252,6 @@ export default function RoleForm({
           {description && (
             <p className="mb-4 text-sm text-on-surface-variant">{description}</p>
           )}
-          {showAssignmentError && (
-            <p className="mb-4 rounded-xl bg-error-container px-3 py-2 text-sm text-error">
-              {showAssignmentError}
-            </p>
-          )}
           {isLoadingPermissions ? (
             <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               <RefreshCw className="h-4 w-4 animate-spin" />
@@ -292,55 +282,130 @@ export default function RoleForm({
                 placeholder="Cari hak akses..."
                 className="mb-3"
               />
-              <div className="overflow-hidden rounded-2xl border border-outline-variant">
-                <button
-                  type="button"
-                  onClick={toggleAll}
-                  className="flex w-full items-center justify-between gap-2 border-b border-outline-variant bg-surface-container-low px-4 py-3 text-sm font-semibold text-on-surface hover:bg-surface-container-low"
-                >
-                  <span>
-                    Pilih Hak Akses ({selectedIds.length}/{permissions.length})
-                  </span>
-                  <span className="flex items-center gap-1 text-on-surface-variant">
-                    Semua <ChevronDown className="h-4 w-4" />
-                  </span>
-                </button>
-                {filteredPermissions.length === 0 ? (
-                  <p className="px-4 py-6 text-center text-sm text-on-surface-variant">
-                    Tidak ada hak akses yang cocok dengan pencarian.
-                  </p>
-                ) : (
-                  <div className="max-h-[320px] divide-y divide-outline-variant overflow-y-auto">
-                    {filteredPermissions.map((perm) => {
-                      const checked = selectedIds.includes(perm.id);
-                      return (
-                        <label
-                          key={perm.id}
-                          className="flex cursor-pointer items-start gap-3 px-4 py-3 hover:bg-surface-container-low"
+
+              {/* Search results — flat list with group labels */}
+              {query ? (
+                <div className="overflow-hidden rounded-2xl border border-outline-variant">
+                  {filteredPermissions.length === 0 ? (
+                    <p className="px-4 py-6 text-center text-sm text-on-surface-variant">
+                      Tidak ada hak akses yang cocok dengan pencarian.
+                    </p>
+                  ) : (
+                    <div className="max-h-[400px] divide-y divide-outline-variant overflow-y-auto">
+                      {filteredPermissions.map((perm) => {
+                        const checked = selectedIds.includes(perm.id);
+                        const g = groupOf.get(perm.name);
+                        return (
+                          <div
+                            key={perm.id}
+                            className="flex items-start gap-3 px-4 py-3"
+                          >
+                            {checked && (
+                              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                            )}
+                            <div className={`min-w-0 ${!checked ? "ml-7" : ""}`}>
+                              <span className={`block text-sm font-medium ${checked ? "text-on-surface" : "text-on-surface-variant"}`}>
+                                {perm.name}
+                              </span>
+                              {g && (
+                                <span className="block text-[10px] font-semibold uppercase tracking-wide text-on-surface-variant opacity-60">
+                                  {g}
+                                </span>
+                              )}
+                              {perm.description && (
+                                <span className="block text-xs text-on-surface-variant">
+                                  {perm.description}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Grouped accordion — no search active */
+                <div className="space-y-2">
+                  {groupsWithPerms.map((g) => {
+                    const expanded = expandedGroups.has(g.label);
+                    const selCount = g.perms.filter((p) =>
+                      selectedIds.includes(p.id),
+                    ).length;
+                    return (
+                      <div
+                        key={g.label}
+                        className="overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest"
+                      >
+                        {/* Group header */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = new Set(expandedGroups);
+                            if (next.has(g.label)) next.delete(g.label);
+                            else next.add(g.label);
+                            setExpandedGroups(next);
+                          }}
+                          className="flex w-full items-center justify-between gap-2 px-4 py-3 text-sm font-semibold text-on-surface transition-colors hover:bg-surface-container-low"
+                          aria-expanded={expanded}
                         >
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => togglePermission(perm.id)}
-                            disabled={syncLoading}
-                            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary-container focus:ring-primary-container"
-                          />
-                          <div className="min-w-0">
-                            <span className="block text-sm font-medium text-on-surface">
-                              {perm.name}
+                          <span className="flex items-center gap-2">
+                            {g.label}
+                            <span className="rounded-full bg-surface-container-low px-2 py-0.5 text-[10px] font-medium text-on-surface-variant">
+                              {g.perms.length}
                             </span>
-                            {perm.description && (
-                              <span className="block text-xs text-on-surface-variant">
-                                {perm.description}
+                            {selCount > 0 && (
+                              <span className="rounded-full bg-primary-container/20 px-2 py-0.5 text-[10px] font-medium text-primary">
+                                {selCount} aktif
                               </span>
                             )}
+                          </span>
+                          <ChevronDown
+                            className={`h-4 w-4 shrink-0 text-on-surface-variant transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                          />
+                        </button>
+
+                        {/* Group body */}
+                        {expanded && (
+                          <div className="border-t border-outline-variant px-2 py-2">
+                            {g.perms.length === 0 ? (
+                              <p className="px-4 py-3 text-sm text-on-surface-variant">
+                                Tidak ada hak akses di grup ini.
+                              </p>
+                            ) : (
+                              <div className="space-y-0.5">
+                                {g.perms.map((p) => {
+                                  const checked = selectedIds.includes(p.id);
+                                  return (
+                                    <div
+                                      key={p.id}
+                                      className="flex items-start gap-3 rounded-xl px-3 py-2"
+                                    >
+                                      {checked && (
+                                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                                      )}
+                                      <div className={`min-w-0 ${!checked ? "ml-7" : ""}`}>
+                                        <span className={`block text-sm font-medium ${checked ? "text-on-surface" : "text-on-surface-variant"}`}>
+                                          {p.name}
+                                        </span>
+                                        {p.description && (
+                                          <span className="block text-xs text-on-surface-variant">
+                                            {p.description}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
-                        </label>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
         </div>
