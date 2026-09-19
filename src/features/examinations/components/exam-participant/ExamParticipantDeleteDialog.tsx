@@ -64,6 +64,9 @@ export default function ExamParticipantDeleteDialog({
         Apakah Anda yakin ingin menghapus peserta ujian ini? Tindakan ini tidak
         dapat dibatalkan.
       </p>
+      <p className="mt-2 text-xs text-outline">
+        Peserta hanya dapat dihapus jika belum memiliki percobaan ujian.
+      </p>
 
       {error && (
         <p className="mt-3 rounded-xl bg-error-container px-3 py-2 text-sm text-error">
