@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import Button from "@/components/ui/Button";
-import Modal from "@/components/ui/Modal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toApiError } from "@/lib/api";
-import type { ApiError } from "@/types";
 import { examResultService } from "../../api/exam-result.service";
 import type { ExamResult } from "../../api/types";
 
@@ -21,20 +19,17 @@ export default function ExamResultDeleteDialog({
   data,
 }: ExamResultDeleteDialogProps) {
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
 
   const handleDelete = async () => {
-    if (!data) return;
+    if (!data || deleting) return;
     setDeleting(true);
-    setError(null);
 
     try {
       await examResultService.remove(data.id);
-      onDeleted();
       toast.success("Hasil ujian berhasil dihapus.");
+      onDeleted();
     } catch (err) {
       const apiError = toApiError(err);
-      setError(apiError);
       toast.error("Gagal menghapus hasil ujian", {
         description: apiError.message,
       });
@@ -44,32 +39,17 @@ export default function ExamResultDeleteDialog({
   };
 
   return (
-    <Modal
+    <ConfirmDialog
       open={open}
-      onClose={onClose}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
       title="Hapus Hasil Ujian"
-      size="sm"
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose} disabled={deleting}>
-            Batal
-          </Button>
-          <Button variant="danger" onClick={handleDelete} loading={deleting}>
-            Hapus
-          </Button>
-        </>
-      }
-    >
-      <p className="text-sm text-on-surface-variant">
-        Apakah Anda yakin ingin menghapus hasil ujian ini? Tindakan ini tidak
-        dapat dibatalkan.
-      </p>
-
-      {error && (
-        <p className="mt-3 rounded-xl bg-error-container px-3 py-2 text-sm text-error">
-          {error.message}
-        </p>
-      )}
-    </Modal>
+      description="Hasil yang telah difinalisasi atau disinkronkan ke nilai akademik tidak dapat dihapus. Penghapusan hasil bersifat permanen dan tidak dapat dibatalkan."
+      confirmText="Hapus"
+      cancelText="Batal"
+      destructive
+      onConfirm={handleDelete}
+    />
   );
 }

@@ -146,6 +146,21 @@ export default function ExamResultForm({
                     : "Legacy"}
               </span>
             </p>
+            {initialData.is_final === true && (
+              <p className="mt-1 font-medium text-error">
+                Status: Final — hasil dikunci dan tidak dapat dihitung ulang.
+              </p>
+            )}
+            {initialData.is_effective === true && (
+              <p className="mt-1">
+                Status: hasil efektif peserta.
+              </p>
+            )}
+            {initialData.exam_attempt_id == null && (
+              <p className="mt-1">
+                Status: Legacy (tanpa attempt) — tidak dapat dihitung ulang.
+              </p>
+            )}
             <p className="mt-1">
               Nilai dihitung ulang oleh sistem saat disimpan. Input manual skor
               tidak didukung.

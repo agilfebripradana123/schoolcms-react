@@ -423,6 +423,11 @@ export interface ExamResult {
   unanswered_count: number;
   grade?: string | null;
   status: ExamResultStatus;
+  is_final?: boolean;
+  finalized_at?: string | null;
+  is_effective?: boolean;
+  grade_synced?: boolean;
+  grade_stale?: boolean;
   graded_at?: string | null;
   created_at?: string;
   updated_at?: string;

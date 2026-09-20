@@ -1,9 +1,10 @@
 ﻿import { useCallback, useEffect, useMemo, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Lock, Plus, Pencil, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import DataTable from "@/components/ui/DataTable";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
@@ -86,6 +87,9 @@ export default function ExamResultsPage() {
   const [editing, setEditing] = useState<ExamResult | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toDelete, setToDelete] = useState<ExamResult | null>(null);
+  const [finalizeTarget, setFinalizeTarget] = useState<ExamResult | null>(null);
+  const [syncTarget, setSyncTarget] = useState<ExamResult | null>(null);
+  const [busy, setBusy] = useState<null | "finalize" | "sync">(null);
 
   useEffect(() => {
     examParticipantService
@@ -185,6 +189,56 @@ export default function ExamResultsPage() {
     setDeleteOpen(true);
   }, []);
 
+  const reload = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
+
+  // Action gating is UX only; backend remains the authority. Effective/final/
+  // sync state comes from backend fields, never recomputed here.
+  const canEditResult = (row: ExamResult) =>
+    row.exam_attempt_id != null && !row.is_final;
+  const canDeleteResult = (row: ExamResult) => !row.is_final && !row.grade_synced;
+  const canFinalize = (row: ExamResult) =>
+    row.exam_attempt_id != null && !row.is_final;
+  const canSyncToGrade = (row: ExamResult) =>
+    row.is_effective === true && !row.grade_synced;
+
+  const handleFinalize = async (target: ExamResult) => {
+    if (busy) return;
+    setBusy("finalize");
+    try {
+      await examResultService.finalize(target.id);
+      toast.success("Hasil ujian difinalisasi dan dikunci.");
+      reload();
+    } catch (err) {
+      const apiError = toApiError(err);
+      toast.error("Gagal memfinalisasi hasil ujian", {
+        description: apiError.message,
+      });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleSync = async (target: ExamResult) => {
+    if (busy) return;
+    setBusy("sync");
+    try {
+      const res = await examResultService.syncToGrade(target.id);
+      toast.success(res.message || "Nilai berhasil disinkronkan ke nilai akademik.");
+      reload();
+    } catch (err) {
+      const apiError = toApiError(err);
+      toast.error("Gagal sinkronisasi nilai", {
+        description: apiError.message,
+      });
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const columns = useMemo(() => {
     type Row = ExamResult;
     return [
@@ -208,14 +262,24 @@ export default function ExamResultsPage() {
         header: "Percobaan",
         accessor: "exam_attempt_id" as keyof Row,
         className: "px-6 py-4 text-center text-sm text-on-surface",
-        render: (_value: Row[keyof Row], row: Row) =>
-          row.attempt_number != null ? (
-            <span>{`Percobaan #${row.attempt_number}`}</span>
-          ) : row.exam_attempt_id != null ? (
-            <span>{`#${row.exam_attempt_id}`}</span>
-          ) : (
-            <Badge variant="secondary">Legacy</Badge>
-          ),
+        render: (_value: Row[keyof Row], row: Row) => (
+          <div className="flex flex-col items-center gap-1">
+            {row.attempt_number != null ? (
+              <span>{`Percobaan #${row.attempt_number}`}</span>
+            ) : row.exam_attempt_id != null ? (
+              <span>{`#${row.exam_attempt_id}`}</span>
+            ) : (
+              <Badge variant="secondary">Legacy</Badge>
+            )}
+            {row.is_effective === true && (
+              <Badge variant="primary">
+                <span title="Hasil efektif peserta (ditentukan backend)">
+                  Efektif
+                </span>
+              </Badge>
+            )}
+          </div>
+        ),
       },
       {
         header: "Nilai",
@@ -261,7 +325,29 @@ export default function ExamResultsPage() {
         accessor: "status" as keyof Row,
         render: (_value: Row[keyof Row], row: Row) => {
           const s = STATUS_BADGE[row.status] ?? STATUS_BADGE.pending;
-          return <Badge variant={s.variant}>{s.label}</Badge>;
+          return (
+            <div className="flex flex-col items-center gap-1">
+              <Badge variant={s.variant}>{s.label}</Badge>
+              {row.is_final === true && (
+                <Badge variant="danger">
+                  <span
+                    title={
+                      row.finalized_at
+                        ? `Difinalisasi ${formatDateTime(row.finalized_at)}`
+                        : undefined
+                    }
+                  >
+                    Final
+                  </span>
+                </Badge>
+              )}
+              {row.grade_stale === true ? (
+                <Badge variant="warning">Usang</Badge>
+              ) : row.grade_synced === true ? (
+                <Badge variant="secondary">Tersinkron</Badge>
+              ) : null}
+            </div>
+          );
         },
       },
       {
@@ -272,22 +358,48 @@ export default function ExamResultsPage() {
         className: "px-6 py-4 text-center text-sm text-on-surface",
         render: (_value: Row[keyof Row], row: Row) => (
           <div className="flex items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
-              aria-label="Edit hasil"
-            >
-              <Pencil className="h-4 w-4" strokeWidth={1.75} />
-            </button>
-            <button
-              type="button"
-              onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
-              aria-label="Hapus hasil"
-            >
-              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
-            </button>
+            {canEditResult(row) && (
+              <button
+                type="button"
+                onClick={() => openEdit(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
+                aria-label="Edit hasil"
+              >
+                <Pencil className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
+            {canDeleteResult(row) && (
+              <button
+                type="button"
+                onClick={() => openDelete(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
+                aria-label="Hapus hasil"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
+            {canFinalize(row) && (
+              <button
+                type="button"
+                onClick={() => setFinalizeTarget(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
+                aria-label="Finalisasi hasil"
+                title="Finalisasi hasil (tidak dapat dibatalkan)"
+              >
+                <Lock className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
+            {canSyncToGrade(row) && (
+              <button
+                type="button"
+                onClick={() => setSyncTarget(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
+                aria-label="Sinkronkan ke nilai akademik"
+                title="Sinkronkan ke nilai akademik"
+              >
+                <RefreshCw className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
           </div>
         ),
       },
@@ -399,26 +511,72 @@ export default function ExamResultsPage() {
                             <span>Grade {row.grade || "-"}</span>
                           </p>
                           <p className="text-xs text-on-surface-variant">
+                            {row.is_final === true && row.finalized_at
+                              ? `Final pada ${formatDateTime(row.finalized_at)} · `
+                              : ""}
                             {formatDateTime(row.graded_at)}
                           </p>
                         </div>
-                        <Badge variant={s.variant}>{s.label}</Badge>
+                        <div className="flex shrink-0 flex-col items-end gap-1">
+                          <Badge variant={s.variant}>{s.label}</Badge>
+                          {row.is_final === true && (
+                            <Badge variant="danger">
+                              <span
+                                title={
+                                  row.finalized_at
+                                    ? `Difinalisasi ${formatDateTime(row.finalized_at)}`
+                                    : undefined
+                                }
+                              >
+                                Final
+                              </span>
+                            </Badge>
+                          )}
+                          {row.is_effective === true && <Badge variant="primary">Efektif</Badge>}
+                          {row.grade_stale === true ? (
+                            <Badge variant="warning">Usang</Badge>
+                          ) : row.grade_synced === true ? (
+                            <Badge variant="secondary">Tersinkron</Badge>
+                          ) : null}
+                        </div>
                       </div>
-                      <div className="mt-3 flex gap-2 border-t border-outline-variant pt-3">
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => openEdit(row)}
-                        >
-                          <Pencil className="h-4 w-4" /> Edit
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => openDelete(row)}
-                        >
-                          <Trash2 className="h-4 w-4" /> Hapus
-                        </Button>
+                      <div className="mt-3 flex flex-wrap gap-2 border-t border-outline-variant pt-3">
+                        {canEditResult(row) && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => openEdit(row)}
+                          >
+                            <Pencil className="h-4 w-4" /> Edit
+                          </Button>
+                        )}
+                        {canDeleteResult(row) && (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => openDelete(row)}
+                          >
+                            <Trash2 className="h-4 w-4" /> Hapus
+                          </Button>
+                        )}
+                        {canFinalize(row) && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setFinalizeTarget(row)}
+                          >
+                            <Lock className="h-4 w-4" /> Finalisasi
+                          </Button>
+                        )}
+                        {canSyncToGrade(row) && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setSyncTarget(row)}
+                          >
+                            <RefreshCw className="h-4 w-4" /> Sinkron
+                          </Button>
+                        )}
                       </div>
                     </div>
                   );
@@ -458,6 +616,41 @@ export default function ExamResultsPage() {
         }}
         onDeleted={handleDeleted}
         data={toDelete}
+      />
+
+      <ConfirmDialog
+        open={finalizeTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setFinalizeTarget(null);
+        }}
+        title="Finalisasi Hasil Ujian"
+        description="Hasil akan dikunci sebagai final dan tidak dapat diubah, dihitung ulang, atau dihapus kembali. Backend menjadikan hasil final sebagai hasil efektif peserta."
+        confirmText="Finalisasi"
+        cancelText="Batal"
+        destructive
+        onConfirm={() => {
+          if (!finalizeTarget) return;
+          const target = finalizeTarget;
+          setFinalizeTarget(null);
+          void handleFinalize(target);
+        }}
+      />
+
+      <ConfirmDialog
+        open={syncTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setSyncTarget(null);
+        }}
+        title="Sinkronkan ke Nilai Akademik"
+        description="Hasil efektif ini akan disinkronkan ke nilai akademik. Backend hanya memperbolehkan sinkronisasi hasil yang efektif."
+        confirmText="Sinkronkan"
+        cancelText="Batal"
+        onConfirm={() => {
+          if (!syncTarget) return;
+          const target = syncTarget;
+          setSyncTarget(null);
+          void handleSync(target);
+        }}
       />
     </PageContainer>
   );

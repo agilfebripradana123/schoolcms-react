@@ -6,6 +6,7 @@ import type {
   ExaminationListParams,
   ExaminationPaginatedResponse,
   ExamResult,
+  GradeSyncResultData,
   UpdateExamResultPayload,
 } from "./types";
 
@@ -39,5 +40,17 @@ export const examResultService = {
 
   async remove(id: number | string): Promise<ApiMessage> {
     return api.delete<ApiMessage>(`${EXAMINATION.EXAM_RESULTS}/${id}`);
+  },
+
+  async syncToGrade(id: number | string): Promise<ApiEnvelope<GradeSyncResultData>> {
+    return api.post<ApiEnvelope<GradeSyncResultData>>(
+      `${EXAMINATION.EXAM_RESULTS}/${id}/grade-sync`,
+    );
+  },
+
+  async finalize(id: number | string): Promise<ApiEnvelope<ExamResult>> {
+    return api.post<ApiEnvelope<ExamResult>>(
+      `${EXAMINATION.EXAM_RESULTS}/${id}/finalize`,
+    );
   },
 };
