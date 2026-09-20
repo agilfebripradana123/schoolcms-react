@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ComponentType } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, SendHorizonal } from "lucide-react";
+import { Archive, ArrowLeft, CheckCircle2, Play, SendHorizonal } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
+import { usePermission } from "@/features/auth/usePermission";
 import type { ApiError } from "@/types";
 import { examService } from "../api/exam.service";
 import { classService } from "@/features/academic/api/class.service";
@@ -44,14 +46,81 @@ const EXAM_TYPE_LABEL: Record<string, string> = {
   other: "Lainnya",
 };
 
+type LifecycleTransition = "publish" | "start" | "complete" | "archive";
+
+const TRANSITION_CONFIG: Record<
+  LifecycleTransition,
+  {
+    target: ExamStatus;
+    label: string;
+    confirmTitle: string;
+    confirmDescription: string;
+    confirmText: string;
+    successMessage: string;
+    errorMessage: string;
+  }
+> = {
+  publish: {
+    target: "published",
+    label: "Terbitkan",
+    confirmTitle: "Terbitkan Ujian",
+    confirmDescription:
+      "Ujian akan diterbitkan dan siap digunakan sesuai lifecycle backend. Validasi kelengkapan komposisi soal tetap dilakukan backend.",
+    confirmText: "Terbitkan",
+    successMessage: "Ujian berhasil diterbitkan.",
+    errorMessage: "Gagal menerbitkan ujian",
+  },
+  start: {
+    target: "ongoing",
+    label: "Mulai Ujian",
+    confirmTitle: "Mulai Ujian",
+    confirmDescription:
+      "Status ujian akan berubah menjadi Berlangsung. Peserta dapat mulai mengerjakan ujian sesuai jadwal.",
+    confirmText: "Mulai",
+    successMessage: "Ujian dimulai.",
+    errorMessage: "Gagal memulai ujian",
+  },
+  complete: {
+    target: "completed",
+    label: "Selesaikan Ujian",
+    confirmTitle: "Selesaikan Ujian",
+    confirmDescription:
+      "Ujian akan ditutup dan status menjadi Selesai. Data percobaan dan hasil tetap tersimpan; aksi ini tidak memfinalisasi hasil peserta.",
+    confirmText: "Selesaikan",
+    successMessage: "Ujian selesai.",
+    errorMessage: "Gagal menyelesaikan ujian",
+  },
+  archive: {
+    target: "archived",
+    label: "Arsipkan Ujian",
+    confirmTitle: "Arsipkan Ujian",
+    confirmDescription:
+      "Ujian akan menjadi Diarsipkan. Data historis tetap tersimpan dan dapat dilihat; status ini bersifat terminal.",
+    confirmText: "Arsipkan",
+    successMessage: "Ujian diarsipkan.",
+    errorMessage: "Gagal mengarsipkan ujian",
+  },
+};
+
+const TRANSITION_ICON: Record<LifecycleTransition, ComponentType<{ className?: string }>> = {
+  publish: SendHorizonal,
+  start: Play,
+  complete: CheckCircle2,
+  archive: Archive,
+};
+
 export default function ExamDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { can } = usePermission();
 
   const [exam, setExam] = useState<Exam | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiError | null>(null);
-  const [publishing, setPublishing] = useState(false);
+
+  const [pendingTransition, setPendingTransition] = useState<LifecycleTransition | null>(null);
+  const [activeTransition, setActiveTransition] = useState<LifecycleTransition | null>(null);
+  const [publishError, setPublishError] = useState<ApiError | null>(null);
 
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
@@ -118,6 +187,25 @@ export default function ExamDetailPage() {
 
   const isDraft = exam?.status === "draft";
 
+  const canManageExams = can("manage-exams");
+
+  const currentTransition: LifecycleTransition | null =
+    exam?.status === "draft"
+      ? "publish"
+      : exam?.status === "published"
+        ? "start"
+        : exam?.status === "ongoing"
+          ? "complete"
+          : exam?.status === "completed"
+            ? "archive"
+            : null;
+
+  const mutating = activeTransition !== null;
+
+  const ActionIcon = currentTransition
+    ? TRANSITION_ICON[currentTransition]
+    : null;
+
   const readiness = useMemo(() => {
     const hasQuestions =
       compositionCount !== null && compositionCount > 0;
@@ -154,20 +242,37 @@ export default function ExamDetailPage() {
     ];
   }, [compositionCount, allApproved, exam]);
 
-  const handlePublish = async () => {
-    if (!exam || !isDraft) return;
-    setPublishing(true);
+  const publishReasons = useMemo(() => {
+    if (!publishError?.errors) return [];
+    const raw = publishError.errors as unknown;
+    if (Array.isArray(raw)) return raw as string[];
+    if (typeof raw === "object" && raw !== null) {
+      return Object.values(raw)
+        .flat()
+        .filter((v): v is string => typeof v === "string");
+    }
+    return [];
+  }, [publishError]);
+
+  const runTransition = async (transition: LifecycleTransition) => {
+    if (!exam || mutating) return;
+    const config = TRANSITION_CONFIG[transition];
+    setActiveTransition(transition);
     try {
-      await examService.update(exam.id, { status: "published" });
-      toast.success("Ujian berhasil diterbitkan.");
+      await examService.update(exam.id, { status: config.target });
+      toast.success(config.successMessage);
+      setPublishError(null);
       fetchExam();
     } catch (err) {
       const apiError = toApiError(err);
-      toast.error("Gagal menerbitkan ujian", {
+      toast.error(config.errorMessage, {
         description: apiError.message,
       });
+      if (config.target === "published") {
+        setPublishError(apiError);
+      }
     } finally {
-      setPublishing(false);
+      setActiveTransition(null);
     }
   };
 
@@ -231,7 +336,7 @@ export default function ExamDetailPage() {
         title={exam.title}
         description="Konfigurasi, komposisi soal, dan penerbitan ujian."
         actions={
-          <>
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="ghost"
               onClick={() => navigate("/admin/examinations/exams")}
@@ -239,12 +344,17 @@ export default function ExamDetailPage() {
             >
               Kembali
             </Button>
-            {isDraft && (
-              <Button onClick={handlePublish} loading={publishing} disabled={publishing}>
-                <SendHorizonal className="h-4 w-4" /> Terbitkan
+            {canManageExams && currentTransition && (
+              <Button
+                onClick={() => setPendingTransition(currentTransition)}
+                loading={activeTransition === currentTransition}
+                disabled={mutating}
+              >
+                {ActionIcon && <ActionIcon className="h-4 w-4" />}
+                {TRANSITION_CONFIG[currentTransition].label}
               </Button>
             )}
-          </>
+          </div>
         }
       />
 
@@ -308,21 +418,53 @@ export default function ExamDetailPage() {
           ))}
         </ul>
         {isDraft ? (
-          <div className="mt-4 flex items-center gap-3">
-            <Button onClick={handlePublish} loading={publishing} disabled={publishing}>
-              <SendHorizonal className="h-4 w-4" /> Terbitkan Ujian
-            </Button>
-            <span className="text-xs text-outline">
-              Validasi backend: minimal satu soal disetujui dan sesuai subjek.
-            </span>
-          </div>
+          <>
+            {canManageExams && (
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <Button
+                  onClick={() => setPendingTransition("publish")}
+                  loading={activeTransition === "publish"}
+                  disabled={mutating}
+                >
+                  <SendHorizonal className="h-4 w-4" /> Terbitkan Ujian
+                </Button>
+                <span className="text-xs text-outline">
+                  Validasi backend: minimal satu soal disetujui dan sesuai subjek.
+                </span>
+              </div>
+            )}
+            {publishError && (
+              <div className="mt-4 rounded-xl bg-error-container px-4 py-3 text-sm text-error">
+                <p className="font-semibold">{publishError.message}</p>
+                {publishReasons.length > 0 && (
+                  <ul className="mt-2 space-y-1">
+                    {publishReasons.map((reason, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-error" />
+                        <span>{reason}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </>
         ) : exam.status === "published" ? (
           <p className="mt-4 text-sm text-on-surface-variant">
-            Ujian sudah diterbitkan. Status lanjutan lain dikelola melalui form edit ujian.
+            Ujian sudah diterbitkan. Gunakan aksi "Mulai Ujian" untuk mengubah status menjadi
+            Berlangsung.
+          </p>
+        ) : exam.status === "ongoing" ? (
+          <p className="mt-4 text-sm text-on-surface-variant">
+            Ujian sedang berlangsung. Gunakan aksi "Selesaikan Ujian" untuk menutup ujian.
+          </p>
+        ) : exam.status === "completed" ? (
+          <p className="mt-4 text-sm text-on-surface-variant">
+            Ujian telah selesai. Gunakan aksi "Arsipkan Ujian" untuk mengarsipkan.
           </p>
         ) : (
           <p className="mt-4 text-sm text-on-surface-variant">
-            Ujian tidak berstatus draft; publish tidak tersedia.
+            Ujian telah diarsipkan dan tidak dapat diubah lagi.
           </p>
         )}
       </Card>
@@ -335,6 +477,25 @@ export default function ExamDetailPage() {
       />
 
       <ExamReportView examId={exam.id} scope="admin" />
+
+      <ConfirmDialog
+        open={pendingTransition !== null}
+        onOpenChange={(open) => {
+          if (!open && !mutating) setPendingTransition(null);
+        }}
+        title={pendingTransition ? TRANSITION_CONFIG[pendingTransition].confirmTitle : ""}
+        description={
+          pendingTransition ? TRANSITION_CONFIG[pendingTransition].confirmDescription : ""
+        }
+        confirmText={pendingTransition ? TRANSITION_CONFIG[pendingTransition].confirmText : "Lanjutkan"}
+        cancelText="Batal"
+        onConfirm={() => {
+          if (!pendingTransition) return;
+          const transition = pendingTransition;
+          setPendingTransition(null);
+          void runTransition(transition);
+        }}
+      />
     </PageContainer>
   );
 }

@@ -303,22 +303,26 @@ export default function ExamsPage() {
             >
               <ListChecks className="h-4 w-4" strokeWidth={1.75} />
             </button>
-            <button
-              type="button"
-              onClick={() => openEdit(row)}
-              className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
-              aria-label={`Edit ${row.title}`}
-            >
-              <Pencil className="h-4 w-4" strokeWidth={1.75} />
-            </button>
-            <button
-              type="button"
-              onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
-              aria-label={`Hapus ${row.title}`}
-            >
-              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
-            </button>
+            {row.status === "draft" && (
+              <button
+                type="button"
+                onClick={() => openEdit(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-surface-container-low hover:text-primary-container"
+                aria-label={`Edit ${row.title}`}
+              >
+                <Pencil className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
+            {(row.status === "draft" || row.status === "archived") && (
+              <button
+                type="button"
+                onClick={() => openDelete(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
+                aria-label={`Hapus ${row.title}`}
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
           </div>
         ),
       },
@@ -442,20 +446,24 @@ export default function ExamsPage() {
                       >
                         <ListChecks className="h-4 w-4" /> Soal
                       </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => openEdit(row)}
-                      >
-                        <Pencil className="h-4 w-4" /> Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => openDelete(row)}
-                      >
-                        <Trash2 className="h-4 w-4" /> Hapus
-                      </Button>
+                      {row.status === "draft" && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => openEdit(row)}
+                        >
+                          <Pencil className="h-4 w-4" /> Edit
+                        </Button>
+                      )}
+                      {(row.status === "draft" || row.status === "archived") && (
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => openDelete(row)}
+                        >
+                          <Trash2 className="h-4 w-4" /> Hapus
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))

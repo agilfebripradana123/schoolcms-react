@@ -13,7 +13,7 @@ import { academicYearService } from "@/features/academic/api/academic-year.servi
 import { semesterService } from "@/features/academic/api/semester.service";
 import type { AcademicYear, SchoolClass, Semester } from "@/features/academic/api/types";
 import { examService } from "../../api/exam.service";
-import type { CreateExamPayload, Exam, ExamStatus, ExamType } from "../../api/types";
+import type { CreateExamPayload, Exam, ExamType } from "../../api/types";
 
 interface ExamFormProps {
   open: boolean;
@@ -21,14 +21,6 @@ interface ExamFormProps {
   onSaved: () => void;
   initialData?: Exam | null;
 }
-
-const STATUS_OPTIONS = [
-  { value: "draft", label: "Draft" },
-  { value: "published", label: "Published" },
-  { value: "ongoing", label: "Berlangsung" },
-  { value: "completed", label: "Selesai" },
-  { value: "archived", label: "Diarsipkan" },
-];
 
 const EXAM_TYPE_OPTIONS = [
   { value: "uts", label: "UTS" },
@@ -60,7 +52,6 @@ export default function ExamForm({
   const [shuffleQuestions, setShuffleQuestions] = useState(true);
   const [shuffleOptions, setShuffleOptions] = useState(true);
   const [showResult, setShowResult] = useState(true);
-  const [status, setStatus] = useState<ExamStatus>("draft");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -120,7 +111,6 @@ export default function ExamForm({
         setShuffleQuestions(initialData.shuffle_questions);
         setShuffleOptions(initialData.shuffle_options);
         setShowResult(initialData.show_result);
-        setStatus(initialData.status);
       } else {
         setSubjectId("");
         setClassId("");
@@ -136,7 +126,6 @@ export default function ExamForm({
         setShuffleQuestions(true);
         setShuffleOptions(true);
         setShowResult(true);
-        setStatus("draft");
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -163,7 +152,6 @@ export default function ExamForm({
       shuffle_questions: shuffleQuestions,
       shuffle_options: shuffleOptions,
       show_result: showResult,
-      status,
     };
 
     try {
@@ -437,16 +425,6 @@ export default function ExamForm({
             <span className="text-sm font-semibold text-on-surface">Tampilkan Hasil</span>
           </label>
         </div>
-
-        <FormField label="Status" required error={fieldErrors.status?.[0]}>
-          <AppSelect
-            value={status}
-            onChange={(v) => setStatus((v ?? "draft") as ExamStatus)}
-            options={STATUS_OPTIONS}
-            isSearchable={false}
-            isDisabled={submitting}
-          />
-        </FormField>
 
         <FormField
           label="Deskripsi"
