@@ -45,6 +45,17 @@ export default function StudentExamAttemptPage() {
 
   const didAutoSubmit = useRef(false);
   const lastStatus = useRef<AnswerStatus>("saved");
+  // Timer presentation baseline: server_now from the attempt payload anchors
+  // remaining time so client clock drift never skews the countdown. The server
+  // remains the authority on expiry.
+  const timerBaseline = useRef<{
+    expiresAt: number;
+    serverNow: number;
+    clientNow: number;
+  } | null>(null);
+  const submittingRef = useRef(false);
+  const savingQuestions = useRef<Set<string>>(new Set());
+  const [autoSubmitFailed, setAutoSubmitFailed] = useState(false);
 
   // ---- Load / resume -------------------------------------------------
   useEffect(() => {
@@ -53,12 +64,10 @@ export default function StudentExamAttemptPage() {
       setLoading(true);
       setLoadError(null);
       try {
-        const [attemptRes, questionsRes] = await Promise.all([
-          studentExamAttemptService.getAttempt(attemptId!),
-          studentExamAttemptService.getQuestions(attemptId!),
-        ]);
+        const attemptRes = await studentExamAttemptService.getAttempt(attemptId!);
         if (cancelled) return;
-        setAttempt(attemptRes.data?.attempt ?? null);
+        const at = attemptRes.data?.attempt ?? null;
+        setAttempt(at);
         if (attemptRes.data?.answers) {
           const selected: Record<string, number | null> = {};
           const essay: Record<string, string> = {};
@@ -69,11 +78,22 @@ export default function StudentExamAttemptPage() {
           setAnswers(selected);
           setEssays(essay);
         }
-        setQuestions(questionsRes.data?.questions ?? []);
-        const at = attemptRes.data?.attempt;
         if (at?.expires_at) {
-          setRemainingMs(new Date(at.expires_at).getTime() - Date.now());
+          const expiresAt = new Date(at.expires_at).getTime();
+          const serverNow = at.server_now
+            ? new Date(at.server_now).getTime()
+            : Date.now();
+          timerBaseline.current = { expiresAt, serverNow, clientNow: Date.now() };
+          setRemainingMs(Math.max(0, expiresAt - serverNow));
         }
+        // Terminal attempts (already submitted/expired) are rendered explicitly:
+        // never open the question-taking UI or wait for the /questions 422.
+        if (at && (at.status === "submitted" || at.status === "expired")) {
+          return;
+        }
+        const questionsRes = await studentExamAttemptService.getQuestions(attemptId!);
+        if (cancelled) return;
+        setQuestions(questionsRes.data?.questions ?? []);
       } catch (err) {
         if (!cancelled) setLoadError(toApiError(err).message);
       } finally {
@@ -87,25 +107,31 @@ export default function StudentExamAttemptPage() {
   }, [attemptId]);
 
   // ---- Countdown (visualization only; server is authority) ----------
+  const computeRemaining = useCallback((): number | null => {
+    const b = timerBaseline.current;
+    if (!b) return null;
+    return b.expiresAt - b.serverNow - (Date.now() - b.clientNow);
+  }, []);
+
   useEffect(() => {
     if (remainingMs === null) return;
     const id = setInterval(() => {
-      setRemainingMs(new Date((attempt?.expires_at as string) ?? Date.now()).getTime() - Date.now());
+      setRemainingMs(computeRemaining());
     }, 1000);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attempt?.expires_at, remainingMs === null]);
+  }, [remainingMs === null]);
 
   const effectiveRemaining = useMemo(() => {
-    if (!attempt?.expires_at) return null;
-    const ms = new Date(attempt.expires_at).getTime() - Date.now();
-    return Math.max(0, ms);
-  }, [attempt?.expires_at, remainingMs]);
+    const r = computeRemaining();
+    return r === null ? null : Math.max(0, r);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [computeRemaining, remainingMs]);
 
   // ---- Auto-submit on expiry (only if active) -----------------------
   useEffect(() => {
     if (!attempt || expired || didAutoSubmit.current || attempt.status !== "active") return;
-    if (attempt.expires_at && Date.now() >= new Date(attempt.expires_at).getTime()) {
+    if (effectiveRemaining !== null && effectiveRemaining === 0) {
       setExpired(true);
       didAutoSubmit.current = true;
       handleSubmit(true).catch(() => {});
@@ -193,6 +219,9 @@ export default function StudentExamAttemptPage() {
     async (questionId: number, selectedId: number | null, essay?: string) => {
       if (!attempt) return;
       const key = String(questionId);
+      // Prevent concurrent PUTs for the same question while one is in flight.
+      if (savingQuestions.current.has(key)) return;
+      savingQuestions.current.add(key);
       setAnswerStatus((p) => ({ ...p, [key]: "saving" }));
       try {
         await studentExamAttemptService.saveAnswer(attempt.id, questionId, {
@@ -206,6 +235,8 @@ export default function StudentExamAttemptPage() {
         setAnswerStatus((p) => ({ ...p, [key]: "error" }));
         // Local answer kept; server remains source of truth on next sync.
         toast.error("Jawaban belum tersimpan", { description: toApiError(err).message });
+      } finally {
+        savingQuestions.current.delete(key);
       }
     },
     [attempt],
@@ -224,7 +255,8 @@ export default function StudentExamAttemptPage() {
   // ---- Submit -------------------------------------------------------
   const handleSubmit = useCallback(
     async (forceExpired = false) => {
-      if (!attempt) return;
+      if (!attempt || submittingRef.current) return;
+      submittingRef.current = true;
       setSubmitting(true);
       try {
         const res = await studentExamAttemptService.submit(attempt.id);
@@ -232,8 +264,13 @@ export default function StudentExamAttemptPage() {
         setSubmitOpen(false);
       } catch (err) {
         const msg = toApiError(err).message;
-        if (!forceExpired) toast.error("Gagal mengumpulkan ujian", { description: msg });
+        if (!forceExpired) {
+          toast.error("Gagal mengumpulkan ujian", { description: msg });
+        } else {
+          setAutoSubmitFailed(true);
+        }
       } finally {
+        submittingRef.current = false;
         setSubmitting(false);
       }
     },
@@ -307,6 +344,48 @@ export default function StudentExamAttemptPage() {
     );
   }
 
+  if (attempt?.status === "submitted") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-surface p-8 text-center shadow-sm">
+          <CheckCircle2 className="mx-auto h-12 w-12 text-success" />
+          <h1 className="mt-4 text-xl font-bold text-on-surface">Ujian Sudah Dikumpulkan</h1>
+          <p className="mt-2 text-sm text-on-surface-variant">
+            Ujian sudah dikumpulkan. Kembali ke daftar ujian untuk melihat hasil.
+          </p>
+          <Button
+            variant="secondary"
+            className="mt-6"
+            onClick={() => navigate("/siswa/exams")}
+          >
+            Kembali ke Ujian
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (attempt?.status === "expired") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+        <div className="w-full max-w-md rounded-2xl border border-outline bg-surface p-8 text-center shadow-sm">
+          <Timer className="mx-auto h-12 w-12 text-error" />
+          <h1 className="mt-4 text-xl font-bold text-on-surface">Ujian Diakhiri</h1>
+          <p className="mt-2 text-sm text-on-surface-variant">
+            Ujian sudah diakhiri karena waktu habis.
+          </p>
+          <Button
+            variant="secondary"
+            className="mt-6"
+            onClick={() => navigate("/siswa/exams")}
+          >
+            Kembali ke Ujian
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (!started) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6">
@@ -347,9 +426,20 @@ export default function StudentExamAttemptPage() {
           <Timer className="mx-auto h-12 w-12 text-error" />
           <h1 className="mt-4 text-xl font-bold text-on-surface">Waktu Habis</h1>
           <p className="mt-2 text-sm text-on-surface-variant">
-            Waktu pengerjaan telah berakhir. Ujian sedang dikumpulkan secara otomatis.
+            {autoSubmitFailed
+              ? "Waktu pengerjaan telah berakhir, tetapi pengumpulan otomatis gagal. Silakan coba kirim kembali."
+              : "Waktu pengerjaan telah berakhir. Ujian sedang dikumpulkan secara otomatis."}
           </p>
           {submitting && <Loader2 className="mx-auto mt-4 h-6 w-6 animate-spin text-primary" />}
+          {autoSubmitFailed && !submitting && (
+            <Button
+              className="mt-6"
+              onClick={() => handleSubmit(false)}
+              disabled={submitting}
+            >
+              Coba kirim ulang
+            </Button>
+          )}
         </div>
       </div>
     );
