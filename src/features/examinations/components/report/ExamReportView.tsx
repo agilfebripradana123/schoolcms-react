@@ -46,6 +46,80 @@ function StatCard({ label, value, hint }: StatProps) {
   );
 }
 
+function OptionDistribution({ row }: { row: ExamReportQuestion }) {
+  if (row.type === "essay" || row.option_distribution.length === 0) {
+    return <span className="text-xs text-outline">-</span>;
+  }
+  const max = Math.max(...row.option_distribution.map((o) => o.selected_count), 1);
+  return (
+    <details className="group">
+      <summary className="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-on-surface hover:text-primary">
+        Distribusi
+        <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="mt-2 space-y-2">
+        {row.option_distribution.map((option) => {
+          const pct = row.attempts_total > 0 ? (option.selected_count / row.attempts_total) * 100 : 0;
+          return (
+            <div key={option.option_id}>
+              <div className="flex items-center justify-between gap-2 text-xs text-on-surface-variant">
+                <span className="truncate">{option.option_text}</span>
+                <span className="shrink-0">
+                  {option.selected_count} · {pct.toLocaleString("id-ID", { maximumFractionDigits: 1 })}%
+                </span>
+              </div>
+              <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
+                <div
+                  className="h-full rounded-full bg-primary-container"
+                  style={{ width: `${(option.selected_count / max) * 100}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </details>
+  );
+}
+
+function QuestionCard({ row }: { row: ExamReportQuestion }) {
+  return (
+    <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4">
+      <div className="flex items-start justify-between gap-2">
+        <p className="font-medium text-on-surface">Soal {row.position}</p>
+        <Badge variant={TYPE_BADGE[row.type] ?? "neutral"}>
+          {TYPE_LABEL[row.type] ?? row.type}
+        </Badge>
+      </div>
+      <p className="mt-1 line-clamp-3 text-sm text-on-surface" title={row.question_text}>
+        {row.question_text}
+      </p>
+      <p className="mt-1 text-xs text-on-surface-variant">Bobot: {row.points}</p>
+      <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-on-surface-variant">
+        <span>Percobaan: {row.attempts_total}</span>
+        <span>Terjawab: {row.answered}</span>
+        <span>Tidak terjawab: {row.unanswered}</span>
+        {row.type === "essay" ? (
+          <>
+            <span>Menunggu dinilai: {row.essay?.pending_manual ?? 0}</span>
+            <span>Sudah dinilai: {row.essay?.manually_graded ?? 0}</span>
+            <span>Rata-rata skor: {row.essay?.average_score != null ? row.essay.average_score : "-"}</span>
+          </>
+        ) : (
+          <>
+            <span>Benar: {row.correct ?? "-"}</span>
+            <span>Salah: {row.incorrect ?? "-"}</span>
+            <span>Persentase benar: {formatPct(row.correctness_percentage)}</span>
+          </>
+        )}
+      </div>
+      <div className="mt-2 border-t border-outline-variant pt-2">
+        <OptionDistribution row={row} />
+      </div>
+    </div>
+  );
+}
+
 interface ExamReportViewProps {
   examId: number;
   scope: ExamReportScope;
@@ -185,41 +259,9 @@ export default function ExamReportView({ examId, scope }: ExamReportViewProps) {
       header: "Distribusi Opsi",
       accessor: "option_distribution" as keyof ExamReportQuestion,
       className: "px-6 py-4 text-sm text-on-surface",
-      render: (_value: unknown, row: ExamReportQuestion) => {
-        if (row.type === "essay" || row.option_distribution.length === 0) {
-          return <span className="text-xs text-outline">-</span>;
-        }
-        const max = Math.max(...row.option_distribution.map((o) => o.selected_count), 1);
-        return (
-          <details className="group">
-            <summary className="inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-on-surface hover:text-primary">
-              Distribusi
-              <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-            </summary>
-            <div className="mt-2 space-y-2">
-              {row.option_distribution.map((option) => {
-                const pct = row.attempts_total > 0 ? (option.selected_count / row.attempts_total) * 100 : 0;
-                return (
-                  <div key={option.option_id}>
-                    <div className="flex items-center justify-between gap-2 text-xs text-on-surface-variant">
-                      <span className="truncate">{option.option_text}</span>
-                      <span className="shrink-0">
-                        {option.selected_count} · {pct.toLocaleString("id-ID", { maximumFractionDigits: 1 })}%
-                      </span>
-                    </div>
-                    <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
-                      <div
-                        className="h-full rounded-full bg-primary-container"
-                        style={{ width: `${(option.selected_count / max) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </details>
-        );
-      },
+      render: (_value: unknown, row: ExamReportQuestion) => (
+        <OptionDistribution row={row} />
+      ),
     },
   ];
 
@@ -261,11 +303,20 @@ export default function ExamReportView({ examId, scope }: ExamReportViewProps) {
             <p className="text-sm text-outline">Belum ada analisis soal untuk ujian ini.</p>
           </div>
         ) : (
-          <DataTable
-            columns={columns}
-            data={questions}
-            emptyMessage="Belum ada analisis soal."
-          />
+          <>
+            <div className="space-y-3 sm:hidden">
+              {questions.map((row) => (
+                <QuestionCard key={row.question_id} row={row} />
+              ))}
+            </div>
+            <div className="hidden sm:block">
+              <DataTable
+                columns={columns}
+                data={questions}
+                emptyMessage="Belum ada analisis soal."
+              />
+            </div>
+          </>
         )}
       </Card>
     </div>

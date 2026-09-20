@@ -13,6 +13,7 @@ import Pagination from "../../../components/ui/Pagination";
 import { myExamService } from "@/features/examinations";
 import type { Exam, ExamStatus } from "@/features/examinations/api/types";
 import ExamReportView from "@/features/examinations/components/report/ExamReportView";
+import { usePermission } from "@/features/auth/usePermission";
 import { toApiError } from "@/lib/api";
 import type { SelectOption } from "@/components/ui/Select";
 
@@ -33,6 +34,9 @@ const STATUS_VARIANTS: Record<ExamStatus, "neutral" | "primary" | "success" | "w
 };
 
 export default function TeacherExamsPage() {
+  const { can } = usePermission();
+  const canViewExamResults = can("view-exam-results");
+
   const [exams, setExams] = useState<Exam[]>([]);
   const [meta, setMeta] = useState<{ total: number; last_page: number; current_page: number } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -229,7 +233,13 @@ export default function TeacherExamsPage() {
               <Badge variant="neutral">Tampilkan hasil: {detail.show_result ? "Ya" : "Tidak"}</Badge>
             </div>
             <div className="border-t border-outline-variant pt-4">
-              <ExamReportView examId={detail.id} scope="teacher" />
+              {canViewExamResults ? (
+                <ExamReportView examId={detail.id} scope="teacher" />
+              ) : (
+                <p className="rounded-xl bg-surface-container px-4 py-3 text-xs text-secondary">
+                  Anda tidak memiliki izin untuk melihat laporan ujian.
+                </p>
+              )}
             </div>
           </div>
         )}
