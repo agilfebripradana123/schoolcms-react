@@ -5,6 +5,7 @@ import DataTable from "@/components/ui/DataTable";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import PortalEmptyState from "@/portal/components/PortalEmptyState";
@@ -14,6 +15,7 @@ import Pagination from "../../../components/ui/Pagination";
 import { myExamResultService, teacherExamGradingService } from "@/features/examinations";
 import type { ExamResult, ExamResultStatus } from "@/features/examinations/api/types";
 import { toApiError } from "@/lib/api";
+import { usePermission } from "@/features/auth/usePermission";
 import type { SelectOption } from "@/components/ui/Select";
 import { toast } from "sonner";
 
@@ -28,6 +30,9 @@ const STATUS_VARIANTS: Record<ExamResultStatus, "neutral" | "success"> = {
 };
 
 export default function TeacherExamResultsPage() {
+  const { can } = usePermission();
+  const canManageExamResults = can("manage-exam-results");
+
   const [results, setResults] = useState<ExamResult[]>([]);
   const [meta, setMeta] = useState<{ total: number; last_page: number; current_page: number; per_page?: number } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,6 +112,7 @@ export default function TeacherExamResultsPage() {
 
   const [detail, setDetail] = useState<ExamResult | null>(null);
   const [syncing, setSyncing] = useState<number | null>(null);
+  const [syncTarget, setSyncTarget] = useState<ExamResult | null>(null);
 
   const syncEligibility = (row: ExamResult) => {
     const exam = row.participant?.exam;
@@ -118,11 +124,13 @@ export default function TeacherExamResultsPage() {
   };
 
   const handleSync = async (row: ExamResult) => {
+    if (syncing !== null) return;
     setSyncing(row.id);
     try {
       const res = await teacherExamGradingService.syncGrade(row.id);
       toast.success(res.message || "Nilai berhasil disinkronkan ke nilai akademik.");
       setSyncing(null);
+      setSyncTarget(null);
       setDetail(null);
       load(page, examId, status);
     } catch (err) {
@@ -130,6 +138,19 @@ export default function TeacherExamResultsPage() {
       const apiError = toApiError(err);
       toast.error("Gagal sinkronisasi nilai", { description: apiError.message });
     }
+  };
+
+  // Mutation gating is UX only; backend remains the authority. Sync is offered
+  // for the participant's effective result only, and only when it is not
+  // already synchronized. Effective/synced/final state comes from backend
+  // fields, never recomputed here.
+  const canSyncRow = (row: ExamResult) =>
+    canManageExamResults && row.is_effective === true && !row.grade_synced;
+
+  const syncStatusText = (row: ExamResult) => {
+    if (row.grade_synced === true) return "Sudah tersinkron";
+    if (row.is_effective !== true) return "Bukan hasil efektif";
+    return null;
   };
 
   const syncReasonText = (row: ExamResult) => {
@@ -189,7 +210,20 @@ export default function TeacherExamResultsPage() {
               ),
             },
             { header: "Ujian", accessor: "id", render: (_v, row) => row.participant?.exam?.title ?? "-" },
-            { header: "Percobaan", accessor: "id", render: (_v, row) => row.attempt_number != null ? <span>{`Percobaan #${row.attempt_number}`}</span> : <Badge variant="secondary">Legacy</Badge> },
+            {
+              header: "Percobaan",
+              accessor: "id",
+              render: (_v, row) => (
+                <div className="flex flex-col items-center gap-1">
+                  {row.attempt_number != null ? (
+                    <span>{`Percobaan #${row.attempt_number}`}</span>
+                  ) : (
+                    <Badge variant="secondary">Legacy</Badge>
+                  )}
+                  {row.is_effective === true && <Badge variant="primary">Efektif</Badge>}
+                </div>
+              ),
+            },
             { header: "Mapel", accessor: "id", render: (_v, row) => row.participant?.exam?.subject?.name ?? "-" },
             { header: "Skor", accessor: "total_score", render: (v) => String(v ?? "-") },
             { header: "Benar", accessor: "correct_count", render: (v) => String(v ?? "0") },
@@ -197,30 +231,68 @@ export default function TeacherExamResultsPage() {
             {
               header: "Status",
               accessor: "status",
-              render: (v) => {
+              render: (v, row) => {
                 const st = v as ExamResultStatus;
-                return <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>{STATUS_LABELS[st] ?? String(v)}</Badge>;
+                return (
+                  <div className="flex flex-col items-center gap-1">
+                    <Badge variant={STATUS_VARIANTS[st] ?? "neutral"}>
+                      {STATUS_LABELS[st] ?? String(v)}
+                    </Badge>
+                    {row.is_final === true && (
+                      <Badge variant="danger">
+                        <span
+                          title={
+                            row.finalized_at
+                              ? `Difinalisasi ${String(row.finalized_at)}`
+                              : undefined
+                          }
+                        >
+                          Final
+                        </span>
+                      </Badge>
+                    )}
+                    {row.grade_stale === true ? (
+                      <Badge variant="warning">Usang</Badge>
+                    ) : row.grade_synced === true ? (
+                      <Badge variant="secondary">Tersinkron</Badge>
+                    ) : null}
+                  </div>
+                );
               },
             },
             {
               header: "Aksi",
               accessor: "id",
               render: (_v, row) => {
+                if (canSyncRow(row)) {
+                  return (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setSyncTarget(row)}
+                      loading={syncing === row.id}
+                      disabled={syncing !== null && syncing !== row.id}
+                    >
+                      Sinkronkan ke Nilai
+                    </Button>
+                  );
+                }
+                const statusText = syncStatusText(row);
+                if (statusText) {
+                  return <span className="text-xs text-secondary">{statusText}</span>;
+                }
                 const reason = syncReasonText(row);
                 if (reason) {
                   return <span className="text-xs text-secondary">{reason}</span>;
                 }
-                return (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleSync(row)}
-                    loading={syncing === row.id}
-                    disabled={syncing !== null && syncing !== row.id}
-                  >
-                    Sinkronkan ke Nilai
-                  </Button>
-                );
+                if (!canManageExamResults) {
+                  return (
+                    <span className="text-xs text-secondary">
+                      Tidak ada izin sinkronisasi
+                    </span>
+                  );
+                }
+                return null;
               },
             },
           ]}
@@ -256,6 +328,38 @@ export default function TeacherExamResultsPage() {
                 {detail.participant?.exam?.title ?? "-"} · {detail.participant?.exam?.subject?.name ?? "-"}
               </p>
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {detail.attempt_number != null ? (
+                <Badge variant="secondary">{`Percobaan #${detail.attempt_number}`}</Badge>
+              ) : (
+                <Badge variant="secondary">Legacy</Badge>
+              )}
+              {detail.is_effective === true && <Badge variant="primary">Efektif</Badge>}
+              {detail.is_final === true && (
+                <Badge variant="danger">
+                  <span
+                    title={
+                      detail.finalized_at
+                        ? `Difinalisasi ${String(detail.finalized_at)}`
+                        : undefined
+                    }
+                  >
+                    Final
+                  </span>
+                </Badge>
+              )}
+              {detail.grade_stale === true ? (
+                <Badge variant="warning">Usang</Badge>
+              ) : detail.grade_synced === true ? (
+                <Badge variant="secondary">Tersinkron</Badge>
+              ) : null}
+            </div>
+            {detail.is_final === true && (
+              <p className="rounded-xl bg-surface-container px-4 py-3 text-xs text-secondary">
+                Hasil telah difinalisasi. Mutation yang dilindungi backend (penilaian
+                ulang, penghapusan, dst.) bersifat read-only; hasil tetap dapat dibaca.
+              </p>
+            )}
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-xl bg-surface-container p-3">
                 <p className="text-xs text-secondary">Skor</p>
@@ -301,6 +405,28 @@ export default function TeacherExamResultsPage() {
             )}
             <div className="pt-2">
               {(() => {
+                if (canSyncRow(detail)) {
+                  return (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setSyncTarget(detail)}
+                      loading={syncing === detail.id}
+                      disabled={syncing !== null && syncing !== detail.id}
+                      className="w-full"
+                    >
+                      Sinkronkan ke Nilai
+                    </Button>
+                  );
+                }
+                const statusText = syncStatusText(detail);
+                if (statusText) {
+                  return (
+                    <p className="rounded-xl bg-surface-container px-3 py-2 text-xs text-secondary">
+                      {statusText}
+                    </p>
+                  );
+                }
                 const reason = syncReasonText(detail);
                 if (reason) {
                   return (
@@ -309,23 +435,36 @@ export default function TeacherExamResultsPage() {
                     </p>
                   );
                 }
-                return (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleSync(detail)}
-                    loading={syncing === detail.id}
-                    disabled={syncing !== null && syncing !== detail.id}
-                    className="w-full"
-                  >
-                    Sinkronkan ke Nilai
-                  </Button>
-                );
+                if (!canManageExamResults) {
+                  return (
+                    <p className="rounded-xl bg-surface-container px-3 py-2 text-xs text-secondary">
+                      Tidak memiliki izin sinkronisasi.
+                    </p>
+                  );
+                }
+                return null;
               })()}
             </div>
           </div>
         )}
       </Modal>
+
+      <ConfirmDialog
+        open={syncTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setSyncTarget(null);
+        }}
+        title="Sinkronkan ke Nilai Akademik"
+        description="Hasil efektif ini akan disinkronkan ke nilai akademik. Backend hanya memperbolehkan sinkronisasi hasil yang efektif."
+        confirmText="Sinkronkan"
+        cancelText="Batal"
+        onConfirm={() => {
+          if (!syncTarget) return;
+          const target = syncTarget;
+          setSyncTarget(null);
+          void handleSync(target);
+        }}
+      />
     </PageContainer>
   );
 }

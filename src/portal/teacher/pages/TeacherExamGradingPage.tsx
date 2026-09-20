@@ -13,6 +13,7 @@ import PortalErrorState from "@/portal/components/PortalErrorState";
 import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import { teacherExamGradingService } from "@/features/examinations";
 import { toApiError } from "@/lib/api";
+import { usePermission } from "@/features/auth/usePermission";
 import type {
   GradeResultSummary,
   TeacherEssayGradingData,
@@ -40,6 +41,8 @@ function formatDate(iso: string | null): string {
 export default function TeacherExamGradingPage() {
   const { attemptId } = useParams<{ attemptId: string }>();
   const navigate = useNavigate();
+  const { can } = usePermission();
+  const canManageExamResults = can("manage-exam-results");
 
   const [data, setData] = useState<TeacherEssayGradingData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +52,7 @@ export default function TeacherExamGradingPage() {
   const [feedbacks, setFeedbacks] = useState<Record<number, string>>({});
   const [savingId, setSavingId] = useState<number | null>(null);
   const [resultSummary, setResultSummary] = useState<GradeResultSummary | null>(null);
+  const [finalizedLocked, setFinalizedLocked] = useState(false);
 
   const fetchData = useCallback(() => {
     if (!attemptId) return;
@@ -92,6 +96,7 @@ export default function TeacherExamGradingPage() {
   const isActiveAttempt = data?.attempt_status === "active";
 
   const handleSave = async (item: TeacherEssayItem) => {
+    if (savingId !== null || !canManageExamResults || finalizedLocked) return;
     const raw = (scores[item.exam_answer_id] ?? "").trim();
     const value = Number(raw);
 
@@ -135,6 +140,9 @@ export default function TeacherExamGradingPage() {
     } catch (err) {
       const apiError = toApiError(err);
       toast.error("Gagal menyimpan skor", { description: apiError.message });
+      if (apiError.message.toLowerCase().includes("finalized")) {
+        setFinalizedLocked(true);
+      }
     } finally {
       setSavingId(null);
     }
@@ -246,6 +254,19 @@ export default function TeacherExamGradingPage() {
         </div>
       )}
 
+      {!canManageExamResults && (
+        <div className="mb-4 rounded-2xl bg-surface-container p-4 text-sm text-secondary">
+          Mode baca saja: Anda tidak memiliki izin <span className="font-semibold">manage-exam-results</span>{" "}
+          untuk menilai esai. Nilai yang ada tetap dapat dilihat.
+        </div>
+      )}
+
+      {finalizedLocked && (
+        <div className="mb-4 rounded-2xl bg-error-container px-4 py-3 text-sm text-error">
+          Hasil sudah difinalisasi — essay tidak dapat diubah. Hasil tetap dapat dibaca.
+        </div>
+      )}
+
       {resultSummary && (
         <Card className="mb-6">
           <CardBody>
@@ -328,7 +349,12 @@ export default function TeacherExamGradingPage() {
                       }))
                     }
                     placeholder="0"
-                    disabled={isActiveAttempt || savingId === essay.exam_answer_id}
+                    disabled={
+                      isActiveAttempt ||
+                      savingId === essay.exam_answer_id ||
+                      finalizedLocked ||
+                      !canManageExamResults
+                    }
                   />
                   <p className="mt-1 text-xs text-secondary">
                     Skor saat ini: {essay.score != null ? `${essay.score} / ${essay.max_points}` : "Belum dinilai"}
@@ -348,7 +374,12 @@ export default function TeacherExamGradingPage() {
                     }
                     placeholder="Catatan untuk siswa (opsional)"
                     rows={2}
-                    disabled={isActiveAttempt || savingId === essay.exam_answer_id}
+                    disabled={
+                      isActiveAttempt ||
+                      savingId === essay.exam_answer_id ||
+                      finalizedLocked ||
+                      !canManageExamResults
+                    }
                   />
                 </div>
               </div>
@@ -357,13 +388,15 @@ export default function TeacherExamGradingPage() {
                 <p className="text-xs text-secondary">
                   Dinilai pada: {formatDate(essay.graded_at)}
                 </p>
-                <Button
-                  onClick={() => handleSave(essay)}
-                  loading={savingId === essay.exam_answer_id}
-                  disabled={isActiveAttempt}
-                >
-                  Simpan Skor
-                </Button>
+                {canManageExamResults && !finalizedLocked && (
+                  <Button
+                    onClick={() => handleSave(essay)}
+                    loading={savingId === essay.exam_answer_id}
+                    disabled={isActiveAttempt || (savingId !== null && savingId !== essay.exam_answer_id)}
+                  >
+                    Simpan Skor
+                  </Button>
+                )}
               </div>
             </CardBody>
           </Card>
