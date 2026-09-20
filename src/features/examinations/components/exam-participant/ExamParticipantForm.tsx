@@ -57,9 +57,13 @@ export default function ExamParticipantForm({
 
   const loadExams = useCallback(() => {
     setExamsError(false);
-    examService
-      .list({ per_page: 100, status: "published" })
-      .then((res) => setExams(res.data))
+    Promise.all([
+      examService.list({ per_page: 100, status: "published" }),
+      examService.list({ per_page: 100, status: "ongoing" }),
+    ])
+      .then(([published, ongoing]) =>
+        setExams([...published.data, ...ongoing.data]),
+      )
       .catch(() => setExamsError(true));
   }, []);
 

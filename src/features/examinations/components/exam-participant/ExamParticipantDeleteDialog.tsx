@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import Button from "@/components/ui/Button";
-import Modal from "@/components/ui/Modal";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toApiError } from "@/lib/api";
-import type { ApiError } from "@/types";
 import { examParticipantService } from "../../api/exam-participant.service";
 import type { ExamParticipant } from "../../api/types";
 
@@ -21,20 +19,17 @@ export default function ExamParticipantDeleteDialog({
   data,
 }: ExamParticipantDeleteDialogProps) {
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<ApiError | null>(null);
 
   const handleDelete = async () => {
-    if (!data) return;
+    if (!data || deleting) return;
     setDeleting(true);
-    setError(null);
 
     try {
       await examParticipantService.remove(data.id);
-      onDeleted();
       toast.success("Peserta ujian berhasil dihapus.");
+      onDeleted();
     } catch (err) {
       const apiError = toApiError(err);
-      setError(apiError);
       toast.error("Gagal menghapus peserta ujian", {
         description: apiError.message,
       });
@@ -44,35 +39,17 @@ export default function ExamParticipantDeleteDialog({
   };
 
   return (
-    <Modal
+    <ConfirmDialog
       open={open}
-      onClose={onClose}
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
       title="Hapus Peserta Ujian"
-      size="sm"
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose} disabled={deleting}>
-            Batal
-          </Button>
-          <Button variant="danger" onClick={handleDelete} loading={deleting}>
-            Hapus
-          </Button>
-        </>
-      }
-    >
-      <p className="text-sm text-on-surface-variant">
-        Apakah Anda yakin ingin menghapus peserta ujian ini? Tindakan ini tidak
-        dapat dibatalkan.
-      </p>
-      <p className="mt-2 text-xs text-outline">
-        Peserta hanya dapat dihapus jika belum memiliki percobaan ujian.
-      </p>
-
-      {error && (
-        <p className="mt-3 rounded-xl bg-error-container px-3 py-2 text-sm text-error">
-          {error.message}
-        </p>
-      )}
-    </Modal>
+      description="Peserta hanya dapat dihapus jika belum memiliki percobaan ujian (attempt). Jika sudah memiliki attempt, backend akan melindungi riwayat dan menolak penghapusan. Tindakan ini menghapus enrollment peserta yang belum memiliki aktivitas ujian dan tidak dapat dibatalkan."
+      confirmText="Hapus"
+      cancelText="Batal"
+      destructive
+      onConfirm={handleDelete}
+    />
   );
 }

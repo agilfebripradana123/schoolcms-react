@@ -71,9 +71,13 @@ export default function ExamParticipantsPage() {
   const [toDelete, setToDelete] = useState<ExamParticipant | null>(null);
 
   useEffect(() => {
-    examService
-      .list({ per_page: 100, status: "published" })
-      .then((res) => setExamOptions(res.data))
+    Promise.all([
+      examService.list({ per_page: 100, status: "published" }),
+      examService.list({ per_page: 100, status: "ongoing" }),
+    ])
+      .then(([published, ongoing]) =>
+        setExamOptions([...published.data, ...ongoing.data]),
+      )
       .catch(() => setExamOptions([]));
   }, []);
 
@@ -225,14 +229,16 @@ export default function ExamParticipantsPage() {
             >
               <Pencil className="h-4 w-4" strokeWidth={1.75} />
             </button>
-            <button
-              type="button"
-              onClick={() => openDelete(row)}
-              className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
-              aria-label="Hapus peserta"
-            >
-              <Trash2 className="h-4 w-4" strokeWidth={1.75} />
-            </button>
+            {row.status !== "started" && row.status !== "completed" && (
+              <button
+                type="button"
+                onClick={() => openDelete(row)}
+                className="rounded-lg p-2 text-outline transition-colors hover:bg-error-container hover:text-error"
+                aria-label="Hapus peserta"
+              >
+                <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            )}
           </div>
         ),
       },
@@ -339,13 +345,15 @@ export default function ExamParticipantsPage() {
                         >
                           <Pencil className="h-4 w-4" /> Edit
                         </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => openDelete(row)}
-                        >
-                          <Trash2 className="h-4 w-4" /> Hapus
-                        </Button>
+                        {row.status !== "started" && row.status !== "completed" && (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => openDelete(row)}
+                          >
+                            <Trash2 className="h-4 w-4" /> Hapus
+                          </Button>
+                        )}
                       </div>
                     </div>
                   );
