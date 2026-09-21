@@ -6,6 +6,8 @@ import type {
   ExaminationListParams,
   ExaminationPaginatedResponse,
   QuestionBank,
+  QuestionImportPreviewData,
+  QuestionImportResultData,
   UpdateQuestionPayload,
 } from "./types";
 
@@ -36,5 +38,25 @@ export const questionBankService = {
 
   async remove(id: number | string): Promise<ApiMessage> {
     return api.delete<ApiMessage>(`${EXAMINATION.QUESTIONS}/${id}`);
+  },
+
+  async downloadImportTemplate(): Promise<Blob> {
+    return api.get<Blob>(EXAMINATION.QUESTIONS_IMPORT_TEMPLATE, undefined, {
+      responseType: "blob",
+    });
+  },
+
+  async previewImport(formData: FormData): Promise<ApiEnvelope<QuestionImportPreviewData>> {
+    return api.post<ApiEnvelope<QuestionImportPreviewData>>(
+      EXAMINATION.QUESTIONS_IMPORT_PREVIEW,
+      formData,
+    );
+  },
+
+  async importQuestions(formData: FormData): Promise<ApiEnvelope<QuestionImportResultData>> {
+    return api.post<ApiEnvelope<QuestionImportResultData>>(
+      EXAMINATION.QUESTIONS_IMPORT,
+      formData,
+    );
   },
 };

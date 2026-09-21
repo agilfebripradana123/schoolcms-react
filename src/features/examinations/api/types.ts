@@ -270,6 +270,38 @@ export interface CreateQuestionPayload {
 export interface UpdateQuestionPayload extends Partial<CreateQuestionPayload> {}
 
 // ---------------------------------------------------------------------
+// Question Bank XLSX import (EXAM-IMPORT-01)
+// Backend contract: preview row only exposes excel_row, question_text,
+// question_type, points and option_count — no option text / answer / explanation.
+// ---------------------------------------------------------------------
+export interface QuestionImportError {
+  row: number;
+  field: string;
+  message: string;
+}
+
+export interface QuestionImportPreviewRow {
+  excel_row: number;
+  question_text: string;
+  question_type: string;
+  points: number;
+  option_count: number;
+}
+
+export interface QuestionImportPreviewData {
+  total_rows: number;
+  valid_rows: number;
+  invalid_rows: number;
+  errors: QuestionImportError[];
+  preview: QuestionImportPreviewRow[];
+}
+
+export interface QuestionImportResultData {
+  imported_count: number;
+  question_ids: number[];
+}
+
+// ---------------------------------------------------------------------
 // ExamInstruction
 // ---------------------------------------------------------------------
 export interface ExamInstruction {

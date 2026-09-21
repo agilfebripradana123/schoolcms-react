@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -11,6 +11,7 @@ import PageContainer from "@/components/layout/PageContainer";
 import PageHeader from "@/components/layout/PageHeader";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
+import { usePermission } from "@/features/auth/usePermission";
 import { questionBankService } from "../api/question.service";
 import { subjectService } from "@/features/academic/api/subject.service";
 import type { Subject } from "@/features/academic/api/types";
@@ -21,6 +22,7 @@ import type {
 } from "../api/types";
 import QuestionForm from "../components/question/QuestionForm";
 import QuestionDeleteDialog from "../components/question/QuestionDeleteDialog";
+import QuestionImportDialog from "../components/question/QuestionImportDialog";
 import Pagination from "../../../components/ui/Pagination";
 
 const PER_PAGE = 10;
@@ -89,6 +91,9 @@ function truncate(text: string, max = 120): string {
 }
 
 export default function QuestionsPage() {
+  const { can } = usePermission();
+  const canManageExams = can("manage-exams");
+
   const [data, setData] = useState<QuestionBank[]>([]);
   const [meta, setMeta] = useState({
     current_page: 1,
@@ -118,6 +123,7 @@ export default function QuestionsPage() {
   const [editing, setEditing] = useState<QuestionBank | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [toDelete, setToDelete] = useState<QuestionBank | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
 
   const searchTimeout = useRef<number | null>(null);
 
@@ -229,9 +235,20 @@ export default function QuestionsPage() {
     setQuery((prev) => ({ ...prev }));
   }, []);
 
+  const handleImported = useCallback(() => {
+    setImportOpen(false);
+    setLoading(true);
+    setError(null);
+    setQuery((prev) => ({ ...prev }));
+  }, []);
+
   const openCreate = useCallback(() => {
     setEditing(null);
     setFormOpen(true);
+  }, []);
+
+  const openImport = useCallback(() => {
+    setImportOpen(true);
   }, []);
 
   const openEdit = useCallback((row: QuestionBank) => {
@@ -393,9 +410,19 @@ export default function QuestionsPage() {
         title="Bank Soal"
         description="Kelola soal ujian dan pilihan jawaban."
         actions={
-          <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
-            Tambah Soal
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              variant="secondary"
+              leftIcon={<Upload className="h-4 w-4" />}
+              onClick={openImport}
+              disabled={!canManageExams}
+            >
+              Import Soal
+            </Button>
+            <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
+              Tambah Soal
+            </Button>
+          </div>
         }
       />
 
@@ -568,6 +595,16 @@ export default function QuestionsPage() {
         onDeleted={handleDeleted}
         data={toDelete}
       />
+
+      {importOpen && (
+        <QuestionImportDialog
+          open={importOpen}
+          onClose={() => setImportOpen(false)}
+          onImported={handleImported}
+          subjects={subjects}
+          initialSubjectId={subjectFilter === "all" ? "" : subjectFilter}
+        />
+      )}
     </PageContainer>
   );
 }
