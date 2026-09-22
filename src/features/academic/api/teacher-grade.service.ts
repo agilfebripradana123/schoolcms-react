@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { ACADEMIC } from "@/lib/api";
 import { TEACHER } from "@/lib/api/endpoints";
 import type { ApiEnvelope, ApiMessage, ListParams } from "@/types";
 import type {
