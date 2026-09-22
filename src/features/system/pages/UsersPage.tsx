@@ -87,7 +87,7 @@ export default function UsersPage() {
       })
       .then((res) => {
         if (!active) return;
-        setData(res.data.filter((u) => u.role?.name !== "Super Admin" && u.role?.name !== "Siswa"));
+        setData(res.data);
         setMeta(res.meta);
         setPage(res.meta.current_page);
       })
