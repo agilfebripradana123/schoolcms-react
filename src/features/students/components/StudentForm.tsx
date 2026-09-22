@@ -1,6 +1,8 @@
 ﻿import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { FormField, Input, Select, Textarea } from "@/components/ui/Form";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
@@ -8,7 +10,13 @@ import type { ApiError } from "@/types";
 import { studentService } from "../api/student.service";
 import { parentService } from "../api/parent.service";
 import { guardianService } from "../api/guardian.service";
-import type { CreateGuardianPayload, CreateStudentParentPayload, CreateStudentPayload, Student } from "../api/types";
+import type {
+  CreateGuardianPayload,
+  CreateStudentParentPayload,
+  CreateStudentPayload,
+  Student,
+  StudentUser,
+} from "../api/types";
 
 interface StudentFormProps {
   open: boolean;
@@ -65,6 +73,16 @@ export default function StudentForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
+  // Akun login (khusus alur Edit)
+  const [accountUser, setAccountUser] = useState<StudentUser | null>(null);
+  const [provisionOpen, setProvisionOpen] = useState(false);
+  const [provisionEmail, setProvisionEmail] = useState("");
+  const [provisionPassword, setProvisionPassword] = useState("");
+  const [accountBusy, setAccountBusy] = useState(false);
+  const [accountError, setAccountError] = useState<string | null>(null);
+  const [accountFieldErrors, setAccountFieldErrors] = useState<Record<string, string[]>>({});
+  const [disableOpen, setDisableOpen] = useState(false);
+
   const [previousOpen, setPreviousOpen] = useState(open);
   const [previousInitialData, setPreviousInitialData] = useState(initialData);
 
@@ -83,6 +101,14 @@ export default function StudentForm({
         setAddress(initialData.address ?? "");
         setPhone(initialData.phone ?? "");
 
+        setAccountUser(initialData.user ?? null);
+        setProvisionOpen(false);
+        setProvisionEmail("");
+        setProvisionPassword("");
+        setAccountError(null);
+        setAccountFieldErrors({});
+        setDisableOpen(false);
+
         setParentId(null);
         setGuardianId(null);
       } else {
@@ -94,6 +120,13 @@ export default function StudentForm({
         setBirthDate("");
         setAddress("");
         setPhone("");
+        setAccountUser(null);
+        setProvisionOpen(false);
+        setProvisionEmail("");
+        setProvisionPassword("");
+        setAccountError(null);
+        setAccountFieldErrors({});
+        setDisableOpen(false);
         setParentId(null);
         setFatherName("");
         setMotherName("");
@@ -144,6 +177,70 @@ export default function StudentForm({
       };
     }
   }, [open, initialData]);
+
+  const handleEnableAccount = async () => {
+    if (!initialData) return;
+    setAccountBusy(true);
+    setAccountError(null);
+    setAccountFieldErrors({});
+
+    try {
+      const res = await studentService.updateAccount(initialData.id, {
+        is_active: true,
+        email: provisionEmail.trim() || null,
+        password: provisionPassword || null,
+      });
+      setAccountUser(res.data.user);
+      setProvisionOpen(false);
+      setProvisionEmail("");
+      setProvisionPassword("");
+      toast.success("Akun login siswa berhasil diaktifkan.");
+    } catch (err) {
+      const apiError = toApiError(err);
+      setAccountError(apiError.message || "Gagal mengaktifkan akun.");
+      if (apiError.errors) setAccountFieldErrors(apiError.errors);
+    } finally {
+      setAccountBusy(false);
+    }
+  };
+
+  const handleReactivateAccount = async () => {
+    if (!initialData) return;
+    setAccountBusy(true);
+    setAccountError(null);
+
+    try {
+      const res = await studentService.updateAccount(initialData.id, {
+        is_active: true,
+      });
+      setAccountUser(res.data.user);
+      toast.success("Akun login siswa berhasil diaktifkan kembali.");
+    } catch (err) {
+      setAccountError(toApiError(err).message || "Gagal mengaktifkan akun.");
+    } finally {
+      setAccountBusy(false);
+    }
+  };
+
+  const handleDisableAccount = async () => {
+    if (!initialData) return;
+    setAccountBusy(true);
+    setAccountError(null);
+
+    try {
+      const res = await studentService.updateAccount(initialData.id, {
+        is_active: false,
+      });
+      setAccountUser(res.data.user);
+      setDisableOpen(false);
+      toast.warning("Akun login siswa berhasil dinonaktifkan.");
+    } catch (err) {
+      setAccountError(toApiError(err).message || "Gagal menonaktifkan akun.");
+      setDisableOpen(false);
+    } finally {
+      setAccountBusy(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -467,6 +564,169 @@ export default function StudentForm({
             </FormField>
           </div>
         </div>
+
+        {/* Akun Login */}
+        {isEdit && initialData ? (
+          <div className="border-t border-outline-variant pt-5">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-on-surface-variant">
+              Akun Login
+            </h3>
+            <div className="mt-3">
+              {!accountUser ? (
+                !provisionOpen ? (
+                  <div className="flex flex-col gap-3 rounded-2xl border border-outline-variant bg-surface-container-lowest p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-on-surface">
+                        Belum ada akun login
+                      </p>
+                      <p className="mt-0.5 text-xs text-on-surface-variant">
+                        Siswa belum memiliki akun. Username akan mengikuti NISN siswa.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setProvisionOpen(true)}
+                      disabled={submitting}
+                    >
+                      Aktifkan Akun
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <FormField label="Username" hint="Menggunakan NISN siswa">
+                      <Input value={initialData.nisn} readOnly disabled />
+                    </FormField>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <FormField
+                        label="Email"
+                        required
+                        error={accountFieldErrors.email?.[0]}
+                      >
+                        <Input
+                          type="email"
+                          value={provisionEmail}
+                          onChange={(e) => setProvisionEmail(e.target.value)}
+                          placeholder="email@sekolah.sch.id"
+                          disabled={accountBusy}
+                          maxLength={100}
+                        />
+                      </FormField>
+
+                      <FormField
+                        label="Password"
+                        required
+                        hint="Minimal 6 karakter, jangan gunakan NISN"
+                        error={accountFieldErrors.password?.[0]}
+                      >
+                        <Input
+                          type="password"
+                          value={provisionPassword}
+                          onChange={(e) => setProvisionPassword(e.target.value)}
+                          placeholder="Kata sandi minimal 6 karakter"
+                          disabled={accountBusy}
+                          minLength={6}
+                        />
+                      </FormField>
+                    </div>
+
+                    {accountError && (
+                      <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">
+                        {accountError}
+                      </p>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        loading={accountBusy}
+                        onClick={handleEnableAccount}
+                      >
+                        Buat Akun
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        disabled={accountBusy}
+                        onClick={() => {
+                          setProvisionOpen(false);
+                          setAccountError(null);
+                          setAccountFieldErrors({});
+                        }}
+                      >
+                        Batal
+                      </Button>
+                    </div>
+                  </div>
+                )
+              ) : (
+                <div className="rounded-2xl border border-outline-variant bg-surface-container-lowest p-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <FormField label="Username">
+                      <Input
+                        value={accountUser.username ?? initialData.nisn ?? ""}
+                        readOnly
+                        disabled
+                      />
+                    </FormField>
+
+                    <FormField label="Email">
+                      <Input value={accountUser.email ?? ""} readOnly disabled />
+                    </FormField>
+                  </div>
+
+                  <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <Badge variant={accountUser.is_active ? "success" : "neutral"}>
+                      {accountUser.is_active ? "Aktif" : "Nonaktif"}
+                    </Badge>
+
+                    {accountUser.is_active ? (
+                      <Button
+                        type="button"
+                        variant="danger"
+                        size="sm"
+                        disabled={accountBusy}
+                        onClick={() => setDisableOpen(true)}
+                      >
+                        Nonaktifkan Akun
+                      </Button>
+                    ) : (
+                      <Button
+                        type="button"
+                        size="sm"
+                        loading={accountBusy}
+                        onClick={handleReactivateAccount}
+                      >
+                        Aktifkan Kembali
+                      </Button>
+                    )}
+                  </div>
+
+                  {accountError && (
+                    <p className="mt-3 rounded-xl bg-error-container px-3 py-2 text-sm text-error">
+                      {accountError}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <ConfirmDialog
+              open={disableOpen}
+              onOpenChange={setDisableOpen}
+              title="Nonaktifkan Akun Siswa"
+              description={`Akun login ${initialData.name || ""} akan dinonaktifkan dan siswa tidak dapat lagi masuk ke sistem. Anda dapat mengaktifkannya kembali sewaktu-waktu.`}
+              confirmText="Nonaktifkan"
+              cancelText="Batal"
+              destructive
+              onConfirm={handleDisableAccount}
+            />
+          </div>
+        ) : null}
 
         {error && !error.errors && (
           <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">

@@ -200,6 +200,20 @@ export default function StudentListPage() {
         ),
       },
       {
+        header: "Akun",
+        accessor: "user_id" as keyof Row,
+        headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",
+        className: "px-6 py-4 text-center",
+        render: (_val: unknown, row: Row) =>
+          row.user ? (
+            <Badge variant={row.user.is_active ? "success" : "neutral"}>
+              {row.user.is_active ? "Aktif" : "Nonaktif"}
+            </Badge>
+          ) : (
+            <Badge variant="neutral">Belum ada</Badge>
+          ),
+      },
+      {
         header: "Aksi",
         accessor: "id" as keyof Row,
         headerClassName: "px-6 py-3 text-center text-xs font-medium text-outline uppercase tracking-wider",

@@ -107,6 +107,19 @@ export interface CreateStudentPayload {
 
 export interface UpdateStudentPayload extends Partial<CreateStudentPayload> {}
 
+/** Payload kelola akun login siswa (PUT /students/{id}/account). */
+export interface StudentAccountPayload {
+  is_active: boolean;
+  email?: string | null;
+  password?: string | null;
+}
+
+/** Respons kelola akun login siswa. */
+export interface StudentAccountResult {
+  is_active: boolean;
+  user: StudentUser | null;
+}
+
 export interface StudentParent {
   id: number;
   student_id?: number;

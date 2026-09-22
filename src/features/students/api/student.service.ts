@@ -4,6 +4,8 @@ import type { ApiEnvelope, ApiMessage } from "@/types";
 import type {
   CreateStudentPayload,
   Student,
+  StudentAccountPayload,
+  StudentAccountResult,
   StudentListParams,
   UpdateStudentPayload,
 } from "./types";
@@ -42,5 +44,15 @@ export const studentService = {
 
   async remove(id: number | string): Promise<ApiMessage> {
     return api.delete<ApiMessage>(`${STUDENTS.STUDENTS}/${id}`);
+  },
+
+  async updateAccount(
+    id: number | string,
+    payload: StudentAccountPayload,
+  ): Promise<ApiEnvelope<StudentAccountResult>> {
+    return api.put<ApiEnvelope<StudentAccountResult>>(
+      `${STUDENTS.STUDENTS}/${id}/account`,
+      payload,
+    );
   },
 };

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
+import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import { formatDate } from "@/lib/format";
 import { toApiError } from "@/lib/api";
@@ -210,7 +211,20 @@ export default function StudentDetail({
             <FieldGrid>
               <Field label="Kelas" value={schoolClass?.name} />
               <Field label="Tingkat" value={schoolClass?.level} />
-              <Field label="Akun Login" value={s.user?.name} />
+              <Field
+                label="Akun Login"
+                value={
+                  s.user ? (
+                    <span className="flex items-center gap-2">
+                      <span>{s.user.username ?? EMPTY}</span>
+                      <Badge variant={s.user.is_active ? "success" : "neutral"}>
+                        {s.user.is_active ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                    </span>
+                  ) : undefined
+                }
+              />
+              <Field label="Email Akun" value={s.user?.email} />
             </FieldGrid>
           </Section>
 
