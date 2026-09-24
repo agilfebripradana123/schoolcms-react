@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, School, Trash2 } from "lucide-react";
 import apiClient from "@/lib/api/axios";
-import { toApiError } from "@/lib/api";
+import { TEACHER_MANAGE, toApiError } from "@/lib/api";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import PageContainer from "@/components/layout/PageContainer";
@@ -11,59 +11,75 @@ import PortalErrorState from "@/portal/components/PortalErrorState";
 import PortalLoadingState from "@/portal/components/PortalLoadingState";
 import DataTable from "@/components/ui/DataTable";
 import Search from "@/components/ui/Search";
+import { teacherService } from "@/features/teachers-staff/api/teacher.service";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
+import type { SchoolClass } from "@/features/academic/api/types";
 import TeacherClassForm from "../components/TeacherClassForm";
 import TeacherClassDeleteDialog from "../components/TeacherClassDeleteDialog";
 
-interface Class {
-  id: number;
-  name?: string | null;
-  homeroom_teacher?: string | null;
-  student_count?: number | string | null;
+interface ClassListResponse {
+  success: boolean;
+  message: string;
+  data: SchoolClass[];
 }
 
 export default function TeacherManageClassesPage() {
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [filtered, setFiltered] = useState<Class[]>([]);
+  const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [selected, setSelected] = useState<Class | null>(null);
-  const [query, setQuery] = useState<{ search: string }>({ search: "" });
-
-  const searchTimeout = useRef<number | null>(null);
+  const [selected, setSelected] = useState<SchoolClass | null>(null);
 
   const openCreate = () => { setSelected(null); setFormOpen(true); };
-  const openEdit = (c: Class) => { setSelected(c); setFormOpen(true); };
-  const openDelete = (c: Class) => { setSelected(c); setDeleteOpen(true); };
+  const openEdit = (c: SchoolClass) => { setSelected(c); setFormOpen(true); };
+  const openDelete = (c: SchoolClass) => { setSelected(c); setDeleteOpen(true); };
 
   const load = useCallback(() => {
     setLoading(true);
     setError(null);
     apiClient
-      .get<{ data: Class[] }>("/teacher/classes", { params: { search: query.search || undefined } })
+      .get<ClassListResponse>(TEACHER_MANAGE.CLASSES)
       .then((res) => {
         const items = res.data.data ?? [];
         setClasses(items);
-        setFiltered(items);
       })
       .catch((err) => setError(toApiError(err).message))
       .finally(() => setLoading(false));
-  }, [query]);
+  }, []);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  useEffect(() => {
+    teacherService
+      .list({ per_page: 100 })
+      .then((res) => setTeachers(res.data))
+      .catch(() => {});
+  }, []);
+
+  const teacherNameById = useMemo(() => {
+    const map: Record<number, string> = {};
+    for (const t of teachers) map[t.id] = formatTeacherName(t);
+    return map;
+  }, [teachers]);
+
+  const filtered = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+    if (!keyword) return classes;
+    return classes.filter(
+      (c) =>
+        c.name.toLowerCase().includes(keyword) ||
+        (c.level ?? "").toLowerCase().includes(keyword) ||
+        (c.teacher_id != null ? teacherNameById[c.teacher_id] ?? "" : "").toLowerCase().includes(keyword),
+    );
+  }, [classes, search, teacherNameById]);
+
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);
-    if (searchTimeout.current) window.clearTimeout(searchTimeout.current);
-    searchTimeout.current = window.setTimeout(() => {
-      setLoading(true);
-      setError(null);
-      setQuery((prev) => ({ ...prev, search: value }));
-    }, 400);
   }, []);
 
   if (loading) {
@@ -109,18 +125,24 @@ export default function TeacherManageClassesPage() {
       <Card>
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between md:flex-wrap">
           <div className="w-full md:max-w-xs">
-            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama kelas atau wali kelas..." />
+            <Search value={search} onChange={handleSearchChange} placeholder="Cari nama kelas, tingkat, atau wali kelas..." />
           </div>
         </div>
 
         <div className="hidden md:block">
           <DataTable
             columns={[
-              { accessor: "name" as keyof Class, header: "Nama Kelas", render: (_val, c) => c.name ?? "—" },
-              { accessor: "homeroom_teacher" as keyof Class, header: "Wali Kelas", render: (_val, c) => c.homeroom_teacher ?? "—" },
-              { accessor: "student_count" as keyof Class, header: "Jumlah Siswa", render: (_val, c) => c.student_count ?? "—" },
+              { accessor: "name" as keyof SchoolClass, header: "Nama Kelas", render: (_val, c) => c.name ?? "—" },
+              { accessor: "level" as keyof SchoolClass, header: "Tingkat", render: (_val, c) => c.level ?? "—" },
+              { accessor: "academic_year" as keyof SchoolClass, header: "Tahun Ajaran", render: (_val, c) => c.academic_year ?? "—" },
               {
-                accessor: "id" as keyof Class,
+                accessor: "teacher_id" as keyof SchoolClass,
+                header: "Wali Kelas",
+                render: (_val, c) =>
+                  c.teacher_id != null ? teacherNameById[c.teacher_id] ?? `#${c.teacher_id}` : "—",
+              },
+              {
+                accessor: "id" as keyof SchoolClass,
                 header: "Aksi",
                 render: (_val, c) => (
                   <div className="flex gap-1">
@@ -139,8 +161,11 @@ export default function TeacherManageClassesPage() {
             <Card key={c.id} className="p-4 rounded-2xl border border-outline-variant">
               <div className="space-y-2">
                 <p className="font-semibold text-primary">{c.name ?? "—"}</p>
-                <p className="text-sm text-secondary">Wali Kelas: {c.homeroom_teacher ?? "—"}</p>
-                <p className="text-sm text-secondary">Jumlah Siswa: {c.student_count ?? "—"}</p>
+                <p className="text-sm text-secondary">Tingkat: {c.level ?? "—"}</p>
+                <p className="text-sm text-secondary">Tahun Ajaran: {c.academic_year ?? "—"}</p>
+                <p className="text-sm text-secondary">
+                  Wali Kelas: {c.teacher_id != null ? teacherNameById[c.teacher_id] ?? `#${c.teacher_id}` : "—"}
+                </p>
                 <div className="flex gap-2 pt-2">
                   <Button variant="ghost" size="sm" onClick={() => openEdit(c)}><Pencil className="h-4 w-4 mr-1" />Edit</Button>
                   <Button variant="ghost" size="sm" onClick={() => openDelete(c)}><Trash2 className="h-4 w-4 mr-1 text-error" />Hapus</Button>

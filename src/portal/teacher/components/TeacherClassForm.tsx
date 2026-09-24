@@ -1,27 +1,53 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input } from "@/components/ui/Form";
+import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import apiClient from "@/lib/api/axios";
-import { toApiError } from "@/lib/api";
+import { TEACHER_MANAGE, toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
+import { teacherService } from "@/features/teachers-staff/api/teacher.service";
+import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
+import type { CreateSchoolClassPayload, SchoolClass } from "@/features/academic/api/types";
 
 interface TeacherClassFormProps {
   open: boolean;
   onClose: () => void;
   onSaved: () => void;
-  initialData?: { id: number; name?: string | null; homeroom_teacher?: string | null; student_count?: number | string | null } | null;
+  initialData?: SchoolClass | null;
 }
 
 export default function TeacherClassForm({ open, onClose, onSaved, initialData }: TeacherClassFormProps) {
-  const isEdit = Boolean(initialData);
   const [name, setName] = useState("");
-  const [homeroomTeacher, setHomeroomTeacher] = useState("");
-  const [studentCount, setStudentCount] = useState("");
+  const [level, setLevel] = useState("");
+  const [academicYear, setAcademicYear] = useState("");
+  const [teacherId, setTeacherId] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [teachersLoading, setTeachersLoading] = useState(false);
+  const [teachersError, setTeachersError] = useState(false);
+
+  const isEdit = Boolean(initialData);
+
+  const loadTeachers = useCallback(() => {
+    teacherService
+      .list({ per_page: 100 })
+      .then((res) => {
+        setTeachers(res.data);
+        setTeachersError(false);
+      })
+      .catch(() => {
+        setTeachersError(true);
+      })
+      .finally(() => {
+        setTeachersLoading(false);
+      });
+  }, []);
 
   const [prevOpen, setPrevOpen] = useState(open);
   const [prevData, setPrevData] = useState(initialData);
@@ -31,12 +57,21 @@ export default function TeacherClassForm({ open, onClose, onSaved, initialData }
     setPrevData(initialData);
     if (open) {
       setName(initialData?.name ?? "");
-      setHomeroomTeacher(initialData?.homeroom_teacher ?? "");
-      setStudentCount(initialData?.student_count != null ? String(initialData.student_count) : "");
+      setLevel(initialData?.level ?? "");
+      setAcademicYear(initialData?.academic_year ?? "");
+      setTeacherId(initialData?.teacher_id != null ? String(initialData.teacher_id) : "");
       setError(null);
       setFieldErrors({});
+      setTeachersLoading(true);
+      setTeachersError(false);
     }
   }
+
+  useEffect(() => {
+    if (open) {
+      loadTeachers();
+    }
+  }, [open, loadTeachers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,16 +85,19 @@ export default function TeacherClassForm({ open, onClose, onSaved, initialData }
       return;
     }
 
-    const payload: Record<string, unknown> = { name: name.trim() };
-    if (homeroomTeacher.trim()) payload.homeroom_teacher = homeroomTeacher.trim();
-    if (studentCount.trim()) payload.student_count = Number(studentCount);
+    const payload: CreateSchoolClassPayload = {
+      name: name.trim(),
+      teacher_id: teacherId ? Number(teacherId) : null,
+      level: level || undefined,
+      academic_year: academicYear || undefined,
+    };
 
     try {
       if (isEdit && initialData) {
-        await apiClient.put(`/teacher/classes/${initialData.id}`, payload);
+        await apiClient.put(`${TEACHER_MANAGE.CLASSES}/${initialData.id}`, payload);
         toast.success("Kelas berhasil diperbarui.");
       } else {
-        await apiClient.post("/teacher/classes", payload);
+        await apiClient.post(TEACHER_MANAGE.CLASSES, payload);
         toast.success("Kelas berhasil ditambahkan.");
       }
       onSaved();
@@ -67,11 +105,16 @@ export default function TeacherClassForm({ open, onClose, onSaved, initialData }
       const apiError = toApiError(err);
       setError(apiError);
       if (apiError.errors) setFieldErrors(apiError.errors);
-      toast.error(apiError.message || "Gagal menyimpan kelas.");
+      toast.error("Gagal menyimpan kelas", { description: apiError.message });
     } finally {
       setSubmitting(false);
     }
   };
+
+  const teacherOptions = teachers.map((t) => ({
+    value: String(t.id),
+    label: formatTeacherName(t),
+  }));
 
   return (
     <Modal
@@ -86,16 +129,59 @@ export default function TeacherClassForm({ open, onClose, onSaved, initialData }
         </>
       }
     >
-      <form id="teacher-class-form" onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <FormField label="Nama Kelas" required error={fieldErrors.name?.[0]}>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="XII-A" disabled={submitting} />
+      <form id="teacher-class-form" onSubmit={handleSubmit} className="space-y-6" noValidate>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <FormField label="Nama Kelas" required error={fieldErrors.name?.[0]}>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="XII-A" maxLength={50} disabled={submitting} />
+          </FormField>
+          <FormField label="Tingkat" hint="Opsional. Contoh: 10, 11, 12." error={fieldErrors.level?.[0]}>
+            <Input value={level} onChange={(e) => setLevel(e.target.value)} placeholder="XI" maxLength={10} disabled={submitting} />
+          </FormField>
+        </div>
+
+        <FormField label="Tahun Ajaran" hint="Opsional. Contoh: 2025/2026." error={fieldErrors.academic_year?.[0]}>
+          <Input value={academicYear} onChange={(e) => setAcademicYear(e.target.value)} placeholder="2025/2026" maxLength={20} disabled={submitting} />
         </FormField>
-        <FormField label="Wali Kelas" error={fieldErrors.homeroom_teacher?.[0]}>
-          <Input value={homeroomTeacher} onChange={(e) => setHomeroomTeacher(e.target.value)} placeholder="Nama wali kelas" disabled={submitting} />
+
+        <FormField label="Wali Kelas" hint="Opsional." error={fieldErrors.teacher_id?.[0]}>
+          {teachersLoading ? (
+            <div className="flex w-full items-center gap-2 rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
+              <RefreshCw className="h-4 w-4 animate-spin" />
+              Memuat guru...
+            </div>
+          ) : teachersError ? (
+            <div className="flex w-full flex-col gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
+              <span>Gagal memuat data guru.</span>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setTeachersLoading(true);
+                  setTeachersError(false);
+                  loadTeachers();
+                }}
+                className="self-start"
+              >
+                Muat Ulang
+              </Button>
+            </div>
+          ) : teachers.length === 0 ? (
+            <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
+              Tidak ada guru tersedia.
+            </p>
+          ) : (
+            <AppSelect
+              value={teacherId}
+              onChange={(v) => setTeacherId(v ?? "")}
+              options={teacherOptions}
+              placeholder="Pilih Wali Kelas"
+              isClearable
+              isDisabled={submitting}
+            />
+          )}
         </FormField>
-        <FormField label="Jumlah Siswa" error={fieldErrors.student_count?.[0]}>
-          <Input type="number" value={studentCount} onChange={(e) => setStudentCount(e.target.value)} placeholder="0" min={0} disabled={submitting} />
-        </FormField>
+
         {error && !error.errors && (
           <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-error">{error.message}</p>
         )}

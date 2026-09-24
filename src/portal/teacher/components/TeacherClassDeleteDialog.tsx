@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import apiClient from "@/lib/api/axios";
-import { toApiError } from "@/lib/api";
+import { TEACHER_MANAGE, toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 
 interface Props {
@@ -22,7 +22,7 @@ export default function TeacherClassDeleteDialog({ open, onClose, onDeleted, dat
     setDeleting(true);
     setError(null);
     try {
-      await apiClient.delete(`/teacher/classes/${data.id}`);
+      await apiClient.delete(`${TEACHER_MANAGE.CLASSES}/${data.id}`);
       toast.success("Kelas berhasil dihapus.");
       onDeleted();
     } catch (err) {

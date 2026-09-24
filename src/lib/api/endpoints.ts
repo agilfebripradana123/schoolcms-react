@@ -80,6 +80,13 @@ export const TEACHER = {
   EXAM_REPORTS: "/teacher/exam-reports",
 } as const;
 
+// Teacher management (Portal Guru) — global scope; permission manage-classes /
+// manage-schedules gates. Distinct from TEACHER self-service (own scope).
+export const TEACHER_MANAGE = {
+  CLASSES: "/teacher/classes/manage",
+  SCHEDULES: "/teacher/schedules/manage",
+} as const;
+
 export const PPDB = {
   REGISTRATIONS: "/registrations",
   VERIFY: "/registrations/{id}/verify",
