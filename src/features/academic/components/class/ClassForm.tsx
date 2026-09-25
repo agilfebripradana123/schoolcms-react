@@ -15,6 +15,12 @@ import type {
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
 import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 
+const ACADEMIC_YEAR_OPTIONS = [
+  { value: "2024/2025", label: "2024/2025" },
+  { value: "2025/2026", label: "2025/2026" },
+  { value: "2026/2027", label: "2026/2027" },
+];
+
 interface ClassFormProps {
   open: boolean;
   onClose: () => void;
@@ -182,15 +188,15 @@ export default function ClassForm({
 
         <FormField
           label="Tahun Ajaran"
-          hint="Opsional. Contoh: 2025/2026."
           error={fieldErrors.academic_year?.[0]}
         >
-          <Input
-            value={academicYear}
-            onChange={(e) => setAcademicYear(e.target.value)}
-            placeholder="2025/2026"
-            maxLength={20}
-            disabled={submitting}
+          <AppSelect
+            value={academicYear || null}
+            onChange={(v) => setAcademicYear(v ?? "")}
+            options={ACADEMIC_YEAR_OPTIONS}
+            placeholder="Pilih Tahun Ajaran"
+            isClearable
+            isDisabled={submitting}
           />
         </FormField>
 
