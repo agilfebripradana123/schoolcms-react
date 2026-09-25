@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Select, Textarea } from "@/components/ui/Form";
@@ -9,7 +9,7 @@ import { studentHistoryService } from "../api/student-history.service";
 import { studentService } from "../api/student.service";
 import type { CreateStudentHistoryPayload, SchoolClassLike, Student, StudentHistory } from "../api/types";
 import { classService } from "@/features/academic/api/class.service";
-import { academicYearService } from "@/features/academic/api/academic-year.service";
+import { useAcademicYears } from "@/features/academic/hooks/useAcademicYears";
 
 interface HistoryFormProps {
   open: boolean;
@@ -29,7 +29,16 @@ export default function HistoryForm({
   const [studentId, setStudentId] = useState<number | "">("");
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<SchoolClassLike[]>([]);
-  const [academicYears, setAcademicYears] = useState<{ id: number; name: string }[]>([]);
+  const { yearOptions, activeYearId } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
+
   const [classId, setClassId] = useState<number | "">("");
   const [academicYearId, setAcademicYearId] = useState<number | "">("");
   const [status, setStatus] = useState("naik");
@@ -68,12 +77,15 @@ export default function HistoryForm({
         .list()
         .then((res) => setClasses(res.data))
         .catch(() => setClasses([]));
-      academicYearService
-        .list()
-        .then((res) => setAcademicYears(res.data))
-        .catch(() => setAcademicYears([]));
     }
   }, [open, isEdit]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(activeYearId);
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const studentOptions = useMemo(
     () =>
@@ -91,15 +103,6 @@ export default function HistoryForm({
         label: c.name,
       })),
     [classes],
-  );
-
-  const yearOptions = useMemo(
-    () =>
-      academicYears.map((y) => ({
-        value: String(y.id),
-        label: y.name,
-      })),
-    [academicYears],
   );
 
   const handleSubmit = async (e: React.FormEvent) => {

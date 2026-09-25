@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -10,16 +10,15 @@ import type { ApiError } from "@/types";
 import { teacherAssignmentService } from "../../api/teacher-assignment.service";
 import { classService } from "../../api/class.service";
 import { subjectService } from "../../api/subject.service";
-import { academicYearService } from "../../api/academic-year.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
 import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type {
-  AcademicYear,
   CreateTeacherAssignmentPayload,
   SchoolClass,
   Subject,
   TeacherAssignment,
 } from "../../api/types";
+import { useAcademicYears } from "../../hooks/useAcademicYears";
 
 interface TeacherAssignmentFormProps {
   open: boolean;
@@ -54,9 +53,22 @@ export default function TeacherAssignmentForm({
   const [subjectsLoading, setSubjectsLoading] = useState(false);
   const [subjectsError, setSubjectsError] = useState(false);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-  const [yearsError, setYearsError] = useState(false);
+  const {
+    years,
+    yearOptions,
+    activeYearId,
+    isLoading: yearsLoading,
+    hasError: yearsError,
+    reload: loadYears,
+  } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
 
   const isEdit = Boolean(initialData);
 
@@ -105,21 +117,6 @@ export default function TeacherAssignmentForm({
       });
   }, []);
 
-  const loadYears = useCallback(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => {
-        setYears(res.data);
-        setYearsError(false);
-      })
-      .catch(() => {
-        setYearsError(true);
-      })
-      .finally(() => {
-        setYearsLoading(false);
-      });
-  }, []);
-
   const [previousOpen, setPreviousOpen] = useState(open);
   const [previousInitialData, setPreviousInitialData] = useState(initialData);
 
@@ -136,9 +133,6 @@ export default function TeacherAssignmentForm({
       setClassesError(false);
       setSubjectsLoading(true);
       setSubjectsError(false);
-      setYearsLoading(true);
-      setYearsError(false);
-
       if (initialData) {
         setTeacherId(String(initialData.teacher_id));
         setClassId(String(initialData.class_id));
@@ -161,6 +155,13 @@ export default function TeacherAssignmentForm({
       loadYears();
     }
   }, [open, loadTeachers, loadClasses, loadSubjects, loadYears]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +202,6 @@ export default function TeacherAssignmentForm({
   const teacherOptions = teachers.map((t) => ({ value: String(t.id), label: formatTeacherName(t) }));
   const classOptions = classes.map((c) => ({ value: String(c.id), label: c.name }));
   const subjectOptions = subjects.map((s) => ({ value: String(s.id), label: s.name }));
-  const yearOptions = years.map((y) => ({ value: String(y.id), label: y.name }));
 
   return (
     <Modal
@@ -354,11 +354,7 @@ export default function TeacherAssignmentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={() => {
-                  setYearsLoading(true);
-                  setYearsError(false);
-                  loadYears();
-                }}
+                onClick={() => loadYears()}
                 className="self-start"
               >
                 Muat Ulang

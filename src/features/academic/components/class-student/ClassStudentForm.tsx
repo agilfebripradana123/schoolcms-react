@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -9,16 +9,15 @@ import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
 import { classStudentService } from "../../api/class-student.service";
 import { classService } from "../../api/class.service";
-import { academicYearService } from "../../api/academic-year.service";
 import { studentService } from "@/features/students/api/student.service";
 import type {
-  AcademicYear,
   ClassStudent,
   ClassStudentStatus,
   CreateClassStudentPayload,
   SchoolClass,
 } from "../../api/types";
 import type { Student } from "@/features/students/api/types";
+import { useAcademicYears } from "../../hooks/useAcademicYears";
 
 interface ClassStudentFormProps {
   open: boolean;
@@ -55,9 +54,22 @@ export default function ClassStudentForm({
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [studentsError, setStudentsError] = useState(false);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-  const [yearsError, setYearsError] = useState(false);
+  const {
+    years,
+    yearOptions,
+    activeYearId,
+    isLoading: yearsLoading,
+    hasError: yearsError,
+    reload: loadYears,
+  } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
 
   const isEdit = Boolean(initialData);
 
@@ -91,21 +103,6 @@ export default function ClassStudentForm({
       });
   }, []);
 
-  const loadYears = useCallback(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => {
-        setYears(res.data);
-        setYearsError(false);
-      })
-      .catch(() => {
-        setYearsError(true);
-      })
-      .finally(() => {
-        setYearsLoading(false);
-      });
-  }, []);
-
   const [previousOpen, setPreviousOpen] = useState(open);
   const [previousInitialData, setPreviousInitialData] = useState(initialData);
 
@@ -120,9 +117,6 @@ export default function ClassStudentForm({
       setClassesError(false);
       setStudentsLoading(true);
       setStudentsError(false);
-      setYearsLoading(true);
-      setYearsError(false);
-
       if (initialData) {
         setClassId(String(initialData.class_id));
         setStudentId(String(initialData.student_id));
@@ -144,6 +138,13 @@ export default function ClassStudentForm({
       loadYears();
     }
   }, [open, loadClasses, loadStudents, loadYears]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +184,6 @@ export default function ClassStudentForm({
 
   const classOptions = classes.map((c) => ({ value: String(c.id), label: c.name }));
   const studentOptions = students.map((s) => ({ value: String(s.id), label: s.name }));
-  const yearOptions = years.map((y) => ({ value: String(y.id), label: y.name }));
 
   return (
     <Modal
@@ -301,11 +301,7 @@ export default function ClassStudentForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={() => {
-                  setYearsLoading(true);
-                  setYearsError(false);
-                  loadYears();
-                }}
+                onClick={() => loadYears()}
                 className="self-start"
               >
                 Muat Ulang

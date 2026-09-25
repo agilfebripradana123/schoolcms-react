@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -10,16 +10,15 @@ import type { ApiError } from "@/types";
 import { billingService } from "../../api/billing.service";
 import { feeTypeService } from "../../api/fee-type.service";
 import { studentService } from "@/features/students/api/student.service";
-import { academicYearService } from "@/features/academic/api/academic-year.service";
 import { semesterService } from "@/features/academic/api/semester.service";
 import type {
-  AcademicYear,
   Billing,
   CreateBillingPayload,
   FeeType,
   Semester,
 } from "../../api/types";
 import type { Student } from "@/features/students/api/types";
+import { useAcademicYears } from "@/features/academic/hooks/useAcademicYears";
 
 interface BillingFormProps {
   open: boolean;
@@ -53,9 +52,22 @@ export default function BillingForm({
   const [feeTypesLoading, setFeeTypesLoading] = useState(false);
   const [feeTypesError, setFeeTypesError] = useState(false);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-  const [yearsError, setYearsError] = useState(false);
+  const {
+    years,
+    yearOptions,
+    activeYearId,
+    isLoading: yearsLoading,
+    hasError: yearsError,
+    reload: loadYears,
+  } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
 
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [semestersLoading, setSemestersLoading] = useState(false);
@@ -93,21 +105,6 @@ export default function BillingForm({
       });
   }, []);
 
-  const loadYears = useCallback(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => {
-        setYears(res.data);
-        setYearsError(false);
-      })
-      .catch(() => {
-        setYearsError(true);
-      })
-      .finally(() => {
-        setYearsLoading(false);
-      });
-  }, []);
-
   const loadSemesters = useCallback(() => {
     semesterService
       .list({ per_page: 100 })
@@ -137,8 +134,6 @@ export default function BillingForm({
       setStudentsError(false);
       setFeeTypesLoading(true);
       setFeeTypesError(false);
-      setYearsLoading(true);
-      setYearsError(false);
       setSemestersLoading(true);
       setSemestersError(false);
 
@@ -170,6 +165,13 @@ export default function BillingForm({
       loadSemesters();
     }
   }, [open, loadStudents, loadFeeTypes, loadYears, loadSemesters]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,7 +226,6 @@ export default function BillingForm({
 
   const studentOptions = students.map((s) => ({ value: String(s.id), label: s.name }));
   const feeTypeOptions = feeTypes.map((f) => ({ value: String(f.id), label: f.name }));
-  const yearOptions = years.map((y) => ({ value: String(y.id), label: y.name }));
   const semesterOptions = semesters.map((s) => ({
     value: String(s.id),
     label: `Semester ${s.name}`,
@@ -336,24 +337,20 @@ export default function BillingForm({
                 <RefreshCw className="h-4 w-4 animate-spin" />
                 Memuat tahun ajaran...
               </div>
-            ) : yearsError ? (
-              <div className="flex w-full flex-col gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
-                <span>Gagal memuat data tahun ajaran.</span>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    setYearsLoading(true);
-                    setYearsError(false);
-                    loadYears();
-                  }}
-                  className="self-start"
-                >
-                  Muat Ulang
-                </Button>
-              </div>
-            ) : years.length === 0 ? (
+) : yearsError ? (
+            <div className="flex w-full flex-col gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
+              <span>Gagal memuat data tahun ajaran.</span>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => loadYears()}
+                className="self-start"
+              >
+                Muat Ulang
+              </Button>
+            </div>
+          ) : years.length === 0 ? (
               <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 Tidak ada tahun ajaran tersedia.
               </p>

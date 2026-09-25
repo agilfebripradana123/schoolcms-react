@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
 import { FormField, Input, Textarea } from "@/components/ui/Form";
@@ -9,9 +9,9 @@ import type { ApiError } from "@/types";
 import { subjectService } from "@/features/academic/api/subject.service";
 import type { Subject } from "@/features/academic/api/types";
 import { classService } from "@/features/academic/api/class.service";
-import { academicYearService } from "@/features/academic/api/academic-year.service";
 import { semesterService } from "@/features/academic/api/semester.service";
-import type { AcademicYear, SchoolClass, Semester } from "@/features/academic/api/types";
+import type { SchoolClass, Semester } from "@/features/academic/api/types";
+import { useAcademicYears } from "@/features/academic/hooks/useAcademicYears";
 import { examService } from "../../api/exam.service";
 import type { CreateExamPayload, Exam, ExamType } from "../../api/types";
 
@@ -59,7 +59,7 @@ export default function ExamForm({
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [subjectsError, setSubjectsError] = useState(false);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
-  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
+  const { yearOptions, activeYearId } = useAcademicYears();
   const [semesters, setSemesters] = useState<Semester[]>([]);
 
   const isEdit = Boolean(initialData);
@@ -77,10 +77,6 @@ export default function ExamForm({
       .list()
       .then((res) => setClasses(res.data))
       .catch(() => setClasses([]));
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => setAcademicYears(res.data))
-      .catch(() => setAcademicYears([]));
     semesterService
       .list({ per_page: 100 })
       .then((res) => setSemesters(res.data))
@@ -93,6 +89,7 @@ export default function ExamForm({
       setFieldErrors({});
       loadSubjects();
       loadContext();
+      activeYearDefaultApplied.current = false;
 
       if (initialData) {
         setSubjectId(String(initialData.subject_id));
@@ -130,6 +127,15 @@ export default function ExamForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialData]);
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,10 +190,6 @@ export default function ExamForm({
   const classOptions = classes.map((c) => ({
     value: String(c.id),
     label: c.name,
-  }));
-  const yearOptions = academicYears.map((y) => ({
-    value: String(y.id),
-    label: y.name,
   }));
   const semesterOptions = useMemo(() => {
     const yearId = academicYearId ? Number(academicYearId) : null;

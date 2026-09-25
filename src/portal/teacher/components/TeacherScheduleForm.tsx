@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -11,12 +11,11 @@ import type { ApiError } from "@/types";
 import { classService } from "@/features/academic/api/class.service";
 import { subjectService } from "@/features/academic/api/subject.service";
 import { periodService } from "@/features/academic/api/period.service";
-import { academicYearService } from "@/features/academic/api/academic-year.service";
 import { semesterService } from "@/features/academic/api/semester.service";
 import { teacherService } from "@/features/teachers-staff/api/teacher.service";
+import { useAcademicYears } from "@/features/academic/hooks/useAcademicYears";
 import { formatTeacherName, type Teacher } from "@/features/teachers-staff/api/types";
 import type {
-  AcademicYear,
   CreateSchedulePayload,
   Period,
   Schedule,
@@ -70,9 +69,22 @@ export default function TeacherScheduleForm({ open, onClose, onSaved, initialDat
   const [periodsLoading, setPeriodsLoading] = useState(false);
   const [periodsError, setPeriodsError] = useState(false);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-  const [yearsError, setYearsError] = useState(false);
+  const {
+    years,
+    yearOptions,
+    activeYearId,
+    isLoading: yearsLoading,
+    hasError: yearsError,
+    reload: loadYears,
+  } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
 
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [semestersLoading, setSemestersLoading] = useState(false);
@@ -140,21 +152,6 @@ export default function TeacherScheduleForm({ open, onClose, onSaved, initialDat
       });
   }, []);
 
-  const loadYears = useCallback(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => {
-        setYears(res.data);
-        setYearsError(false);
-      })
-      .catch(() => {
-        setYearsError(true);
-      })
-      .finally(() => {
-        setYearsLoading(false);
-      });
-  }, []);
-
   const loadSemesters = useCallback(() => {
     semesterService
       .list({ per_page: 100 })
@@ -188,8 +185,6 @@ export default function TeacherScheduleForm({ open, onClose, onSaved, initialDat
       setTeachersError(false);
       setPeriodsLoading(true);
       setPeriodsError(false);
-      setYearsLoading(true);
-      setYearsError(false);
       setSemestersLoading(true);
       setSemestersError(false);
 
@@ -223,6 +218,13 @@ export default function TeacherScheduleForm({ open, onClose, onSaved, initialDat
       loadSemesters();
     }
   }, [open, loadClasses, loadSubjects, loadTeachers, loadPeriods, loadYears, loadSemesters]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -266,7 +268,6 @@ export default function TeacherScheduleForm({ open, onClose, onSaved, initialDat
     value: String(p.id),
     label: `${p.name}${p.start_time ? ` (${p.start_time} - ${p.end_time ?? ""})` : ""}`,
   }));
-  const yearOptions = years.map((y) => ({ value: String(y.id), label: y.name }));
   const semesterOptions = semesters.map((s) => ({
     value: String(s.id),
     label: `Semester ${s.name}`,
@@ -372,7 +373,7 @@ export default function TeacherScheduleForm({ open, onClose, onSaved, initialDat
             ) : yearsError ? (
               <div className="flex w-full flex-col gap-2 rounded-2xl border border-error/30 bg-error-container px-4 py-3 text-sm text-error">
                 <span>Gagal memuat data tahun ajaran.</span>
-                <Button type="button" variant="secondary" size="sm" onClick={() => { setYearsLoading(true); setYearsError(false); loadYears(); }} className="self-start">Muat Ulang</Button>
+                <Button type="button" variant="secondary" size="sm" onClick={() => loadYears()} className="self-start">Muat Ulang</Button>
               </div>
             ) : years.length === 0 ? (
               <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">Tidak ada tahun ajaran tersedia.</p>

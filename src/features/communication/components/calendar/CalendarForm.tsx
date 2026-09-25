@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -13,8 +13,7 @@ import type {
   CalendarType,
   CreateCalendarPayload,
 } from "../../api/types";
-import { academicYearService } from "@/features/academic/api/academic-year.service";
-import type { AcademicYear } from "@/features/academic/api/types";
+import { useAcademicYears } from "@/features/academic/hooks/useAcademicYears";
 
 interface CalendarFormProps {
   open: boolean;
@@ -46,26 +45,23 @@ export default function CalendarForm({
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
-  const [academicYearsLoading, setAcademicYearsLoading] = useState(false);
-  const [academicYearsError, setAcademicYearsError] = useState(false);
+  const {
+    yearOptions: academicYearOptions,
+    activeYearId,
+    isLoading: academicYearsLoading,
+    hasError: academicYearsError,
+    reload: loadAcademicYears,
+  } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
 
   const isEdit = Boolean(initialData);
-
-  const loadAcademicYears = useCallback(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => {
-        setAcademicYears(res.data);
-        setAcademicYearsError(false);
-      })
-      .catch(() => {
-        setAcademicYearsError(true);
-      })
-      .finally(() => {
-        setAcademicYearsLoading(false);
-      });
-  }, []);
 
   const [previousOpen, setPreviousOpen] = useState(open);
   const [previousInitialData, setPreviousInitialData] = useState(initialData);
@@ -77,9 +73,6 @@ export default function CalendarForm({
     if (open) {
       setError(null);
       setFieldErrors({});
-      setAcademicYearsLoading(true);
-      setAcademicYearsError(false);
-
       if (initialData) {
         setTitle(initialData.title ?? "");
         setDescription(initialData.description ?? "");
@@ -105,6 +98,13 @@ export default function CalendarForm({
       loadAcademicYears();
     }
   }, [open, loadAcademicYears]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,11 +142,6 @@ export default function CalendarForm({
       setSubmitting(false);
     }
   };
-
-  const academicYearOptions = academicYears.map((y) => ({
-    value: String(y.id),
-    label: y.name,
-  }));
 
   return (
     <Modal
@@ -237,11 +232,7 @@ export default function CalendarForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={() => {
-                  setAcademicYearsLoading(true);
-                  setAcademicYearsError(false);
-                  loadAcademicYears();
-                }}
+                onClick={() => loadAcademicYears()}
                 className="self-start"
               >
                 Muat Ulang

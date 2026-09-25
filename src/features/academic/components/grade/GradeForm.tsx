@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -10,11 +10,9 @@ import type { ApiError } from "@/types";
 import { gradeService } from "../../api/grade.service";
 import { classService } from "../../api/class.service";
 import { subjectService } from "../../api/subject.service";
-import { academicYearService } from "../../api/academic-year.service";
 import { semesterService } from "../../api/semester.service";
 import { studentService } from "@/features/students/api/student.service";
 import type {
-  AcademicYear,
   CreateGradePayload,
   Grade,
   GradeType,
@@ -23,6 +21,7 @@ import type {
   Subject,
 } from "../../api/types";
 import type { Student } from "@/features/students/api/types";
+import { useAcademicYears } from "../../hooks/useAcademicYears";
 
 interface GradeFormProps {
   open: boolean;
@@ -66,9 +65,22 @@ export default function GradeForm({
   const [classesLoading, setClassesLoading] = useState(false);
   const [classesError, setClassesError] = useState(false);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-  const [yearsError, setYearsError] = useState(false);
+  const {
+    yearOptions,
+    years,
+    activeYearId,
+    isLoading: yearsLoading,
+    hasError: yearsError,
+    reload: loadYears,
+  } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
 
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [semestersLoading, setSemestersLoading] = useState(false);
@@ -121,21 +133,6 @@ export default function GradeForm({
       });
   }, []);
 
-  const loadYears = useCallback(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => {
-        setYears(res.data);
-        setYearsError(false);
-      })
-      .catch(() => {
-        setYearsError(true);
-      })
-      .finally(() => {
-        setYearsLoading(false);
-      });
-  }, []);
-
   const loadSemesters = useCallback((yearId?: number) => {
     setSemestersLoading(true);
     setSemestersError(false);
@@ -169,9 +166,6 @@ export default function GradeForm({
       setSubjectsError(false);
       setClassesLoading(true);
       setClassesError(false);
-      setYearsLoading(true);
-      setYearsError(false);
-
       if (initialData) {
         setStudentId(String(initialData.student_id));
         setSubjectId(String(initialData.subject_id));
@@ -200,6 +194,13 @@ export default function GradeForm({
       loadYears();
     }
   }, [open, loadStudents, loadSubjects, loadClasses, loadYears]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   useEffect(() => {
     if (open) {
@@ -280,7 +281,6 @@ export default function GradeForm({
   const studentOptions = students.map((s) => ({ value: String(s.id), label: s.name }));
   const subjectOptions = subjects.map((s) => ({ value: String(s.id), label: s.name }));
   const classOptions = classes.map((c) => ({ value: String(c.id), label: c.name }));
-  const yearOptions = years.map((y) => ({ value: String(y.id), label: y.name }));
   const semesterOptions = semesters.map((s) => ({ value: String(s.id), label: `Semester ${s.name}` }));
 
   return (
@@ -499,11 +499,7 @@ export default function GradeForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={() => {
-                  setYearsLoading(true);
-                  setYearsError(false);
-                  loadYears();
-                }}
+                onClick={() => loadYears()}
                 className="self-start"
               >
                 Muat Ulang

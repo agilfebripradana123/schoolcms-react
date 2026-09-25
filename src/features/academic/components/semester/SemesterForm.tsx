@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import Button from "@/components/ui/Button";
@@ -7,13 +7,9 @@ import AppSelect from "@/components/ui/Select";
 import Modal from "@/components/ui/Modal";
 import { toApiError } from "@/lib/api";
 import type { ApiError } from "@/types";
-import { academicYearService } from "../../api/academic-year.service";
 import { semesterService } from "../../api/semester.service";
-import type {
-  AcademicYear,
-  CreateSemesterPayload,
-  Semester,
-} from "../../api/types";
+import type { CreateSemesterPayload, Semester } from "../../api/types";
+import { useAcademicYears } from "../../hooks/useAcademicYears";
 
 interface SemesterFormProps {
   open: boolean;
@@ -39,28 +35,25 @@ export default function SemesterForm({
   const [name, setName] = useState<string>("1");
   const [isActive, setIsActive] = useState(false);
 
-  const [years, setYears] = useState<AcademicYear[]>([]);
-  const [yearsLoading, setYearsLoading] = useState(false);
-  const [yearsError, setYearsError] = useState(false);
+  const {
+    yearOptions,
+    activeYearId,
+    isLoading: yearsLoading,
+    hasError: yearsError,
+    reload: loadYears,
+  } = useAcademicYears();
+
+  const activeYearDefaultApplied = useRef(Boolean(initialData));
+
+  useEffect(() => {
+    if (open && !initialData) {
+      activeYearDefaultApplied.current = false;
+    }
+  }, [open, initialData]);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
-
-  const loadYears = useCallback(() => {
-    academicYearService
-      .list({ per_page: 100 })
-      .then((res) => {
-        setYears(res.data);
-        setYearsError(false);
-      })
-      .catch(() => {
-        setYearsError(true);
-      })
-      .finally(() => {
-        setYearsLoading(false);
-      });
-  }, []);
 
   const [previousOpen, setPreviousOpen] = useState(open);
   const [previousInitialData, setPreviousInitialData] = useState(initialData);
@@ -72,9 +65,6 @@ export default function SemesterForm({
     if (open) {
       setError(null);
       setFieldErrors({});
-      setYearsLoading(true);
-      setYearsError(false);
-
       if (initialData) {
         setAcademicYearId(String(initialData.academic_year_id));
         setName(initialData.name);
@@ -92,6 +82,13 @@ export default function SemesterForm({
       loadYears();
     }
   }, [open, loadYears]);
+
+  useEffect(() => {
+    if (!open || isEdit || activeYearDefaultApplied.current) return;
+    if (activeYearId == null || academicYearId !== "") return;
+    activeYearDefaultApplied.current = true;
+    setAcademicYearId(String(activeYearId));
+  }, [open, isEdit, activeYearId, academicYearId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,11 +131,6 @@ export default function SemesterForm({
     }
   };
 
-  const yearOptions = years.map((y) => ({
-    value: String(y.id),
-    label: y.name,
-  }));
-
   return (
     <Modal
       open={open}
@@ -179,17 +171,13 @@ export default function SemesterForm({
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={() => {
-                  setYearsLoading(true);
-                  setYearsError(false);
-                  loadYears();
-                }}
+                onClick={() => loadYears()}
                 className="self-start"
               >
                 Muat Ulang
               </Button>
             </div>
-          ) : years.length === 0 ? (
+          ) : yearOptions.length === 0 ? (
             <p className="rounded-2xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
               Tidak ada tahun ajaran tersedia. Belum ada tahun ajaran, tambahkan
               melalui menu Tahun Ajaran.

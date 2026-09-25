@@ -15,6 +15,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import Pagination from "../../../components/ui/Pagination";
 import { usePermission } from "@/features/auth/usePermission";
 import { myAssignmentService } from "@/features/academic";
+import { useAcademicYears } from "@/features/academic/hooks/useAcademicYears";
 import type { Assignment } from "@/features/academic/api/types";
 import { toApiError } from "@/lib/api";
 import type { SelectOption } from "@/components/ui/Select";
@@ -56,6 +57,9 @@ export default function TeacherAssignmentsPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [toDelete, setToDelete] = useState<Assignment | null>(null);
+
+  const { activeYearId } = useAcademicYears();
+  const yearDefaultApplied = useRef(false);
 
   // Scope options untuk filter & form (dari assignment milik guru).
   const [scopeAssignments, setScopeAssignments] = useState<Assignment[]>([]);
@@ -135,9 +139,20 @@ export default function TeacherAssignmentsPage() {
     return Array.from(seen, ([value, label]) => ({ value, label }));
   }, [scopeAssignments]);
 
+  useEffect(() => {
+    if (!formOpen || editing) return;
+    if (yearDefaultApplied.current) return;
+    if (activeYearId == null) return;
+    if (form.academic_year_id != null) return;
+    if (!yearOptions.some((o) => o.value === activeYearId)) return;
+    yearDefaultApplied.current = true;
+    setForm((f) => ({ ...f, academic_year_id: activeYearId }));
+  }, [formOpen, editing, activeYearId, form.academic_year_id, yearOptions]);
+
   const openCreate = () => {
     setEditing(null);
     setForm(EMPTY_FORM);
+    yearDefaultApplied.current = false;
     setFormOpen(true);
   };
 
