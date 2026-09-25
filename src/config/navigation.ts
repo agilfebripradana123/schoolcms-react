@@ -147,7 +147,7 @@ export const navigation: NavigationGroup[] = [
     label: "Soal & Ujian",
     items: [
       { label: "Bank Soal", path: "/admin/examinations/questions", icon: BrainCircuit },
-      { label: "Ujian", path: "/admin/examinations/exams", icon: ClipboardList },
+      { label: "Ujian", path: "/admin/examinations/exams", icon: ClipboardList, activePaths: ["/admin/examinations/exams"] },
       { label: "Jadwal Ujian", path: "/admin/examinations/schedules", icon: CalendarClock },
       { label: "Sesi Ujian", path: "/admin/examinations/sessions", icon: Activity },
       { label: "Peserta Ujian", path: "/admin/examinations/participants", icon: Users },
@@ -172,7 +172,7 @@ export const navigation: NavigationGroup[] = [
       { label: "Hak Akses", path: "/admin/system/permissions", icon: KeyRound },
       { label: "Pengguna", path: "/admin/system/users", icon: Users },
       { label: "Log Aktivitas", path: "/admin/system/audit-logs", icon: ScrollText, permission: "view-audit-logs" },
-      { label: "Pengaturan", path: "/admin/system/settings", icon: Cog, permission: "manage-settings" },
+      { label: "Pengaturan", path: "/admin/system/settings", icon: Cog, permission: "manage-settings", activePaths: ["/admin/system/settings"] },
     ],
   },
 ];

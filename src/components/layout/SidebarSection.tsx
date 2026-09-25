@@ -1,4 +1,5 @@
 import SidebarItem from "./SidebarItem";
+import { isItemActive } from "@/lib/nav-active";
 import type { NavigationGroup } from "@/types";
 
 interface SidebarSectionProps {
@@ -26,7 +27,7 @@ export default function SidebarSection({
             key={item.path}
             item={item}
             collapsed={collapsed}
-            active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
+            active={isItemActive(item, currentPath)}
           />
         ))}
       </div>
@@ -61,7 +62,7 @@ export default function SidebarSection({
               key={item.path}
               item={item}
               collapsed={collapsed}
-              active={currentPath === item.path || currentPath.startsWith(item.path + "/")}
+              active={isItemActive(item, currentPath)}
             />
           ))}
         </div>

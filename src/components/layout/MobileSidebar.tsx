@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { navigation, dashboardItem } from "@/config/navigation";
+import { isNamespaceMatch } from "@/lib/nav-active";
 import SidebarSection from "./SidebarSection";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 import { useAuth } from "@/features/auth/useAuth";
@@ -18,7 +19,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const location = useLocation();
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = navigation.find((group) =>
-      group.items.some((item) => location.pathname === item.path || location.pathname.startsWith(item.path + "/")),
+      group.items.some((item) => isNamespaceMatch(item.path, location.pathname)),
     );
     return new Set(activeGroup ? [activeGroup.label] : []);
   });
@@ -42,10 +43,9 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     });
   }, []);
 
-  const isActive = (path: string) =>
-    location.pathname === path || location.pathname.startsWith(path + "/");
+  const isActive = (path: string) => isNamespaceMatch(path, location.pathname);
   const isGroupActive = (group: (typeof navigation)[number]) =>
-    group.items.some((item) => location.pathname === item.path || location.pathname.startsWith(item.path + "/"));
+    group.items.some((item) => isNamespaceMatch(item.path, location.pathname));
 
   const filteredNavigation = navigation.map((group) => ({
     ...group,

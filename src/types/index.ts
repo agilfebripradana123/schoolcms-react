@@ -92,6 +92,7 @@ export interface NavigationItem {
   children?: NavigationItem[];
   permission?: string;
   roles?: string[];
+  activePaths?: string[];
 }
 
 export interface NavigationGroup {

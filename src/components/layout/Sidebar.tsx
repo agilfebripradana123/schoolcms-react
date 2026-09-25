@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { navigation, dashboardItem } from "@/config/navigation";
+import { isNamespaceMatch } from "@/lib/nav-active";
 import SidebarSection from "./SidebarSection";
 import { usePublicSettings } from "@/features/system/hooks/usePublicSettings";
 import { useAuth } from "@/features/auth/useAuth";
@@ -35,7 +36,7 @@ export default function Sidebar({
 
   const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
     const activeGroup = filteredNavigation.find((group) =>
-      group.items.some((item) => pathname === item.path || pathname.startsWith(item.path + "/")),
+      group.items.some((item) => isNamespaceMatch(item.path, pathname)),
     );
     return new Set(activeGroup ? [activeGroup.label] : []);
   });
@@ -49,13 +50,9 @@ export default function Sidebar({
     });
   }, []);
 
-  const isActive = useCallback(
-    (path: string) => pathname === path || pathname.startsWith(path + "/"),
-    [pathname],
-  );
   const isGroupActive = useCallback(
     (group: (typeof navigation)[number]) =>
-      group.items.some((item) => pathname === item.path || pathname.startsWith(item.path + "/")),
+      group.items.some((item) => isNamespaceMatch(item.path, pathname)),
     [pathname],
   );
 
@@ -91,16 +88,16 @@ export default function Sidebar({
             <a
               href={dashboardItem.path}
               className={`flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${
-                isActive(dashboardItem.path)
+                isNamespaceMatch(dashboardItem.path, pathname)
                   ? "text-white ring-1"
                   : "hover:bg-white/5"
               } ${collapsed ? "justify-center" : ""}`}
-              style={isActive(dashboardItem.path) ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)", borderColor: "color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" } : { color: "var(--sidebar-text-muted)" }}
+              style={isNamespaceMatch(dashboardItem.path, pathname) ? { backgroundColor: "color-mix(in srgb, var(--sidebar-accent) 20%, transparent)", borderColor: "color-mix(in srgb, var(--sidebar-accent) 30%, transparent)" } : { color: "var(--sidebar-text-muted)" }}
               title={collapsed ? dashboardItem.label : undefined}
             >
               <dashboardItem.icon
                 className="h-5 w-5 shrink-0"
-                style={{ color: isActive(dashboardItem.path) ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }}
+                style={{ color: isNamespaceMatch(dashboardItem.path, pathname) ? "var(--sidebar-accent)" : "var(--sidebar-text-muted)" }}
               />
               {!collapsed && <span>{dashboardItem.label}</span>}
             </a>
@@ -126,7 +123,6 @@ export default function Sidebar({
       collapsed,
       expandedSections,
       pathname,
-      isActive,
       isGroupActive,
       toggleSection,
     ],
