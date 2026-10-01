@@ -49,7 +49,7 @@ export default function TeacherHeader({ onToggleSidebar }: TeacherHeaderProps) {
     toast.success("Berhasil keluar", {
       description: "Sesi Anda telah diakhiri.",
     });
-    navigate("/login", { replace: true });
+    navigate("/login/guru", { replace: true });
   }, [logout, navigate]);
 
   useEffect(() => {

@@ -30,7 +30,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
     toast.success("Berhasil keluar", {
       description: "Sesi Anda telah diakhiri.",
     });
-    navigate("/login", { replace: true });
+    navigate("/login/admin", { replace: true });
   }, [logout, navigate]);
 
   useEffect(() => {
