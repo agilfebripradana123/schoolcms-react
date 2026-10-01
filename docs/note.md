@@ -1,17 +1,65 @@
-# Akun
+# Akun Login
 
-| Role | Login | Password | URL |
-|------|-------|----------|-----|
-| Administrator | `testuser` / `test@example.com` | `password` | `/login/admin` |
-| Guru | `guru@schoolcms.test` | `password` | `/login/guru` |
-| Siswa | `20240001` (NIS) | `password` | `/login` |
-| Guru (QA fixture) | `qa.teacher.crossportal@schoolcms.test` | `qa.cross.portal.2026` | `/login/guru` |
-| Siswa (QA fixture) | `QA-CROSS-PORTAL-ST` | `qa.cross.portal.2026` | `/login` |
+## Yang Langsung Bisa Dipakai
 
-Hanya akun Administrator pertama yang di-seed (`php artisan migrate --seed`). Sisip `test@example.com` = `DatabaseSeeder.php`.
+| Role | Login | Password | Halaman |
+|------|-------|----------|---------|
+| Administrator | `testuser` | `password` | `/login/admin` |
 
-Role `Super Admin` tidak di-seed. `Administrator` sudah berperan superuser (bypass `permission` middleware), jadi pakai akun Administrator untuk akses penuh.
+Cuma ini yang di-seed (`DatabaseSeeder`). Login mode **Admin**.
 
-Baris QA fixture butuh `php artisan db:seed --class=AcademicCrossPortalFixtureSeeder`.
+## Buat Akun Lain (wajib jalanin dulu)
 
-Cara buat akun Guru / Siswa baru: login Administrator, buka `/admin/system/users`, tambah user dengan role `Guru` (login pakai email) atau `Siswa` (login pakai NIS).
+```powershell
+cd E:\gilfp\simitra\schoolcms-laravel
+php artisan serve --port=8001
+```
+
+Lalu di tab baru:
+
+```powershell
+php artisan tinker
+```
+
+### Guru
+```php
+$r = \App\Models\System\Role::where('name','Guru')->first();
+\App\Models\System\User::create(['role_id'=>$r->id,'username'=>'guru01','name'=>'Guru Demo','email'=>'guru@schoolcms.test','password'=>bcrypt('password'),'is_active'=>true]);
+```
+Login `/login/guru` → `guru@schoolcms.test` / `password`
+
+### Siswa
+```php
+$r = \App\Models\System\Role::where('name','Siswa')->first();
+\App\Models\System\User::create(['role_id'=>$r->id,'username'=>'20240001','name'=>'Siswa Demo','email'=>'siswa@schoolcms.test','password'=>bcrypt('password'),'is_active'=>true]);
+```
+Login `/login` → NIS `20240001` / `password`
+
+### Super Admin
+Bukan role terpisah. `Administrator` = superuser (bypass permission middleware). Pakai akun `testuser` di atas untuk akses penuh.
+
+## Cara Menjalankan
+
+### Backend
+```powershell
+cd E:\gilfp\simitra\schoolcms-laravel
+php artisan serve --port=8001
+```
+
+### Frontend
+```powershell
+cd E:\gilfp\simitra\schoolcms-react
+npm run dev
+```
+Akses `http://localhost:5174`.
+
+## Cek Gambar Settings
+
+Kalau gambar tidak muncul di `/admin/system/settings/general`:
+```powershell
+cd E:\gilfp\simitra\schoolcms-laravel
+Remove-Item public\storage -Recurse -Force
+php artisan storage:link
+php artisan config:clear
+```
+Verifikasi URL gambar di DB harus `http://127.0.0.1:8001/storage/settings/...`.
