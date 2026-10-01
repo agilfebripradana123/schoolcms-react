@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import { loginPathForRole } from "@/features/auth/redirect";
 
 export const TOKEN_KEY = "schoolcms_token";
 export const USER_KEY = "schoolcms_user";
@@ -37,10 +38,21 @@ apiClient.interceptors.response.use(
     const isLoginRequest = error.config?.url === "/login";
 
     if (error.response?.status === 401 && !isLoginRequest) {
+      // Prefer the persisted snapshot of the authenticated user (set at login)
+      // because React state is already gone by the time an async 401 fires.
+      let role: string | null = null;
+      try {
+        const raw = localStorage.getItem(USER_KEY);
+        if (raw) role = (JSON.parse(raw) as { role?: string })?.role ?? null;
+      } catch {
+        // corrupted payload — fall through to the last-role key
+      }
+      if (!role) role = localStorage.getItem("schoolcms_last_role");
+      const loginPath = loginPathForRole(role);
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
+      if (window.location.pathname !== loginPath) {
+        window.location.href = loginPath;
       }
     }
 

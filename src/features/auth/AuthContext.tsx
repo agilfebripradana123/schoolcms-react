@@ -3,6 +3,7 @@ import type { User, LoginPayload, LoginResponse } from "@/types";
 import { TOKEN_KEY, USER_KEY } from "@/lib/api/axios";
 import { login as loginRequest, me } from "./api/auth.service";
 import { AuthContext } from "./context";
+import { loginPathForRole } from "./redirect";
 
 function parseStoredUser(): User | null {
   const storedUser = localStorage.getItem(USER_KEY);
@@ -43,10 +44,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    // Read role BEFORE clearing state so callers (or the router) can still
+    // inspect it synchronously if they grab `user` from context first.
+    const role = user?.role ?? null;
     setUser(null);
     setToken(null);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    // Persist last role so the axios interceptor and any post-logout redirect
+    // logic can resolve the correct login page even after state is cleared.
+    if (role) {
+      localStorage.setItem("schoolcms_last_role", role);
+    }
   };
 
   // Re-fetch the authenticated user (GET /api/me) so effective permissions

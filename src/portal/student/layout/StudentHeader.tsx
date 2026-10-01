@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { LogOut, User } from "lucide-react";
 import { useAuth } from "@/features/auth/useAuth";
+import { getLoginRedirectPath } from "@/features/auth/context";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { toast } from "sonner";
@@ -45,12 +46,13 @@ export default function StudentHeader({ onToggleSidebar }: StudentHeaderProps) {
   }, []);
 
   const handleLogout = useCallback(() => {
+    const target = getLoginRedirectPath(user);
     logout();
     toast.success("Berhasil keluar", {
       description: "Sesi Anda telah diakhiri.",
     });
-    navigate("/login", { replace: true });
-  }, [logout, navigate]);
+    navigate(target, { replace: true });
+  }, [logout, navigate, user]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
